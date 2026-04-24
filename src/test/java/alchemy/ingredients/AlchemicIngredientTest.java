@@ -1,4 +1,4 @@
-package alchemy;
+package alchemy.ingredients;
 
 public class AlchemicIngredientTest {
 }
