@@ -6,7 +6,7 @@ public class AlchemicIngredient {
 
     public static boolean isValidName(String name) {
 
-
+        //ToDO: die 2 dingen die checken naar word.char in 1 fct schrijven die regex gebruikt
 
         if (!name.matches("[a-zA-Z'() ]+"))
             return false;
