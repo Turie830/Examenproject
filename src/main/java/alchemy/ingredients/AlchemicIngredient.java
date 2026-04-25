@@ -3,6 +3,8 @@ package alchemy.ingredients;
 public class AlchemicIngredient {
     private String name;
 
+    private static final String ALLOWED_SPECIAL_CHARACTERS = "'()";
+
     public static boolean isValidName(String name) {
         if (name == null) {
             return false;
@@ -44,9 +46,7 @@ public class AlchemicIngredient {
     }
 
     private static boolean isAllowedSpecialCharacter(char c) {
-        return c == '\''
-                || c == '('
-                || c == ')';
+        return ALLOWED_SPECIAL_CHARACTERS.indexOf(c) != -1;
     }
 
     private static int countLetters(String word) {
