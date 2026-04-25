@@ -46,6 +46,7 @@ public class AlchemicIngredient {
     }
 
     private static boolean isAllowedSpecialCharacter(char c) {
+        // als Java het karakter niet vindt, geeft indexOf(c) altijd -1 terug.
         return ALLOWED_SPECIAL_CHARACTERS.indexOf(c) != -1;
     }
 
