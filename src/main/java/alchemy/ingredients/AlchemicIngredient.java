@@ -1,56 +1,110 @@
 package alchemy.ingredients;
 
 public class AlchemicIngredient {
-    public String name;
-
+    private String name;
 
     public static boolean isValidName(String name) {
-
-        //ToDO: die 2 dingen die checken naar word.char in 1 fct schrijven die regex gebruikt
-
-        if (!name.matches("[a-zA-Z'() ]+"))
+        if (name == null) {
             return false;
+        }
+
+        if (!hasOnlyAllowedCharacters(name)) {
+            return false;
+        }
 
         String[] words = name.split(" ");
 
         if (words.length == 1) {
-            return words[0].length() >= 3;
-        }
-        for (String word : words) {
-            if (word.length() <= 2) {
-                return false;
-            }
+            return countLetters(words[0]) >= 3 && hasCorrectCapitalization(words[0]);
         }
 
         for (String word : words) {
-            if (word.equals("mixed") || word.equals("with")) {
-                continue;
-            }
-            // if 'mixed' or 'with' is written with capital letters, return false
-            if (word.equals("Mixed") || word.equals("With")) {
+            if (countLetters(word) < 2) {
                 return false;
             }
-            if (!Character.isUpperCase(word.charAt(0))
-                    && word.charAt(0) != '\''
-                    && word.charAt(0) != '('
-                    && word.charAt(0) != ')') {
+            if (!hasCorrectCapitalization(word)) {
                 return false;
             }
-            for (int i = 1; i < word.length(); i++) {
-                char letter = word.charAt(i);
-                if (!Character.isLowerCase(letter)
-                        && letter != '('
-                        && letter != ')'
-                        && letter != '\'') {
+        }
+        return true;
+    }
+
+    private static boolean hasOnlyAllowedCharacters(String name) {
+        for (int i = 0; i < name.length(); i++) {
+
+            char c = name.charAt(i);
+
+            if (!Character.isLetter(c)
+                    && c != ' '
+                    && !isAllowedSpecialCharacter(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isAllowedSpecialCharacter(char c) {
+        return c == '\''
+                || c == '('
+                || c == ')';
+    }
+
+    private static int countLetters(String word) {
+        int count = 0;
+        // count gaat 1 omhoog als de char een letter is.
+        // Toegelaten speciale tekens tellen niet als letter.
+        for (int i = 0; i < word.length(); i++) {
+            if (Character.isLetter(word.charAt(i))) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static boolean hasCorrectCapitalization(String word) {
+        // uitzonderingen
+        if (word.equals("mixed") || word.equals("with")) {
+            return true;
+        }
+        // de uitzonderingen mogen niet met hoofdletters geschreven worden
+        if (word.equals("Mixed") || word.equals("With")) {
+            return false;
+        }
+        boolean foundFirstLetter = false;
+
+        for (int i = 0; i < word.length(); i++) {
+
+            char c = word.charAt(i);
+
+            if (isAllowedSpecialCharacter(c)) {
+                continue;   // gaat naar de volgende i in de loop
+            }
+
+            if (!Character.isLetter(c)) {
+                return false;
+            }
+            // Als we nog geen eerste letter gevonden hadden, dan moet deze letter een hoofdletter zijn.
+            // Daarna zetten we foundFirstLetter op true.
+            if (!foundFirstLetter) {
+                if (!Character.isUpperCase(c)) {
+                    return false;
+                }
+                foundFirstLetter = true;
+            }
+            else {
+                if (!Character.isLowerCase(c)) {
                     return false;
                 }
             }
         }
-
-
-
-        return true;
+        return foundFirstLetter;
     }
+
+
+
+
+
+
 
 
 
