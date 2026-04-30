@@ -1,4 +1,129 @@
 package alchemy;
 
-public class Unit {
+import alchemy.ingredients.State;
+import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
+
+/**
+ * An enum for storing the Unit and in this unit we have the assosciated state and factor to the base Unit of that state
+ *
+ *
+ * @invar The state of each quantity unit must be effective.
+ *      | getState() != null
+ *
+ * @invar The factor to the base unit of each quantity unit must be strictly positive.
+ *      | getFactorToBaseUnit() > 0
+ *
+ * @author Obe Willaert
+ * @author Mauro Devolder
+ * @author Arthur Pintelon
+ *
+ * @version 1.0
+ */
+public enum Unit {
+    DROP(State.LIQUID, 1),
+    SPOON_LIQUID(State.LIQUID, 8),
+    VIAL(State.LIQUID, 5 * 8),
+    BOTTLE(State.LIQUID, 3 * 5 * 8),
+    JUG(State.LIQUID, 7 * 3 * 5 * 8),
+    BARREL(State.LIQUID, 12 * 7 * 3 * 5 * 8),
+    STOREROOM_LIQUID(State.LIQUID, 5 * 12 * 7 * 3 * 5 * 8),
+
+    PINCH(State.POWDER, 1),
+    SPOON_POWDER(State.POWDER, 6),
+    SACHET(State.POWDER, 7 * 6),
+    BOX(State.POWDER, 6 * 7 * 6),
+    SACK(State.POWDER, 3 * 6 * 7 * 6),
+    CHEST(State.POWDER, 10 * 3 * 6 * 7 * 6),
+    STOREROOM_POWDER(State.POWDER, 5 * 10 * 3 * 6 * 7 * 6);
+
+    /**
+     * The state of the unit
+     */
+    private final State state;
+
+    /**
+     * the factor to convert it to the baseUnit of the state
+     */
+    private final int factorToBaseUnit;
+
+    /**
+     * Initialise the unit
+     *
+     * @param state the state for this unit type
+     * @param factorToBaseUnit the factor to the base unit for the according state
+     *
+     * @post The state of this Unit is set to the given state
+     *      | new.getState() == state
+     * @post The factorToBaseUnit is set to the given factor
+     *      | new.getFactorToBaseUnit == factorToBaseUnit
+     *
+     * @throws IllegalArgumentException
+     *       | factorToBaseUnit > 0
+     */
+    Unit(State state, int factorToBaseUnit) throws IllegalArgumentException {
+        if (factorToBaseUnit <= 0 ) {
+            throw new IllegalArgumentException("factorToBaseUnit must be positive");
+        }
+
+        this.state = state;
+        this.factorToBaseUnit = factorToBaseUnit;
+    }
+
+
+    /**
+     * @return the state this unit is used for
+     */
+    @Basic
+    @Immutable
+    public State getState() {
+        return state;
+    }
+
+    /**
+     *
+     * @return the factor to the base unit
+     *      For liquid units, the base unit is the drop
+     *      For powder units, the base unit is the pinch
+     */
+    @Basic
+    @Immutable
+    public int getFactorToBaseUnit() {
+        return factorToBaseUnit;
+    }
+
+    /**
+     * Checks if the given state matches the unit type this is used on
+     * @param state
+     *        The state to check for
+     * @return True if the state of this quantity unit is equal to the given state
+     *      | result == (getState() == state)
+     */
+    public boolean isValidFor(State state) {
+        return this.state == state;
+    }
+
+    /**
+     * Convert the given amount expressed in this quantity unit to the corresponding
+     * amount expressed in the base unit
+     *
+     * For liquid units, the result is expressed in drops.
+     * For powder units, the result is expressed in pinches.
+     *
+     * @param amount
+     *        The amount expressed in this quantity unit.
+     *
+     * @return The given amount multiplied by the factor to the base unit of this quantity unit.
+     *       | result == amount * getFactorToBaseUnit()
+     *
+     * @throws IllegalArgumentException
+     *         The given amount is negative.
+     *       | amount < 0
+     */
+    public int convertToBaseUnit(int amount) throws IllegalArgumentException {
+        if (amount < 0)
+            throw new IllegalArgumentException("Amount cannot be negative.");
+
+        return amount * getFactorToBaseUnit();
+    }
 }
