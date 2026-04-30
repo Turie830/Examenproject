@@ -56,12 +56,16 @@ public enum Unit {
      * @post The state of this Unit is set to the given state
      *      | new.getState() == state
      * @post The factorToBaseUnit is set to the given factor
-     *      | new.getFactorToBaseUnit == factorToBaseUnit
+     *      | new.getFactorToBaseUnit() == factorToBaseUnit
      *
      * @throws IllegalArgumentException
-     *       | factorToBaseUnit > 0
+     *       | factorToBaseUnit <= 0
      */
     Unit(State state, int factorToBaseUnit) throws IllegalArgumentException {
+        if (state == null) {
+            throw new IllegalArgumentException("State cannot be null.");
+        }
+
         if (factorToBaseUnit <= 0 ) {
             throw new IllegalArgumentException("factorToBaseUnit must be positive");
         }
