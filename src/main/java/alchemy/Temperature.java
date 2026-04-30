@@ -83,7 +83,7 @@ public class Temperature {
     public Temperature(long coldness, long hotness) {
         if (isValidTemperature(coldness, hotness)) {
             this.coldness = coldness;
-            this.hotness = hotness
+            this.hotness = hotness;
         }
         else {
             this.coldness = DEFAULT_COLDNESS;
