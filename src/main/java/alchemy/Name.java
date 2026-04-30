@@ -18,6 +18,8 @@ import be.kuleuven.cs.som.annotate.Model;
  * @author Arthur
  * @author Mauro
  * @author Obe
+ *
+ * @version 1.0
  */
 public class Name {
     /**
