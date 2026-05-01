@@ -15,10 +15,10 @@ import be.kuleuven.cs.som.annotate.Model;
  * a valid default temperature.
  *
  * @invar The coldness of each temperature must be valid.
- *      | isValidTemperatureValue(getColdness())
+ *      | getColdness() >= 0 && getColdness() <= getUpperBound()
  *
  * @invar The hotness of each temperature must be valid.
- *      | isValidTemperatureValue(getHotness())
+ *      | getHotness() >= 0 && getHotness() <= getUpperBound()
  *
  * @invar A temperature cannot have both positive coldness and positive hotness.
  *      | !(getColdness() > 0 && getHotness() > 0)
