@@ -35,7 +35,7 @@ public class IngredientType {
     /**
      * A variable referencing the default ingredient type, water.
      */
-    public static final IngredientType DEFAULT = new IngredientType("Water", State.LIQUID, new Temperature(0, 20), false);
+    //public static final IngredientType DEFAULT = new IngredientType("Water", State.LIQUID, new Temperature(0, 20), false);
 
     //ToDO: constructor voor dit
 

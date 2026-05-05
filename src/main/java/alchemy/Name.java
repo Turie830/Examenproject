@@ -31,13 +31,6 @@ public class Name {
      * CLASS PROPERTIES
      **********************************************************/
 
-    /**
-     * A variable referencing the default name, Water.
-     *
-     * @note We make this variable public because it is a constant and
-     *       clients can use it freely, i.e. they cannot do illegal things with it.
-     */
-    public static final Name WATER = new Name("Water");
 
     /**
      * A string containing all allowed special characters in names.
@@ -55,6 +48,14 @@ public class Name {
             "Cooled"
             // TODO: Add extra prefix/suffix words when they are introduced.
     };
+
+    /**
+     * A variable referencing the default name, Water.
+     *
+     * @note We make this variable public because it is a constant and
+     *       clients can use it freely, i.e. they cannot do illegal things with it.
+     */
+    public static final Name WATER = new Name("Water");
 
 
     /**********************************************************
