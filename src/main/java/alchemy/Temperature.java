@@ -413,4 +413,17 @@ public class Temperature {
     private long getNetTemperature() {
         return getHotness() - getColdness();
     }
+
+
+
+
+
+
+
+
+
+
+
+
+    //ToDO: Full name met Heated / Cooled (eerst doen in Name)
 }

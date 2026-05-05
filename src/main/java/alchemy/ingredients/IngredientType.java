@@ -428,4 +428,16 @@ public class IngredientType {
 
         return new Temperature(0, 20);
     }
+
+
+
+
+
+
+    //ToDO: Nog later nodig: integratie met AlchemicIngredient, Quantity, Kettle/mengsels, full name.
+
+
+
+
+
 }
