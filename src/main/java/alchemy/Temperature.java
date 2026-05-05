@@ -71,6 +71,15 @@ public class Temperature {
      **********************************************************/
 
     /**
+     * Initialize this new temperature as the default temperature [0, 20].
+     *
+     * @effect This new temperature is initialized with coldness 0 and hotness 20.
+     *       | this(DEFAULT_COLDNESS, DEFAULT_HOTNESS)
+     */
+    public Temperature() {
+        this(DEFAULT_COLDNESS, DEFAULT_HOTNESS);
+    }
+    /**
      * Initialize this new temperature with the given coldness and hotness.
      *
      * If the given values do not form a valid temperature, this temperature is
@@ -168,8 +177,7 @@ public class Temperature {
      * @return The upper bound for coldness and hotness.
      *       | result == 10000
      */
-    @Basic
-    @Immutable
+    @Basic @Immutable
     public static long getUpperBound() {
         return UPPER_BOUND;
     }
