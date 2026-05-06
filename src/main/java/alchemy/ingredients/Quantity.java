@@ -7,18 +7,14 @@ import be.kuleuven.cs.som.annotate.Immutable;
 /**
  * A class for quantities
  *
- * @invar The amount of each quantity must be greater than or equal to 0
+ * @invar The amount of each quantity must be greater than or equal to 0.
  *      | getAmount() >= 0
  *
- * @invar The amount is effective
+ * @invar The amount is effective.
  *      | getAmount() != null;
  *
- * @invar The unit of each quantity must be compatible with the state
- *        of the ingredient
- *      | canHaveAsUnitForState(getUnit(), getState())
- *
- * @invar The state is effective
- *      | getState() != null
+ * @invar The unit is effective.
+ *      | getUnit() != null
  *
  * @author Obe Willaert
  * @author Mauro Devolder
@@ -65,6 +61,7 @@ public class Quantity {
      * @return the amount
      */
     @Basic
+    @Immutable
     public Long getAmount() {
         return amount;
     }
@@ -73,6 +70,7 @@ public class Quantity {
      * Gets the unit of this quantity
      * @return the unit
      */
+    @Basic
     @Immutable
     public Unit getUnit() {
         return unit;
@@ -81,21 +79,28 @@ public class Quantity {
     /**
      * Converts this quantity to the lowest unit of a given state
      *
+     * @param state
+     *      The state for which this quantity is converted
+     *
      * @return the amount in the lowest unit
      */
-    public Long toLowestUnit() {
-        return getUnit().convertToBaseUnit(getAmount());
+    @Immutable
+    public Long toLowestUnit(State state) {
+        return getUnit().convertToBaseUnit(getAmount(), state);
     }
 
     /**
      * Converts the amount to all be in spoons
      *
+     * @param state
+     *      The state for which this quantity is converted
+     *
      * @return The largest whole number of spoons contained in this quantity.
-     *      | result == Math.floor(toLowestUnit() / getUnit().getSpoonUnit().getFactorToBaseUnit())
+     *      | result == Math.floor(toLowestUnit(state) / Unit.getSpoonUnit(state).getFactorToBaseUnit(state))
      */
-    public Long toSpoons() {
-        // this is floored since its Long / Long
-        return toLowestUnit() / getUnit().getSpoonUnit().getFactorToBaseUnit();
+    @Immutable
+    public Long toSpoons(State state) {
+        return toLowestUnit(state) / Unit.getSpoonUnit(state).getFactorToBaseUnit(state);
     }
 
     /**
@@ -106,14 +111,15 @@ public class Quantity {
      *
      * @return True if the given unit has the same state as this quantity unit and
      *         this quantity is smaller than or equal to one of the given unit.
-     *      | result == (unit.getState() == getUnit().getState()
-     *      |        && toLowestUnit() <= unit.getFactorToBaseUnit())
+     *      | result == (getUnit().isValidFor(state) && unit.isValidFor(state)
+     *      |        && toLowestUnit(state) <= unit.getFactorToBaseUnit(state))
      */
-    public boolean fitsIn(Unit unit) {
-        if (unit == null || unit.getState() != getUnit().getState()) {
+    @Immutable
+    public boolean fitsIn(Unit unit, State state) {
+        if (unit == null || state == null || !getUnit().isValidFor(state) || !unit.isValidFor(state)) {
             return false;
         }
 
-        return toLowestUnit() <= unit.getFactorToBaseUnit();
+        return toLowestUnit(state) <= unit.getFactorToBaseUnit(state);
     }
 }
