@@ -252,7 +252,7 @@ public class Name {
      */
     @Raw
     @Model
-    protected void setSpecialName(String specialName) throws IllegalStateException, IllegalNameException {
+    public void setSpecialName(String specialName) throws IllegalStateException, IllegalNameException {
         if (!isMixed() && specialName != null) {
             throw new IllegalStateException("No special name allowed!");
         }
@@ -317,6 +317,7 @@ public class Name {
      */
     public static boolean isValidMixtureName(String name) {
         return isValidName(name, true);
+        //ToDO: dit klopt niet
     }
 
     /**
