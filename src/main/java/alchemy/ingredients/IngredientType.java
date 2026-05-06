@@ -167,6 +167,8 @@ public class IngredientType {
      * MIXED
      **********************************************************/
 
+    //ToDO: beter subclass
+
     /**
      * Variable registering whether this ingredient type is mixed.
      */
