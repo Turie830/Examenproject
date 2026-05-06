@@ -32,12 +32,12 @@ public class Quantity {
     /**
      * A variable for storing the amount
      */
-    private Long amount;
+    private final Long amount;
 
     /**
      * A variable for storing the unit
      */
-    private Unit  unit;
+    private final Unit  unit;
 
 
     /**
@@ -57,42 +57,7 @@ public class Quantity {
      *      | new.getUnit() == unit
      */
     public Quantity(Long amount, Unit unit) {
-        setAmount(amount);
-        setUnit(unit);
-    }
-
-    /**
-     * Set the amount to the given amount
-     * @param amount
-     *      the amount to set the amount to
-     *
-     * @pre The amount is not negative
-     *      | amount >= 0
-     * @pre the amount is not null
-     *      | amount != null
-     *
-     * @post the amount is set to the new amount
-     *      | new.getAmount() == amount
-     */
-    @Raw
-    private void setAmount(Long amount) {
-        // Nominale implementatie
         this.amount = amount;
-    }
-
-    /**
-     * Set the unit to the given unit
-     * @param unit
-     *      the unit of this quantity
-     *
-     * @pre unit is not null
-     *      | unit != null
-     * @post the unit is set as the unit of this quantity
-     *      | new.getUnit() == unit
-     */
-    // TODO RAW of niet??
-    private void setUnit(Unit unit) {
-        // Nominale implementatie
         this.unit = unit;
     }
 
@@ -117,13 +82,23 @@ public class Quantity {
     /**
      * Converts this quantity to the lowest unit of a given state
      *
-     * @post unit is set to the lowest unit of a given state
-     *      | getUnit() == getUnit().getBaseUnit()
-     * @post new amount is greater than or equal old amount
-     *      | new.getAmount() >= old.getAmount()
+     * @return the amount in the lowest unit
      */
-    public void toLowestUnit() {
-        setAmount(getUnit().convertToBaseUnit(getAmount()));
-        setUnit(getUnit().getBaseUnit());
+    public Long toLowestUnit() {
+        return getUnit().convertToBaseUnit(getAmount());
+    }
+
+    /**
+     * Converts the amount to all be in spoons
+     */
+    public void toSpoons() {
+
+    }
+
+    /**
+     *
+     */
+    public boolean fitsIn(Unit unit) {
+
     }
 }
