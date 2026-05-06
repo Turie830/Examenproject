@@ -1,5 +1,6 @@
 package alchemy;
 
+import alchemy.ingredients.AlchemicIngredient;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,101 +9,101 @@ public class NameTest {
 
     @Test
     public void isValidName_ValidSingleWordNames() {
-        assertTrue(Name.isValidName("Water"));
-        assertTrue(Name.isValidName("Milk"));
-        assertTrue(Name.isValidName("Salt"));
-        assertTrue(Name.isValidName("Eye"));
+        assertTrue(AlchemicIngredient.isValidName("Water"));
+        assertTrue(AlchemicIngredient.isValidName("Milk"));
+        assertTrue(AlchemicIngredient.isValidName("Salt"));
+        assertTrue(AlchemicIngredient.isValidName("Eye"));
     }
 
     @Test
     public void isValidName_ValidMultipleWordNames() {
-        assertTrue(Name.isValidName("Lizard's Tale"));
-        assertTrue(Name.isValidName("Rat's Eye Fluid"));
-        assertTrue(Name.isValidName("Red Mushroom Gas"));
-        assertTrue(Name.isValidName("(Red) Mushroom"));
+        assertTrue(AlchemicIngredient.isValidName("Lizard's Tale"));
+        assertTrue(AlchemicIngredient.isValidName("Rat's Eye Fluid"));
+        assertTrue(AlchemicIngredient.isValidName("Red Mushroom Gas"));
+        assertTrue(AlchemicIngredient.isValidName("(Red) Mushroom"));
     }
 
     @Test
     public void isValidName_NullOrBlankNames() {
-        assertFalse(Name.isValidName(null));
-        assertFalse(Name.isValidName(""));
-        assertFalse(Name.isValidName(" "));
-        assertFalse(Name.isValidName("   "));
+        assertFalse(AlchemicIngredient.isValidName(null));
+        assertFalse(AlchemicIngredient.isValidName(""));
+        assertFalse(AlchemicIngredient.isValidName(" "));
+        assertFalse(AlchemicIngredient.isValidName("   "));
     }
 
     @Test
     public void isValidName_InvalidSpaces() {
-        assertFalse(Name.isValidName(" Water"));
-        assertFalse(Name.isValidName("Water "));
-        assertFalse(Name.isValidName("Red  Mushroom"));
-        assertFalse(Name.isValidName("Red   Mushroom"));
+        assertFalse(AlchemicIngredient.isValidName(" Water"));
+        assertFalse(AlchemicIngredient.isValidName("Water "));
+        assertFalse(AlchemicIngredient.isValidName("Red  Mushroom"));
+        assertFalse(AlchemicIngredient.isValidName("Red   Mushroom"));
     }
 
     @Test
     public void isValidName_InvalidCharacters() {
-        assertFalse(Name.isValidName("Water2"));
-        assertFalse(Name.isValidName("Red-Mushroom"));
-        assertFalse(Name.isValidName("Red_Mushroom"));
-        assertFalse(Name.isValidName("Red.Mushroom"));
-        assertFalse(Name.isValidName("Red!"));
-        assertFalse(Name.isValidName("Red@Mushroom"));
-        assertFalse(Name.isValidName("Red[Mushroom]"));
+        assertFalse(AlchemicIngredient.isValidName("Water2"));
+        assertFalse(AlchemicIngredient.isValidName("Red-Mushroom"));
+        assertFalse(AlchemicIngredient.isValidName("Red_Mushroom"));
+        assertFalse(AlchemicIngredient.isValidName("Red.Mushroom"));
+        assertFalse(AlchemicIngredient.isValidName("Red!"));
+        assertFalse(AlchemicIngredient.isValidName("Red@Mushroom"));
+        assertFalse(AlchemicIngredient.isValidName("Red[Mushroom]"));
     }
 
     @Test
     public void isValidName_InvalidWordLengthSingleWord() {
-        assertFalse(Name.isValidName("Ox"));     // one word must have at least 3 letters
-        assertFalse(Name.isValidName("A"));      // one word must have at least 3 letters
-        assertFalse(Name.isValidName("(Ox)"));   // only 2 letters
-        assertFalse(Name.isValidName("()"));     // 0 letters
-        assertFalse(Name.isValidName("(e"));     // 1 letter
+        assertFalse(AlchemicIngredient.isValidName("Ox"));     // one word must have at least 3 letters
+        assertFalse(AlchemicIngredient.isValidName("A"));      // one word must have at least 3 letters
+        assertFalse(AlchemicIngredient.isValidName("(Ox)"));   // only 2 letters
+        assertFalse(AlchemicIngredient.isValidName("()"));     // 0 letters
+        assertFalse(AlchemicIngredient.isValidName("(e"));     // 1 letter
     }
 
     @Test
     public void isValidName_InvalidWordLengthMultipleWords() {
-        assertFalse(Name.isValidName("Red A"));
-        assertFalse(Name.isValidName("A Red"));
-        assertFalse(Name.isValidName("Red (A)"));
-        assertTrue(Name.isValidName("Ox Eye"));  // multiple words: each word at least 2 letters
+        assertFalse(AlchemicIngredient.isValidName("Red A"));
+        assertFalse(AlchemicIngredient.isValidName("A Red"));
+        assertFalse(AlchemicIngredient.isValidName("Red (A)"));
+        assertTrue(AlchemicIngredient.isValidName("Ox Eye"));  // multiple words: each word at least 2 letters
     }
 
     @Test
     public void isValidName_InvalidCapitalization() {
-        assertFalse(Name.isValidName("water"));
-        assertFalse(Name.isValidName("red Mushroom"));
-        assertFalse(Name.isValidName("Red mushroom"));
-        assertFalse(Name.isValidName("REd Mushroom"));
-        assertFalse(Name.isValidName("Red MUshroom"));
-        assertFalse(Name.isValidName("(red) Mushroom"));
+        assertFalse(AlchemicIngredient.isValidName("water"));
+        assertFalse(AlchemicIngredient.isValidName("red Mushroom"));
+        assertFalse(AlchemicIngredient.isValidName("Red mushroom"));
+        assertFalse(AlchemicIngredient.isValidName("REd Mushroom"));
+        assertFalse(AlchemicIngredient.isValidName("Red MUshroom"));
+        assertFalse(AlchemicIngredient.isValidName("(red) Mushroom"));
     }
 
     @Test
     public void isValidName_MixedAndWithNotAllowedInRegularNames() {
-        assertFalse(Name.isValidName("mixed"));
-        assertFalse(Name.isValidName("with"));
-        assertFalse(Name.isValidName("Beer mixed with Coke"));
-        assertFalse(Name.isValidName("Beer Mixed With Coke"));
+        assertFalse(AlchemicIngredient.isValidName("mixed"));
+        assertFalse(AlchemicIngredient.isValidName("with"));
+        assertFalse(AlchemicIngredient.isValidName("Beer mixed with Coke"));
+        assertFalse(AlchemicIngredient.isValidName("Beer Mixed With Coke"));
     }
 
     @Test
     public void isValidMixtureName_MixedAndWithAllowed() {
-        assertTrue(Name.isValidMixtureName("Beer mixed with Coke"));
-        assertTrue(Name.isValidMixtureName("Water mixed with Salt"));
+        assertTrue(AlchemicIngredient.isValidMixtureName("Beer mixed with Coke"));
+        assertTrue(AlchemicIngredient.isValidMixtureName("Water mixed with Salt"));
     }
 
     @Test
     public void isValidMixtureName_MixedAndWithMustBeLowercase() {
-        assertFalse(Name.isValidMixtureName("Beer Mixed with Coke"));
-        assertFalse(Name.isValidMixtureName("Beer mixed With Coke"));
-        assertFalse(Name.isValidMixtureName("Beer Mixed With Coke"));
+        assertFalse(AlchemicIngredient.isValidMixtureName("Beer Mixed with Coke"));
+        assertFalse(AlchemicIngredient.isValidMixtureName("Beer mixed With Coke"));
+        assertFalse(AlchemicIngredient.isValidMixtureName("Beer Mixed With Coke"));
     }
 
     @Test
     public void isValidName_ForbiddenSimpleNameWords() {
-        assertFalse(Name.isValidName("Heated"));
-        assertFalse(Name.isValidName("Cooled"));
-        assertFalse(Name.isValidName("Heated Water"));
-        assertFalse(Name.isValidName("Cooled Salt"));
+        assertFalse(AlchemicIngredient.isValidName("Heated"));
+        assertFalse(AlchemicIngredient.isValidName("Cooled"));
+        assertFalse(AlchemicIngredient.isValidName("Heated Water"));
+        assertFalse(AlchemicIngredient.isValidName("Cooled Salt"));
     }
 
     @Test
@@ -144,11 +145,11 @@ public class NameTest {
 
     @Test
     public void isValidMixtureName_MustContainMixedWithStructure() {
-        assertFalse(Name.isValidMixtureName("Water"));
-        assertFalse(Name.isValidMixtureName("Beer with Coke"));
-        assertFalse(Name.isValidMixtureName("Beer mixed Coke"));
-        assertFalse(Name.isValidMixtureName("Beer mixed"));
-        assertFalse(Name.isValidMixtureName("mixed with Coke"));
+        assertFalse(AlchemicIngredient.isValidMixtureName("Water"));
+        assertFalse(AlchemicIngredient.isValidMixtureName("Beer with Coke"));
+        assertFalse(AlchemicIngredient.isValidMixtureName("Beer mixed Coke"));
+        assertFalse(AlchemicIngredient.isValidMixtureName("Beer mixed"));
+        assertFalse(AlchemicIngredient.isValidMixtureName("mixed with Coke"));
     }
 
 

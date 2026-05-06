@@ -1,5 +1,6 @@
 package alchemy.ingredients;
 
+import alchemy.Name;
 import alchemy.Unit;
 import alchemy.Temperature;
 import be.kuleuven.cs.som.annotate.Basic;
@@ -179,6 +180,137 @@ public class AlchemicIngredient {
      */
     public long getAmountInSpoons() {
         return getQuantity().toSpoons(getType().getStandardState());
+    }
+
+
+    /**
+     * Check whether this name can have the given special name.
+     *
+     * @param specialName
+     *        The special name to check.
+     *
+     * @return True if and only if the given special name is not effective,
+     *         or this name is mixed and the given special name is a valid regular name.
+     *       | result ==
+     *       |   specialName == null
+     *       |   || (isMixed() && isValidName(specialName))
+     */
+    public static boolean canHaveAsSpecialName(Name name, String specialName) {
+        return specialName == null
+                || (name.isMixed() && AlchemicIngredient.isValidName(specialName));
+    }
+
+    /**
+     * Check whether the given string is a valid name for a non-mixed ingredient
+     * or for a special name of a mixed ingredient.
+     *
+     * In this kind of name, the words "mixed" and "with" are not allowed.
+     *
+     * @param name
+     *        The string to check.
+     *
+     * @return True if and only if the given string is a valid name,
+     *         where the words "mixed" and "with" are not allowed.
+     *       | result == isValidName(name, false)
+     */
+    public static boolean isValidName(String name) {
+        return isValidName(name, false);
+    }
+
+    /**
+     * Check whether the given string is a valid simple name for a mixed ingredient.
+     *
+     * In this kind of name, the words "mixed" and "with" are allowed.
+     *
+     * @param name
+     *        The string to check.
+     *
+     * @return True if and only if the given string is a valid mixture name,
+     *         where the words "mixed" and "with" are allowed.
+     *       | result == isValidName(name, true)
+     */
+    public static boolean isValidMixtureName(String name) {
+        return isValidName(name, true);
+        //ToDO: dit klopt niet
+    }
+
+    /**
+     * Check whether the given string is a valid name, taking into account
+     * whether the words "mixed" and "with" are allowed.
+     *
+     * @param name
+     *        The string to check.
+     *
+     * @param allowMixedAndWith
+     *        Whether the words "mixed" and "with" are allowed.
+     *
+     * @return False if the given string is not effective.
+     *       | if (name == null) then result == false
+     *
+     * @return False if the given string is blank.
+     *       | if (name != null && name.isBlank()) then result == false
+     *
+     * @return False if the given string has spaces at the beginning or at the end.
+     *       | if (name != null && !name.equals(name.trim())) then result == false
+     *
+     * @return False if the given string contains multiple consecutive spaces.
+     *       | if (name != null && name.contains("  ")) then result == false
+     *
+     * @return False if the given string contains illegal characters.
+     *       | if (name != null && !hasOnlyAllowedCharacters(name)) then result == false
+     *
+     * @return If the given string consists of one word, true if and only if
+     *         that word contains at least three letters, is not a forbidden
+     *         simple name word, and has correct capitalization.
+     *
+     * @return If the given string consists of more than one word, true if and only if
+     *         every word contains at least two letters, is not a forbidden
+     *         simple name word, and has correct capitalization.
+     */
+    public static boolean isValidName(String name, boolean allowMixedAndWith) {
+        if (name == null) {
+            return false;
+        }
+
+        if (name.isBlank()) {
+            return false;
+        }
+
+        if (!name.equals(name.trim())) {
+            return false;
+        }
+
+        if (name.contains("  ")) {
+            return false;
+        }
+
+        if (!Name.hasOnlyAllowedCharacters(name)) {
+            return false;
+        }
+
+        String[] words = name.split(" ");
+
+        if (words.length == 1) {
+            return !Name.isForbiddenSimpleNameWord(words[0])
+                    && Name.countLetters(words[0]) >= 3
+                    && Name.hasCorrectCapitalization(words[0], allowMixedAndWith);
+        }
+
+        for (String word : words) {
+            if (Name.isForbiddenSimpleNameWord(word)) {
+                return false;
+            }
+
+            if (Name.countLetters(word) < 2) {
+                return false;
+            }
+
+            if (!Name.hasCorrectCapitalization(word, allowMixedAndWith)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
