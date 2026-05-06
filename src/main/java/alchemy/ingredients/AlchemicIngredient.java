@@ -171,6 +171,12 @@ public class AlchemicIngredient {
         return getQuantity().toLowestUnit(getType().getStandardState());
     }
 
+    /**
+     * Return the amount of this alchemic ingredient in spoons.
+     *
+     * @return The largest whole number of spoons contained in this ingredient.
+     *       | result == getQuantity().toSpoons(getType().getStandardState())
+     */
     public long getAmountInSpoons() {
         return getQuantity().toSpoons(getType().getStandardState());
     }
