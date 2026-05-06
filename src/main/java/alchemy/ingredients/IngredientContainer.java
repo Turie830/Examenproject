@@ -95,6 +95,7 @@ public class IngredientContainer {
      * Variable referencing the capacity unit of this container.
      */
     private final Unit capacityUnit;
+    // TODO: okay so we have a unit but how much of this unit shouldn't we have another variable capacity or so?
 
 
     /**
