@@ -20,9 +20,6 @@ import be.kuleuven.cs.som.annotate.Immutable;
  * @invar The quantity of each alchemic ingredient must be effective.
  *      | getQuantity() != null
  *
- *
- *
- *
  * @author Arthur
  * @author Mauro
  * @author Obe
@@ -31,20 +28,29 @@ import be.kuleuven.cs.som.annotate.Immutable;
  */
 public class AlchemicIngredient {
 
+    /**********************************************************
+     * INSTANCE VARIABLES
+     **********************************************************/
+
     /**
      * Variable referencing the type of this alchemic ingredient.
      */
     private final IngredientType type;
+
     /**
      * Variable referencing the current temperature of this alchemic ingredient.
      */
     private final Temperature temperature;
+
     /**
      * Variable referencing the quantity of this alchemic ingredient.
      */
     private final Quantity quantity;
 
 
+    /**********************************************************
+     * CONSTRUCTORS
+     **********************************************************/
 
     /**
      * Initialize this new alchemic ingredient with the given ingredient type.
@@ -104,7 +110,6 @@ public class AlchemicIngredient {
 
     /**
      * Initialize this new alchemic ingredient with the default ingredient type.
-
      *
      * @effect This new alchemic ingredient is initialized with the default type.
      *       | this(IngredientType.DEFAULT)
@@ -113,6 +118,10 @@ public class AlchemicIngredient {
         this(IngredientType.DEFAULT);
     }
 
+
+    /**********************************************************
+     * TYPE - TOTAL
+     **********************************************************/
 
     /**
      * Return the type of this alchemic ingredient.
@@ -125,6 +134,11 @@ public class AlchemicIngredient {
         return type;
     }
 
+
+    /**********************************************************
+     * QUANTITY - TOTAL
+     **********************************************************/
+
     /**
      * Return the quantity of this alchemic ingredient.
      *
@@ -135,7 +149,6 @@ public class AlchemicIngredient {
     public Quantity getQuantity() {
         return quantity;
     }
-
 
     /**
      * Return the amount of this alchemic ingredient.
@@ -148,7 +161,6 @@ public class AlchemicIngredient {
         return getQuantity().getAmount();
     }
 
-
     /**
      * Return the unit of this alchemic ingredient.
      *
@@ -159,7 +171,6 @@ public class AlchemicIngredient {
     public Unit getUnit() {
         return getQuantity().getUnit();
     }
-
 
     /**
      * Return the amount of this alchemic ingredient in the lowest unit
@@ -183,6 +194,46 @@ public class AlchemicIngredient {
     }
 
 
+    /**********************************************************
+     * NAME - DEFENSIVE
+     **********************************************************/
+
+    /**
+     * Return the simple name of this alchemic ingredient.
+     *
+     * @return The simple name of this alchemic ingredient.
+     *       | result.equals(getType().getSimpleName())
+     */
+    @Basic
+    @Immutable
+    public String getSimpleName() {
+        return getType().getSimpleName();
+    }
+
+    /**
+     * Return the full name of this alchemic ingredient.
+     *
+     * If this ingredient is hotter than its standard temperature, the full name
+     * starts with "Heated". If it is colder, the full name starts with "Cooled".
+     * If this ingredient has a special name, that special name is followed by
+     * the full regular name between round brackets.
+     *
+     * @return The full name of this alchemic ingredient.
+     */
+    public String getFullName() {
+        String baseName = getTemperaturePrefix() + getSimpleName();
+        if (type.isMixed()
+                && type.getName().hasSpecialName()) {
+            return type.getName().getSpecialName() + " (" + baseName + ")";
+        }
+        return baseName;
+    }
+
+
+    /**********************************************************
+     * SPECIAL NAME VALIDATION - DEFENSIVE
+     **********************************************************/
+
     /**
      * Check whether this name can have the given special name.
      *
@@ -199,6 +250,11 @@ public class AlchemicIngredient {
         return specialName == null
                 || (name.isMixed() && AlchemicIngredient.isValidName(specialName));
     }
+
+
+    /**********************************************************
+     * NAME VALIDATION - DEFENSIVE
+     **********************************************************/
 
     /**
      * Check whether the given string is a valid name for a non-mixed ingredient
@@ -314,39 +370,9 @@ public class AlchemicIngredient {
     }
 
 
-    /**
-     * Return the simple name of this alchemic ingredient.
-     *
-     * @return The simple name of this alchemic ingredient.
-     *       | result.equals(getType().getSimpleName())
-     */
-    @Basic
-    @Immutable
-    public String getSimpleName() {
-        return getType().getSimpleName();
-    }
-
-
-
-    /**
-     * Return the full name of this alchemic ingredient.
-     *
-     * If this ingredient is hotter than its standard temperature, the full name
-     * starts with "Heated". If it is colder, the full name starts with "Cooled".
-     * If this ingredient has a special name, that special name is followed by
-     * the full regular name between round brackets.
-     *
-     * @return The full name of this alchemic ingredient.
-     */
-    public String getFullName() {
-        String baseName = getTemperaturePrefix() + getSimpleName();
-        if (type.isMixed()
-                && type.getName().hasSpecialName()) {
-            return type.getName().getSpecialName() + " (" + baseName + ")";
-        }
-        return baseName;
-    }
-
+    /**********************************************************
+     * TEMPERATURE - TOTAL
+     **********************************************************/
 
     /**
      * Return the coldness of this alchemic ingredient.
@@ -370,7 +396,6 @@ public class AlchemicIngredient {
         return temperature.getHotness();
     }
 
-
     /**
      * Return the temperature of this alchemic ingredient.
      *
@@ -384,7 +409,6 @@ public class AlchemicIngredient {
         return temperature.getTemperature();
     }
 
-
     /**
      * Return a copy of the temperature object of this alchemic ingredient.
      *
@@ -395,7 +419,6 @@ public class AlchemicIngredient {
     protected Temperature getTemperatureObject() {
         return new Temperature(temperature);
     }
-
 
     /**
      * Heat this alchemic ingredient with the given amount.
@@ -410,7 +433,6 @@ public class AlchemicIngredient {
         temperature.heat(amount);
     }
 
-
     /**
      * Cool this alchemic ingredient with the given amount.
      *
@@ -424,6 +446,10 @@ public class AlchemicIngredient {
         temperature.cool(amount);
     }
 
+
+    /**********************************************************
+     * SUPPORTING METHODS
+     **********************************************************/
 
     /**
      * Return the temperature prefix for the full name of this alchemic ingredient.
@@ -442,7 +468,4 @@ public class AlchemicIngredient {
         }
         return "Cooled ";
     }
-
-
-
 }
