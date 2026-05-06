@@ -3,7 +3,6 @@ package alchemy.ingredients;
 import alchemy.Unit;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
-import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for quantities
@@ -90,15 +89,31 @@ public class Quantity {
 
     /**
      * Converts the amount to all be in spoons
+     *
+     * @return The largest whole number of spoons contained in this quantity.
+     *      | result == Math.floor(toLowestUnit() / getUnit().getSpoonUnit().getFactorToBaseUnit())
      */
-    public void toSpoons() {
-
+    public Long toSpoons() {
+        // this is floored since its Long / Long
+        return toLowestUnit() / getUnit().getSpoonUnit().getFactorToBaseUnit();
     }
 
     /**
+     * Checks whether this quantity fits in the given unit
      *
+     * @param unit
+     *      The unit to check for
+     *
+     * @return True if the given unit has the same state as this quantity unit and
+     *         this quantity is smaller than or equal to one of the given unit.
+     *      | result == (unit.getState() == getUnit().getState()
+     *      |        && toLowestUnit() <= unit.getFactorToBaseUnit())
      */
     public boolean fitsIn(Unit unit) {
+        if (unit == null || unit.getState() != getUnit().getState()) {
+            return false;
+        }
 
+        return toLowestUnit() <= unit.getFactorToBaseUnit();
     }
 }

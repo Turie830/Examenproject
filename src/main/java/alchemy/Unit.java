@@ -122,6 +122,22 @@ public enum Unit {
     }
 
     /**
+     * Gets the spoon unit for this quantity unit.
+     *
+     * @return The spoon unit with the same state as this quantity unit.
+     *       | result.getState() == getState()
+     *       | result == Unit.SPOON_LIQUID || result == Unit.SPOON_POWDER
+     */
+    @Immutable
+    public Unit getSpoonUnit() {
+        if (getState() == State.LIQUID) {
+            return Unit.SPOON_LIQUID;
+        }
+
+        return Unit.SPOON_POWDER;
+    }
+
+    /**
      * Checks if the given state matches the unit type this is used on
      * @param state
      *        The state to check for
