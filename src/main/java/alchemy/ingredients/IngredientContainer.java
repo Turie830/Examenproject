@@ -205,6 +205,7 @@ public class IngredientContainer {
      * @post This container is empty after this call.
      *     | new.isEmpty()
      */
+    // ToDo: mag public zijn? of niet?
     public void empty() {
         this.ingredient = null;
     }
