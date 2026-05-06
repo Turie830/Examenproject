@@ -161,10 +161,17 @@ public class IngredientContainer {
     // ToDo: deze functie vind ik stom
     public static boolean canContain(Unit capacityUnit, AlchemicIngredient ingredient) {
         if (capacityUnit == null || ingredient == null)
-            return false;          // ToDo: is dit goed zo? of exception throwen beter?
-        if (ingredient.getState() != capacityUnit.getState())
+            return false;// ToDo: is dit goed zo? of exception throwen beter?
+
+        State state = ingredient.getType().getStandardState();
+
+        if (!capacityUnit.isValidFor(state)) {
             return false;
-        return ingredient.getQuantity().toLowestUnit() <= capacityUnit.getFactorToBaseUnit(ingredient.getState());   // ToDo: wat moet er tss de haakjes? : Kdenk de state van et je ingredient
+        }
+        if (!ingredient.getQuantity().getUnit().isValidFor(state)) {
+            return false;
+        }
+        return ingredient.getQuantity().toLowestUnit(state) <= capacityUnit.getFactorToBaseUnit(state);
     }
 
 
