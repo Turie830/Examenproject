@@ -63,6 +63,27 @@ public class IngredientTypeTest {
         });
     }
 
+    @Test
+    public void constructor_MixtureNameForRegularType() {
+        Name mixtureName = Name.createMixtureName("Beer mixed with Coke");
+        assertThrows(IllegalNameException.class, () -> {
+            new IngredientType(mixtureName, State.LIQUID, new Temperature(0, 20), false);
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     //ToDO Arthur: rest van de testen
 
 

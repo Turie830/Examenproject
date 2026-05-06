@@ -25,6 +25,9 @@ import be.kuleuven.cs.som.annotate.Raw;
  *
  * @version 1.1
  */
+
+//ToDO: hier alle hulpfcts, checkers in ingredient
+
 public class Name {
 
     /**********************************************************
