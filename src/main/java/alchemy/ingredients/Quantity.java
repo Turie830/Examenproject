@@ -117,11 +117,13 @@ public class Quantity {
     /**
      * Converts this quantity to the lowest unit of a given state
      *
-     * @param state
-     *      the state it should get converted to
+     * @post unit is set to the lowest unit of a given state
+     *      | getUnit() == getUnit().getBaseUnit()
+     * @post new amount is greater than or equal old amount
+     *      | new.getAmount() >= old.getAmount()
      */
-    // todo, waarom state nodig? we weten state toch van object
-    public void toLowestUnit(State state) {
-
+    public void toLowestUnit() {
+        setAmount(getUnit().convertToBaseUnit(getAmount()));
+        setUnit(getUnit().getBaseUnit());
     }
 }

@@ -14,6 +14,12 @@ import be.kuleuven.cs.som.annotate.Immutable;
  * @invar The factor to the base unit of each quantity unit must be strictly positive.
  *      | getFactorToBaseUnit() > 0
  *
+ * @invar Each state must have exactly 1 base unit
+ *      | for each state in State.values():
+ *      |     count(unit in Unit.values() |
+ *      |         unit.getState() == state &&
+ *      |         unit.getFactorToBaseUnit() == 1) == 1
+ *
  * @author Obe Willaert
  * @author Mauro Devolder
  * @author Arthur Pintelon
@@ -97,6 +103,25 @@ public enum Unit {
     }
 
     /**
+     * Gets the base unit for this quantity unit.
+     *
+     * @return The unit with the same state as this quantity unit and a factor to
+     *         the base unit equal to 1.
+     *       | result.getState() == getState()
+     *       | result.getFactorToBaseUnit() == 1
+     */
+    @Immutable
+    public Unit getBaseUnit() {
+        for (Unit unit : Unit.values()) {
+            if (unit.getState() == getState() && unit.getFactorToBaseUnit() == 1) {
+                return unit;
+            }
+        }
+
+        throw new IllegalStateException("No base unit found.");
+    }
+
+    /**
      * Checks if the given state matches the unit type this is used on
      * @param state
      *        The state to check for
@@ -110,21 +135,17 @@ public enum Unit {
     /**
      * Convert the given amount expressed in this quantity unit to the corresponding
      * amount expressed in the base unit
-     *
+     * <p>
      * For liquid units, the result is expressed in drops.
      * For powder units, the result is expressed in pinches.
      *
-     * @param amount
-     *        The amount expressed in this quantity unit.
-     *
+     * @param amount The amount expressed in this quantity unit.
      * @return The given amount multiplied by the factor to the base unit of this quantity unit.
-     *       | result == amount * getFactorToBaseUnit()
-     *
-     * @throws IllegalArgumentException
-     *         The given amount is negative.
-     *       | amount < 0
+     * | result == amount * getFactorToBaseUnit()
+     * @throws IllegalArgumentException The given amount is negative.
+     *                                  | amount < 0
      */
-    public int convertToBaseUnit(int amount) throws IllegalArgumentException {
+    public Long convertToBaseUnit(Long amount) throws IllegalArgumentException {
         if (amount < 0)
             throw new IllegalArgumentException("Amount cannot be negative.");
 
