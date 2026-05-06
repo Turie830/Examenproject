@@ -3,7 +3,6 @@ package alchemy.ingredients;
 import alchemy.Unit;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
-import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for quantities
@@ -32,12 +31,12 @@ public class Quantity {
     /**
      * A variable for storing the amount
      */
-    private Long amount;
+    private final Long amount;
 
     /**
      * A variable for storing the unit
      */
-    private Unit  unit;
+    private final Unit  unit;
 
 
     /**
@@ -57,42 +56,7 @@ public class Quantity {
      *      | new.getUnit() == unit
      */
     public Quantity(Long amount, Unit unit) {
-        setAmount(amount);
-        setUnit(unit);
-    }
-
-    /**
-     * Set the amount to the given amount
-     * @param amount
-     *      the amount to set the amount to
-     *
-     * @pre The amount is not negative
-     *      | amount >= 0
-     * @pre the amount is not null
-     *      | amount != null
-     *
-     * @post the amount is set to the new amount
-     *      | new.getAmount() == amount
-     */
-    @Raw
-    private void setAmount(Long amount) {
-        // Nominale implementatie
         this.amount = amount;
-    }
-
-    /**
-     * Set the unit to the given unit
-     * @param unit
-     *      the unit of this quantity
-     *
-     * @pre unit is not null
-     *      | unit != null
-     * @post the unit is set as the unit of this quantity
-     *      | new.getUnit() == unit
-     */
-    // TODO RAW of niet??
-    private void setUnit(Unit unit) {
-        // Nominale implementatie
         this.unit = unit;
     }
 
@@ -117,11 +81,39 @@ public class Quantity {
     /**
      * Converts this quantity to the lowest unit of a given state
      *
-     * @param state
-     *      the state it should get converted to
+     * @return the amount in the lowest unit
      */
-    // todo, waarom state nodig? we weten state toch van object
-    public void toLowestUnit(State state) {
+    public Long toLowestUnit() {
+        return getUnit().convertToBaseUnit(getAmount());
+    }
 
+    /**
+     * Converts the amount to all be in spoons
+     *
+     * @return The largest whole number of spoons contained in this quantity.
+     *      | result == Math.floor(toLowestUnit() / getUnit().getSpoonUnit().getFactorToBaseUnit())
+     */
+    public Long toSpoons() {
+        // this is floored since its Long / Long
+        return toLowestUnit() / getUnit().getSpoonUnit().getFactorToBaseUnit();
+    }
+
+    /**
+     * Checks whether this quantity fits in the given unit
+     *
+     * @param unit
+     *      The unit to check for
+     *
+     * @return True if the given unit has the same state as this quantity unit and
+     *         this quantity is smaller than or equal to one of the given unit.
+     *      | result == (unit.getState() == getUnit().getState()
+     *      |        && toLowestUnit() <= unit.getFactorToBaseUnit())
+     */
+    public boolean fitsIn(Unit unit) {
+        if (unit == null || unit.getState() != getUnit().getState()) {
+            return false;
+        }
+
+        return toLowestUnit() <= unit.getFactorToBaseUnit();
     }
 }

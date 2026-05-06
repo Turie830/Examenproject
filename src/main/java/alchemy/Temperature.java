@@ -30,6 +30,11 @@ import be.kuleuven.cs.som.annotate.Model;
  * @version 1.0
  */
 public class Temperature {
+
+    /**********************************************************
+     * CLASS PROPERTIES
+     **********************************************************/
+
     /**
      * The upper bound for coldness and hotness.
      */
@@ -45,6 +50,11 @@ public class Temperature {
      */
     private static final long DEFAULT_HOTNESS = 20;
 
+
+    /**********************************************************
+     * INSTANCE VARIABLES
+     **********************************************************/
+
     /**
      * Variable storing the coldness of this temperature.
      */
@@ -56,6 +66,19 @@ public class Temperature {
     private long hotness;
 
 
+    /**********************************************************
+     * CONSTRUCTORS
+     **********************************************************/
+
+    /**
+     * Initialize this new temperature as the default temperature [0, 20].
+     *
+     * @effect This new temperature is initialized with coldness 0 and hotness 20.
+     *       | this(DEFAULT_COLDNESS, DEFAULT_HOTNESS)
+     */
+    public Temperature() {
+        this(DEFAULT_COLDNESS, DEFAULT_HOTNESS);
+    }
     /**
      * Initialize this new temperature with the given coldness and hotness.
      *
@@ -144,20 +167,25 @@ public class Temperature {
     }
 
 
+    /**********************************************************
+     * UPPER BOUND
+     **********************************************************/
+
     /**
      * Return the upper bound for coldness and hotness.
      *
      * @return The upper bound for coldness and hotness.
      *       | result == 10000
      */
-    @Basic
-    @Immutable
+    @Basic @Immutable
     public static long getUpperBound() {
         return UPPER_BOUND;
     }
 
 
-
+    /**********************************************************
+     * COLDNESS
+     **********************************************************/
 
     /**
      * Return the coldness of this temperature.
@@ -171,6 +199,10 @@ public class Temperature {
     }
 
 
+    /**********************************************************
+     * HOTNESS
+     **********************************************************/
+
     /**
      * Return the hotness of this temperature.
      *
@@ -181,6 +213,11 @@ public class Temperature {
     public long getHotness() {
         return hotness;
     }
+
+
+    /**********************************************************
+     * TEMPERATURE ARRAY
+     **********************************************************/
 
     /**
      * Return this temperature as an array.
@@ -198,6 +235,10 @@ public class Temperature {
         };
     }
 
+
+    /**********************************************************
+     * VALIDATION
+     **********************************************************/
 
     /**
      * Check whether the given coldness and hotness form a valid temperature.
@@ -227,6 +268,10 @@ public class Temperature {
                 && !(coldness > 0 && hotness > 0);
     }
 
+
+    /**********************************************************
+     * HEATING
+     **********************************************************/
 
     /**
      * Heat this temperature with the given amount.
@@ -258,6 +303,10 @@ public class Temperature {
     }
 
 
+    /**********************************************************
+     * COOLING
+     **********************************************************/
+
     /**
      * Cool this temperature with the given amount.
      *
@@ -287,6 +336,10 @@ public class Temperature {
         }
     }
 
+
+    /**********************************************************
+     * COMPARISON
+     **********************************************************/
 
     /**
      * Check whether this temperature is hotter than the given temperature.
@@ -351,6 +404,10 @@ public class Temperature {
     }
 
 
+    /**********************************************************
+     * SUPPORTING METHODS
+     **********************************************************/
+
     /**
      * Return the signed net temperature value.
      *
@@ -366,4 +423,15 @@ public class Temperature {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+    //ToDO: Full name met Heated / Cooled (eerst doen in Name)
 }

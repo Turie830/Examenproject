@@ -1,9 +1,10 @@
 package alchemy;
 
+import alchemy.exceptions.IllegalNameException;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Model;
-
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class of names for alchemic ingredients.
@@ -13,19 +14,23 @@ import be.kuleuven.cs.som.annotate.Model;
  * The allowed special characters are the apostrophe and round brackets.
  *
  * @invar The name of each Name object must be a valid regular name or a valid mixture name.
- *        | isValidName(getName()) || isValidMixtureName(getName())
+ *      | isValidName(getName()) || isValidMixtureName(getName())
+ *
+ * @invar The special name of each Name object must be proper.
+ *      | canHaveAsSpecialName(getSpecialName())
  *
  * @author Arthur
  * @author Mauro
  * @author Obe
  *
- * @version 1.0
+ * @version 1.1
  */
 public class Name {
-    /**
-     * Variable storing the actual name.
-     */
-    private final String name;
+
+    /**********************************************************
+     * CLASS PROPERTIES
+     **********************************************************/
+
 
     /**
      * A string containing all allowed special characters in names.
@@ -41,22 +46,37 @@ public class Name {
     private static final String[] FORBIDDEN_SIMPLE_NAME_WORDS = {
             "Heated",
             "Cooled"
-            //ToDo: extra woorden??
+            // TODO: Add extra prefix/suffix words when they are introduced.
     };
 
     /**
+     * A variable referencing the default name, Water.
+     *
+     * @note We make this variable public because it is a constant and
+     *       clients can use it freely, i.e. they cannot do illegal things with it.
+     */
+    public static final Name WATER = new Name("Water");
+
+
+    /**********************************************************
+     * CONSTRUCTORS
+     **********************************************************/
+
+    /**
      * Initialize this new name with the given string.
+     *
+     * The words "mixed" and "with" are not allowed.
      *
      * @param name
      *        The string for this new name.
      *
      * @effect This new name is initialized with the given name,
      *         where the words "mixed" and "with" are not allowed.
-     *         | this(name, false)
+     *       | this(name, false)
      *
      * @throws IllegalArgumentException
-     *         The given name is not a valid name.
-     *         | !isValidName(name)
+     *         The given name is not a valid regular name.
+     *       | !isValidName(name)
      */
     public Name(String name) {
         this(name, false);
@@ -75,6 +95,13 @@ public class Name {
      * @post The name of this new Name object is equal to the given name.
      *     | new.getName().equals(name)
      *
+     * @post This new Name object is mixed if and only if the words "mixed"
+     *       and "with" were allowed.
+     *     | new.isMixed() == allowMixedAndWith
+     *
+     * @post The special name of this new Name object is not effective.
+     *     | new.getSpecialName() == null
+     *
      * @throws IllegalArgumentException
      *         The given name is not valid, taking into account whether
      *         the words "mixed" and "with" are allowed.
@@ -84,19 +111,10 @@ public class Name {
         if (!isValidName(name, allowMixedAndWith)) {
             throw new IllegalArgumentException("Invalid name.");
         }
-        this.name = name;
-    }
 
-    /**
-     * Return the string value of this name.
-     *
-     * @return The string value of this name.
-     *       | result == this.name
-     */
-    @Basic
-    @Immutable
-    public String getName() {
-        return name;
+        this.name = name;
+        this.mixed = allowMixedAndWith;
+        this.specialName = null;
     }
 
     /**
@@ -106,18 +124,164 @@ public class Name {
      *        The string for the new mixture name.
      *
      * @return A new Name object whose name is equal to the given name.
-     *         | result.getName().equals(name)
+     *       | result.getName().equals(name)
+     *
+     * @return The resulting Name object is mixed.
+     *       | result.isMixed()
      *
      * @throws IllegalArgumentException
      *         The given name is not a valid mixture name.
-     *         | !isValidMixtureName(name)
+     *       | !isValidMixtureName(name)
      */
     public static Name createMixtureName(String name) {
         if (!isValidMixtureName(name)) {
             throw new IllegalArgumentException("Invalid mixture name.");
         }
+
         return new Name(name, true);
     }
+
+
+    /**********************************************************
+     * SIMPLE NAME
+     **********************************************************/
+
+    /**
+     * Variable storing the actual simple name.
+     */
+    private final String name;
+
+    /**
+     * Variable registering whether this name is a mixture name.
+     */
+    private final boolean mixed;
+
+    /**
+     * Return the string value of this name.
+     *
+     * @return The string value of this name.
+     *       | result == this.name
+     */
+    @Basic @Immutable
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Return the simple name.
+     *
+     * @return The simple name.
+     *       | result == getName()
+     */
+    @Immutable
+    public String getSimpleName() {
+        return getName();
+    }
+
+    /**
+     * Check whether this name is a mixture name.
+     *
+     * @return True if and only if this name is a mixture name.
+     *       | result == this.mixed
+     */
+    @Basic @Immutable
+    public boolean isMixed() {
+        return mixed;
+    }
+
+
+    /**********************************************************
+     * SPECIAL NAME
+     **********************************************************/
+
+    /**
+     * A variable referencing the special name of this name.
+     */
+    private String specialName;
+
+    /**
+     * Return the special name of this name.
+     *
+     * @return The special name of this name.
+     *       | result == this.specialName
+     */
+    @Basic
+    public String getSpecialName() {
+        return specialName;
+    }
+
+    /**
+     * Check whether this name has a special name.
+     *
+     * @return True if and only if the special name of this name is effective.
+     *       | result == (getSpecialName() != null)
+     */
+    public boolean hasSpecialName() {
+        return getSpecialName() != null;
+    }
+
+    /**
+     * Set the special name of this name to the given special name.
+     *
+     * A special name is only allowed for mixture names.
+     * The special name itself must satisfy the rules for a regular name.
+     *
+     * @param specialName
+     *        The special name to set.
+     *
+     * @post If this name is mixed and the given special name is effective and valid,
+     *       the special name of this name is equal to the given special name.
+     *     | if (isMixed() && specialName != null && isValidName(specialName)) then
+     *     |   new.getSpecialName().equals(specialName)
+     *
+     * @post If this name is mixed and the given special name is not effective,
+     *       the special name of this name is not effective.
+     *     | if (isMixed() && specialName == null) then
+     *     |   new.getSpecialName() == null
+     *
+     * @throws IllegalStateException
+     *         This name is not mixed and the given special name is effective.
+     *       | !isMixed() && specialName != null
+     *
+     * @throws IllegalNameException
+     *         The given special name is effective but not valid.
+     *       | specialName != null && !isValidName(specialName)
+     */
+    @Raw
+    @Model
+    protected void setSpecialName(String specialName) throws IllegalStateException, IllegalNameException {
+        if (!isMixed() && specialName != null) {
+            throw new IllegalStateException("No special name allowed!");
+        }
+
+        if (specialName != null && !isValidName(specialName)) {
+            throw new IllegalNameException(specialName);
+        }
+
+        this.specialName = specialName;
+    }
+
+    /**
+     * Check whether this name can have the given special name.
+     *
+     * @param specialName
+     *        The special name to check.
+     *
+     * @return True if and only if the given special name is not effective,
+     *         or this name is mixed and the given special name is a valid regular name.
+     *       | result ==
+     *       |   specialName == null
+     *       |   || (isMixed() && isValidName(specialName))
+     */
+    public boolean canHaveAsSpecialName(String specialName) {
+        return specialName == null
+                || (isMixed() && isValidName(specialName));
+    }
+
+
+    /**********************************************************
+     * VALIDATION
+     **********************************************************/
 
     /**
      * Check whether the given string is a valid name for a non-mixed ingredient
@@ -130,7 +294,7 @@ public class Name {
      *
      * @return True if and only if the given string is a valid name,
      *         where the words "mixed" and "with" are not allowed.
-     *         | result == isValidName(name, false)
+     *       | result == isValidName(name, false)
      */
     public static boolean isValidName(String name) {
         return isValidName(name, false);
@@ -146,7 +310,7 @@ public class Name {
      *
      * @return True if and only if the given string is a valid mixture name,
      *         where the words "mixed" and "with" are allowed.
-     *         | result == isValidName(name, true)
+     *       | result == isValidName(name, true)
      */
     public static boolean isValidMixtureName(String name) {
         return isValidName(name, true);
@@ -190,18 +354,19 @@ public class Name {
         if (name == null) {
             return false;
         }
-        // geen blank naam
+
         if (name.isBlank()) {
             return false;
         }
-        // er mogen geen spaties voor of achter een woord (natuurlijk wel als het een spatie is tussen 2 woorden)
+
         if (!name.equals(name.trim())) {
             return false;
         }
-        // dubbele spaties mogen niet
+
         if (name.contains("  ")) {
             return false;
         }
+
         if (!hasOnlyAllowedCharacters(name)) {
             return false;
         }
@@ -218,13 +383,16 @@ public class Name {
             if (isForbiddenSimpleNameWord(word)) {
                 return false;
             }
+
             if (countLetters(word) < 2) {
                 return false;
             }
+
             if (!hasCorrectCapitalization(word, allowMixedAndWith)) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -242,7 +410,6 @@ public class Name {
     @Model
     private static boolean hasOnlyAllowedCharacters(String name) {
         for (int i = 0; i < name.length(); i++) {
-
             char c = name.charAt(i);
 
             if (!Character.isLetter(c)
@@ -251,6 +418,7 @@ public class Name {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -266,7 +434,6 @@ public class Name {
      */
     @Model
     private static boolean isAllowedSpecialCharacter(char c) {
-        // als Java het karakter niet vindt, geeft indexOf(c) altijd -1 terug.
         return ALLOWED_SPECIAL_CHARACTERS.indexOf(c) != -1;
     }
 
@@ -289,10 +456,9 @@ public class Name {
                 count++;
             }
         }
+
         return count;
     }
-
-
 
     /**
      * Check whether the given word has correct capitalization.
@@ -315,44 +481,42 @@ public class Name {
      */
     @Model
     private static boolean hasCorrectCapitalization(String word, boolean allowMixedAndWith) {
-        // mixed en with zijn niet toegelaten in gewone namen, wel in mixtures
         if (word.equals("mixed") || word.equals("with")) {
             return allowMixedAndWith;
         }
-        // met hoofdletters mag nooit
+
         if (word.equals("Mixed") || word.equals("With")) {
             return false;
         }
+
         boolean foundFirstLetter = false;
 
         for (int i = 0; i < word.length(); i++) {
-
             char c = word.charAt(i);
 
             if (isAllowedSpecialCharacter(c)) {
-                continue;   // gaat naar de volgende i in de loop
+                continue;
             }
 
             if (!Character.isLetter(c)) {
                 return false;
             }
-            // Als we nog geen eerste letter gevonden hadden, dan moet deze letter een hoofdletter zijn.
-            // Daarna zetten we foundFirstLetter op true.
+
             if (!foundFirstLetter) {
                 if (!Character.isUpperCase(c)) {
                     return false;
                 }
+
                 foundFirstLetter = true;
-            }
-            else {
+            } else {
                 if (!Character.isLowerCase(c)) {
                     return false;
                 }
             }
         }
+
         return foundFirstLetter;
     }
-
 
     /**
      * Check whether the given word is forbidden in the simple name of an
@@ -363,8 +527,8 @@ public class Name {
      *
      * @return True if and only if the given word occurs in the list of forbidden
      *         simple name words.
-     *         | result == (for some forbiddenWord in FORBIDDEN_SIMPLE_NAME_WORDS :
-     *         |              word.equals(forbiddenWord))
+     *       | result == (for some forbiddenWord in FORBIDDEN_SIMPLE_NAME_WORDS :
+     *       |              word.equals(forbiddenWord))
      */
     @Model
     private static boolean isForbiddenSimpleNameWord(String word) {
@@ -373,6 +537,7 @@ public class Name {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -383,14 +548,7 @@ public class Name {
 
 
 
-
-
-
-
-
-
-
-
+    //ToDO: volledige naam
 
 
 
