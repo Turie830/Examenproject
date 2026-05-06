@@ -164,7 +164,7 @@ public class IngredientContainer {
             return false;          // ToDo: is dit goed zo? of exception throwen beter?
         if (ingredient.getState() != capacityUnit.getState())
             return false;
-        return ingredient.getQuantity().toLowestUnit() <= capacityUnit.getFactorToBaseUnit();   // ToDo: wat moet er tss de haakjes?
+        return ingredient.getQuantity().toLowestUnit() <= capacityUnit.getFactorToBaseUnit(ingredient.getState());   // ToDo: wat moet er tss de haakjes? : Kdenk de state van et je ingredient
     }
 
 
