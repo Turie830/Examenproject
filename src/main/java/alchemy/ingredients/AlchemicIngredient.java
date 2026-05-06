@@ -1,7 +1,6 @@
 package alchemy.ingredients;
 
-
-import alchemy.Name;
+import alchemy.Unit;
 import alchemy.Temperature;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
@@ -14,7 +13,13 @@ import be.kuleuven.cs.som.annotate.Immutable;
  * @invar The simple name of each alchemic ingredient must be effective.
  *      | getSimpleName() != null
  *
- * Todo: full name
+ * @invar The type of each alchemic ingredient must be effective.
+ *      | getType() != null
+ *
+ * @invar The quantity of each alchemic ingredient must be effective.
+ *      | getQuantity() != null
+ *
+ *
  *
  *
  * @author Arthur
@@ -33,6 +38,10 @@ public class AlchemicIngredient {
      * Variable referencing the current temperature of this alchemic ingredient.
      */
     private final Temperature temperature;
+    /**
+     * Variable referencing the quantity of this alchemic ingredient.
+     */
+    private final Quantity quantity;
 
 
 
@@ -43,6 +52,9 @@ public class AlchemicIngredient {
      *
      * @param type
      *        The ingredient type for this new alchemic ingredient.
+     *
+     * @param quantity
+     *        The quantity for this new alchemic ingredient
      *
      * @post If the given type is effective, the type of this new alchemic ingredient
      *       is equal to the given type.
@@ -57,7 +69,7 @@ public class AlchemicIngredient {
      *     | new.getTemperature()[0] == new.getType().getStandardTemperature()[0]
      *     | && new.getTemperature()[1] == new.getType().getStandardTemperature()[1]
      */
-    public AlchemicIngredient(IngredientType type) {
+    public AlchemicIngredient(IngredientType type, Quantity quantity) {
         if (type == null) {
             this.type = IngredientType.DEFAULT;
         }
@@ -65,12 +77,35 @@ public class AlchemicIngredient {
             this.type = type;
         }
         this.temperature = this.type.getStandardTemperatureObject();
+
+        if (quantity == null) {
+            this.quantity = new Quantity(0L, Unit.getSpoonUnit(this.type.getStandardState()));
+        }
+        else {
+            this.quantity = quantity;
+        }
+    }
+
+    /**
+     * Initialize this new alchemic ingredient with the given ingredient type
+     * and a default quantity.
+     *
+     * @param type
+     *        The ingredient type for this new alchemic ingredient
+     *
+     * @effect This new alchemic ingredient is initialized with the given type and
+     *         a default quantity.
+     *       | this(type, null)
+     */
+    public AlchemicIngredient(IngredientType type) {
+        this(type, null);
     }
 
     /**
      * Initialize this new alchemic ingredient with the default ingredient type.
+
      *
-     * @effect This new alchemic ingredient is initialized with the default ingredient type.
+     * @effect This new alchemic ingredient is initialized with the default type.
      *       | this(IngredientType.DEFAULT)
      */
     public AlchemicIngredient() {
@@ -88,6 +123,58 @@ public class AlchemicIngredient {
     public IngredientType getType() {
         return type;
     }
+
+    /**
+     * Return the quantity of this alchemic ingredient.
+     *
+     * @return The quantity of this alchemic ingredient.
+     *       | result == this.quantity
+     */
+    @Basic @Immutable
+    public Quantity getQuantity() {
+        return quantity;
+    }
+
+
+    /**
+     * Return the amount of this alchemic ingredient.
+     *
+     * @return The amount of this alchemic ingredient.
+     *       | result == getQuantity().getAmount()
+     */
+    @Basic @Immutable
+    public long getAmount() {
+        return getQuantity().getAmount();
+    }
+
+
+    /**
+     * Return the unit of this alchemic ingredient.
+     *
+     * @return The unit of this alchemic ingredient.
+     *       | result == getQuantity().getUnit()
+     */
+    @Basic @Immutable
+    public Unit getUnit() {
+        return getQuantity().getUnit();
+    }
+
+
+    /**
+     * Return the amount of this alchemic ingredient in the lowest unit
+     * of its standard state.
+     *
+     * @return The amount of this alchemic ingredient in the lowest unit.
+     *       | result == getQuantity().toLowestUnit(getType().getStandardState())
+     */
+    public Long getAmountInLowestUnit() {
+        return getQuantity().toLowestUnit(getType().getStandardState());
+    }
+
+    public long getAmountInSpoons() {
+        return getQuantity().toSpoons(getType().getStandardState());
+    }
+
 
     /**
      * Return the simple name of this alchemic ingredient.
