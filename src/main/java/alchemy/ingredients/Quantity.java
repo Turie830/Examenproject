@@ -61,6 +61,7 @@ public class Quantity {
      * @return the amount
      */
     @Basic
+    @Immutable
     public Long getAmount() {
         return amount;
     }
@@ -69,6 +70,7 @@ public class Quantity {
      * Gets the unit of this quantity
      * @return the unit
      */
+    @Basic
     @Immutable
     public Unit getUnit() {
         return unit;
@@ -82,6 +84,7 @@ public class Quantity {
      *
      * @return the amount in the lowest unit
      */
+    @Immutable
     public Long toLowestUnit(State state) {
         return getUnit().convertToBaseUnit(getAmount(), state);
     }
@@ -95,6 +98,7 @@ public class Quantity {
      * @return The largest whole number of spoons contained in this quantity.
      *      | result == Math.floor(toLowestUnit(state) / Unit.getSpoonUnit(state).getFactorToBaseUnit(state))
      */
+    @Immutable
     public Long toSpoons(State state) {
         return toLowestUnit(state) / Unit.getSpoonUnit(state).getFactorToBaseUnit(state);
     }
@@ -110,6 +114,7 @@ public class Quantity {
      *      | result == (getUnit().isValidFor(state) && unit.isValidFor(state)
      *      |        && toLowestUnit(state) <= unit.getFactorToBaseUnit(state))
      */
+    @Immutable
     public boolean fitsIn(Unit unit, State state) {
         if (unit == null || state == null || !getUnit().isValidFor(state) || !unit.isValidFor(state)) {
             return false;

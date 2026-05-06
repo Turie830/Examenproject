@@ -3,6 +3,7 @@ package alchemy;
 import alchemy.ingredients.State;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
+import be.kuleuven.cs.som.annotate.Raw;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -115,6 +116,7 @@ public enum Unit {
      *      The given factor is not strictly positive.
      *      | factorToBaseUnit <= 0
      */
+    @Raw
     private void addFactorToBaseUnit(State state, int factorToBaseUnit) throws IllegalArgumentException {
         if (state == null) {
             throw new IllegalArgumentException("State cannot be null.");
