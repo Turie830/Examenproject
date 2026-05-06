@@ -113,7 +113,7 @@ public class NameTest {
     }
 
     @Test
-    public void constructor_InvalidNameThrowsException() {
+    public void constructor_InvalidName() {
         assertThrows(IllegalArgumentException.class, () -> new Name(null));
         assertThrows(IllegalArgumentException.class, () -> new Name(""));
         assertThrows(IllegalArgumentException.class, () -> new Name("Water2"));
@@ -128,12 +128,28 @@ public class NameTest {
         assertEquals("Beer mixed with Coke", name.getName());
     }
 
+
+    //ToDO: dit klopt niet doordat isValidMixtureName() niet klopt
     @Test
-    public void createMixtureName_InvalidMixtureNameThrowsException() {
+    public void createMixtureName_InvalidMixtureName() {
         assertThrows(IllegalArgumentException.class, () -> Name.createMixtureName(null));
         assertThrows(IllegalArgumentException.class, () -> Name.createMixtureName(""));
+        assertThrows(IllegalArgumentException.class, () -> Name.createMixtureName("Water"));
+        assertThrows(IllegalArgumentException.class, () -> Name.createMixtureName("Beer with Coke"));
+        assertThrows(IllegalArgumentException.class, () -> Name.createMixtureName("Beer mixed Coke"));
         assertThrows(IllegalArgumentException.class, () -> Name.createMixtureName("Beer Mixed with Coke"));
         assertThrows(IllegalArgumentException.class, () -> Name.createMixtureName("Beer mixed With Coke"));
         assertThrows(IllegalArgumentException.class, () -> Name.createMixtureName("Beer2 mixed with Coke"));
     }
+
+    @Test
+    public void isValidMixtureName_MustContainMixedWithStructure() {
+        assertFalse(Name.isValidMixtureName("Water"));
+        assertFalse(Name.isValidMixtureName("Beer with Coke"));
+        assertFalse(Name.isValidMixtureName("Beer mixed Coke"));
+        assertFalse(Name.isValidMixtureName("Beer mixed"));
+        assertFalse(Name.isValidMixtureName("mixed with Coke"));
+    }
+
+
 }
