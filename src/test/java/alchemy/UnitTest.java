@@ -5,118 +5,105 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 public class UnitTest {
 
     @Test
-    public void getBaseUnit_LiquidUnit_ReturnsDrop() {
-        assertEquals(Unit.DROP, Unit.BOTTLE.getBaseUnit());
+    public void isValidFor_SharedUnits_AcceptLiquidAndPowder() {
+        assertTrue(Unit.SPOON.isValidFor(State.LIQUID));
+        assertTrue(Unit.SPOON.isValidFor(State.POWDER));
+        assertTrue(Unit.STOREROOM.isValidFor(State.LIQUID));
+        assertTrue(Unit.STOREROOM.isValidFor(State.POWDER));
     }
 
     @Test
-    public void getBaseUnit_PowderUnit_ReturnsPinch() {
-        assertEquals(Unit.PINCH, Unit.SACK.getBaseUnit());
+    public void isValidFor_LiquidOnlyUnit_RejectsPowder() {
+        assertTrue(Unit.VIAL.isValidFor(State.LIQUID));
+        assertFalse(Unit.VIAL.isValidFor(State.POWDER));
     }
 
     @Test
-    public void getBaseUnit_BaseUnit_ReturnsSameUnit() {
-        assertEquals(Unit.DROP, Unit.DROP.getBaseUnit());
-        assertEquals(Unit.PINCH, Unit.PINCH.getBaseUnit());
-    }
-
-    @Test
-    public void getBaseUnit_AllLiquidUnits_ReturnDrop() {
-        for (Unit unit : Unit.values()) {
-            if (unit.getState() == State.LIQUID) {
-                assertEquals(Unit.DROP, unit.getBaseUnit());
-            }
-        }
-    }
-
-    @Test
-    public void getBaseUnit_AllPowderUnits_ReturnPinch() {
-        for (Unit unit : Unit.values()) {
-            if (unit.getState() == State.POWDER) {
-                assertEquals(Unit.PINCH, unit.getBaseUnit());
-            }
-        }
-    }
-
-    @Test
-    public void getSpoonUnit_LiquidUnit_ReturnsLiquidSpoon() {
-        assertEquals(Unit.SPOON_LIQUID, Unit.BOTTLE.getSpoonUnit());
-    }
-
-    @Test
-    public void getSpoonUnit_PowderUnit_ReturnsPowderSpoon() {
-        assertEquals(Unit.SPOON_POWDER, Unit.SACK.getSpoonUnit());
-    }
-
-    @Test
-    public void getSpoonUnit_AllLiquidUnits_ReturnLiquidSpoon() {
-        for (Unit unit : Unit.values()) {
-            if (unit.getState() == State.LIQUID) {
-                assertEquals(Unit.SPOON_LIQUID, unit.getSpoonUnit());
-            }
-        }
-    }
-
-    @Test
-    public void getSpoonUnit_AllPowderUnits_ReturnPowderSpoon() {
-        for (Unit unit : Unit.values()) {
-            if (unit.getState() == State.POWDER) {
-                assertEquals(Unit.SPOON_POWDER, unit.getSpoonUnit());
-            }
-        }
-    }
-
-    @Test
-    public void getState_LiquidUnit_ReturnsLiquid() {
-        assertEquals(State.LIQUID, Unit.VIAL.getState());
-    }
-
-    @Test
-    public void getState_PowderUnit_ReturnsPowder() {
-        assertEquals(State.POWDER, Unit.SACHET.getState());
-    }
-
-    @Test
-    public void getFactorToBaseUnit_ReturnsConversionFactor() {
-        assertEquals(1, Unit.DROP.getFactorToBaseUnit());
-        assertEquals(8, Unit.SPOON_LIQUID.getFactorToBaseUnit());
-        assertEquals(42, Unit.SACHET.getFactorToBaseUnit());
-    }
-
-    @Test
-    public void isValidFor_SameState_ReturnsTrue() {
-        assertTrue(Unit.BOTTLE.isValidFor(State.LIQUID));
-        assertTrue(Unit.SACK.isValidFor(State.POWDER));
-    }
-
-    @Test
-    public void isValidFor_DifferentState_ReturnsFalse() {
-        assertFalse(Unit.BOTTLE.isValidFor(State.POWDER));
-        assertFalse(Unit.SACK.isValidFor(State.LIQUID));
+    public void isValidFor_PowderOnlyUnit_RejectsLiquid() {
+        assertTrue(Unit.SACHET.isValidFor(State.POWDER));
+        assertFalse(Unit.SACHET.isValidFor(State.LIQUID));
     }
 
     @Test
     public void isValidFor_NullState_ReturnsFalse() {
-        assertFalse(Unit.BOTTLE.isValidFor(null));
+        assertFalse(Unit.SPOON.isValidFor(null));
     }
 
     @Test
-    public void convertToBaseUnit_PositiveAmount_ReturnsAmountInBaseUnit() {
-        assertEquals(80L, Unit.VIAL.convertToBaseUnit(2L));
-        assertEquals(126L, Unit.SACHET.convertToBaseUnit(3L));
+    public void getFactorToBaseUnit_SharedSpoon_ReturnsFactorForGivenState() {
+        assertEquals(8, Unit.SPOON.getFactorToBaseUnit(State.LIQUID));
+        assertEquals(6, Unit.SPOON.getFactorToBaseUnit(State.POWDER));
+    }
+
+    @Test
+    public void getFactorToBaseUnit_SharedStoreroom_ReturnsFactorForGivenState() {
+        assertEquals(5 * 12 * 7 * 3 * 5 * 8, Unit.STOREROOM.getFactorToBaseUnit(State.LIQUID));
+        assertEquals(5 * 10 * 3 * 6 * 7 * 6, Unit.STOREROOM.getFactorToBaseUnit(State.POWDER));
+    }
+
+    @Test
+    public void getFactorToBaseUnit_InvalidState_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> Unit.VIAL.getFactorToBaseUnit(State.POWDER));
+        assertThrows(IllegalArgumentException.class, () -> Unit.SACHET.getFactorToBaseUnit(State.LIQUID));
+    }
+
+    @Test
+    public void getFactorToBaseUnit_NullState_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> Unit.SPOON.getFactorToBaseUnit(null));
+    }
+
+    @Test
+    public void getBaseUnit_LiquidState_ReturnsDrop() {
+        assertEquals(Unit.DROP, Unit.getBaseUnit(State.LIQUID));
+    }
+
+    @Test
+    public void getBaseUnit_PowderState_ReturnsPinch() {
+        assertEquals(Unit.PINCH, Unit.getBaseUnit(State.POWDER));
+    }
+
+    @Test
+    public void getBaseUnit_NullState_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> Unit.getBaseUnit(null));
+    }
+
+    @Test
+    public void getSpoonUnit_LiquidState_ReturnsSharedSpoon() {
+        assertEquals(Unit.SPOON, Unit.getSpoonUnit(State.LIQUID));
+    }
+
+    @Test
+    public void getSpoonUnit_PowderState_ReturnsSharedSpoon() {
+        assertEquals(Unit.SPOON, Unit.getSpoonUnit(State.POWDER));
+    }
+
+    @Test
+    public void getSpoonUnit_NullState_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> Unit.getSpoonUnit(null));
+    }
+
+    @Test
+    public void convertToBaseUnit_PositiveAmount_ReturnsAmountInBaseUnitForState() {
+        assertEquals(80L, Unit.SPOON.convertToBaseUnit(10L, State.LIQUID));
+        assertEquals(60L, Unit.SPOON.convertToBaseUnit(10L, State.POWDER));
+        assertEquals(126L, Unit.SACHET.convertToBaseUnit(3L, State.POWDER));
     }
 
     @Test
     public void convertToBaseUnit_ZeroAmount_ReturnsZero() {
-        assertEquals(0L, Unit.BOTTLE.convertToBaseUnit(0L));
+        assertEquals(0L, Unit.BOTTLE.convertToBaseUnit(0L, State.LIQUID));
     }
 
     @Test
     public void convertToBaseUnit_NegativeAmount_ThrowsIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> Unit.BOTTLE.convertToBaseUnit(-1L));
+        assertThrows(IllegalArgumentException.class, () -> Unit.BOTTLE.convertToBaseUnit(-1L, State.LIQUID));
+    }
+
+    @Test
+    public void convertToBaseUnit_InvalidState_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> Unit.BOTTLE.convertToBaseUnit(1L, State.POWDER));
     }
 }
