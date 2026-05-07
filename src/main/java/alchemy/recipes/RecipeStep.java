@@ -12,6 +12,7 @@ package alchemy.recipes;
  * @author Arthur Pintelon
  *
  * @version 1.0
+ *
  */
 public abstract class RecipeStep {
 
@@ -34,7 +35,7 @@ public abstract class RecipeStep {
      * @post the operation is set to the given operation
      *      | new.getOperation() == operation
      */
-    public RecipeStep(Operation operation) throws IllegalArgumentException {
+    protected RecipeStep(Operation operation) throws IllegalArgumentException {
         if (operation == null) {
             throw new IllegalArgumentException("Operation cannot be null");
         }
@@ -50,5 +51,14 @@ public abstract class RecipeStep {
     public Operation getOperation() {
         return operation;
     }
+
+    /**
+     * Check whether this step is valid to use in a recipe.
+     *
+     * @return True if this step satisfies its recipe-step invariants.
+     *
+     * @note This was added so that a Recipe can verify if all the steps are correct (in case a user creates a custom RecipeStep)
+     */
+    public abstract boolean isValidRecipeStep();
 
 }

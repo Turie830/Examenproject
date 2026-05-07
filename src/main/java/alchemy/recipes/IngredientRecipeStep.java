@@ -100,5 +100,11 @@ public class IngredientRecipeStep extends RecipeStep {
         return ingredientQuantity;
     }
 
+    @Override
+    public boolean isValidRecipeStep() {
+        return getOperation().requiresIngredient()
+                && getIngredientName() != null
+                && getIngredientQuantity() != null;
+    }
 
 }

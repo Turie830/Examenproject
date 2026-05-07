@@ -11,6 +11,14 @@ import java.util.List;
  * @invar A recipe must have at least 1 step
  *      | getNbSteps() > 0
  *
+ * @invar Each recipe step must be effective
+ *      | for each I in 0..getNbSteps()-1:
+ *      |     getStepAt(I) != null
+ *
+ * @invar Each recipe step must be valid
+ *      | for each I in 0..getNbSteps()-1:
+ *      |     getStepAt(I).isValidRecipeStep()
+ *
  * @author Obe Willaert
  * @author Mauro Devolder
  * @author Arthur Pintelon
@@ -22,6 +30,7 @@ public class Recipe {
     /**
      * A List for storing the steps of this recipe
      */
+    // TODO check if the last step is a mix step, if not add it
     private final List<RecipeStep> steps = new ArrayList<RecipeStep>();
 
     /**
@@ -35,10 +44,23 @@ public class Recipe {
      * @throws IllegalArgumentException
      *      The given list steps must be effective and not empty
      *      | steps == null || steps.isEmpty()
+     * @throws IllegalArgumentException
+     *      Each step in the given list must be effective
+     * @throws IllegalArgumentException
+     *      Each step in the given list must be valid
      */
     public Recipe(List<RecipeStep> steps) throws IllegalArgumentException {
         if  (steps == null || steps.isEmpty()) {
             throw new IllegalArgumentException("Steps cannot be null or empty");
+        }
+
+        for (RecipeStep step : steps) {
+            if (step == null) {
+                throw new IllegalArgumentException("Recipe step cannot be null");
+            }
+            if (!step.isValidRecipeStep()) {
+                throw new IllegalArgumentException("Recipe step is not valid");
+            }
         }
 
         // Add the steps to the list, this creates a copy of a step

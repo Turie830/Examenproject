@@ -24,5 +24,10 @@ public class RecipeStepTest {
         private TestRecipeStep(Operation operation) {
             super(operation);
         }
+
+        @Override
+        public boolean isValidRecipeStep() {
+            return true;
+        }
     }
 }

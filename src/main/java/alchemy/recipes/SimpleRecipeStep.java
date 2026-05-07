@@ -37,4 +37,9 @@ public class SimpleRecipeStep extends RecipeStep {
         super(operation);
     }
 
+    @Override
+    public boolean isValidRecipeStep() {
+        return !getOperation().requiresIngredient();
+    }
+
 }
