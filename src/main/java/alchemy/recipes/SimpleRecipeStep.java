@@ -26,10 +26,15 @@ public class SimpleRecipeStep extends RecipeStep {
      *      | operation.requiresIngredient() == false
      */
     public SimpleRecipeStep(Operation operation) throws IllegalArgumentException {
+        // We must do this one again, cause if it's null the operation.requiresIngredient Will fail for nullpointer even thoug it's already in RecipeStep
+        if (operation == null) {
+            throw new IllegalArgumentException("Operation cannot be null");
+        }
         if (operation.requiresIngredient()) {
             throw new IllegalArgumentException("Operation must not require ingredient");
         }
 
         super(operation);
     }
+
 }

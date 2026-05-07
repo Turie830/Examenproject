@@ -60,15 +60,20 @@ public class IngredientRecipeStep extends RecipeStep {
      *      The operation must require an ingredient
      *      | !operation.reqruiresIngredient()
      */
-    public IngredientRecipeStep(Operation operation, Name ingredientName, Quantity quantity) {
+    public IngredientRecipeStep(Operation operation, Name ingredientName, Quantity quantity) throws IllegalArgumentException {
+        // We must do this one again, cause if it's null the operation.requiresIngredient Will fail for nullpointer even thoug it's already in RecipeStep
+        if (operation == null) {
+            throw new IllegalArgumentException("Operation cannot be null");
+        }
+        if (!operation.requiresIngredient()) {
+            throw new IllegalArgumentException("Operation must require ingredient");
+        }
+
         if (ingredientName == null) {
             throw new IllegalArgumentException("Ingredient name cannot be null");
         }
         if (quantity == null) {
             throw new IllegalArgumentException("Quantity cannot be null");
-        }
-        if (!operation.requiresIngredient()) {
-            throw new IllegalArgumentException("Operation must require ingredient");
         }
 
         super(operation);
