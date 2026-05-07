@@ -12,6 +12,15 @@ package alchemy.recipes;
  * @version 1.0
  */
 public enum Operation {
-    ADD, HEAT, COOL, MIX
+    ADD, HEAT, COOL, MIX;
+
+    /**
+     * Checks if the operation requires an ingredient in the step
+     *
+     * @return
+     */
+    public boolean requiresIngredient() {
+        return this == ADD;
+    }
 
 }
