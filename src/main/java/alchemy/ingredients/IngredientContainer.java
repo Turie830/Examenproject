@@ -157,7 +157,7 @@ public class IngredientContainer {
      *       |   && ingredient.getQuantity().toLowestUnit()
      *       |       <= capacityUnit.getFactorToBaseUnit()
      */
-    // ToDo : mag static zijn? (ja zeker?)
+    // ToDo : mag static zijn? (ja zeker?): Kdenk et nie want da hangt toch af van wa da der in je container zit???
     // ToDo: deze functie vind ik stom
     public static boolean canContain(Unit capacityUnit, AlchemicIngredient ingredient) {
         if (capacityUnit == null || ingredient == null)
