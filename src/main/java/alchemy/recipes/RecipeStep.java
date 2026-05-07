@@ -60,5 +60,4 @@ public abstract class RecipeStep {
      * @note This was added so that a Recipe can verify if all the steps are correct (in case a user creates a custom RecipeStep)
      */
     public abstract boolean isValidRecipeStep();
-
 }
