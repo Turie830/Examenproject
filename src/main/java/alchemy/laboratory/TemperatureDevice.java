@@ -14,6 +14,8 @@ public interface TemperatureDevice {
 
     /**
      * Return the configured temperature of this temperature device
+     *
+     * @return A copy of the configured temperature of this temperature device
      */
     Temperature getTemperatureTarget();
 
@@ -25,8 +27,9 @@ public interface TemperatureDevice {
      * @throws IllegalArgumentException The given temperature must be effective
      *                                  | temperature == null
      *
-     * @post The temperature of this device is set to the given temperature
-     * | new.getTemperature() == temperature
+     * @post The temperature target of this device has the same coldness and hotness as the given temperature
+     *       | new.getTemperatureTarget().getColdness() == temperature.getColdness()
+     *       | && new.getTemperatureTarget().getHotness() == temperature.getHotness()
      */
     void setTemperatureTarget(Temperature temperature) throws IllegalArgumentException;
 }
