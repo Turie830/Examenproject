@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * An interface for devices that can contain multiple ingredient containers
+ * An abstract class for devices that can contain multiple ingredient containers.
  *
  * @author Obe Willaert
  * @author Mauro Devolder
@@ -17,9 +17,11 @@ import java.util.List;
 public abstract class MultiContainerDevice extends Device {
 
     /**
-     * The ingredients inside the device
+     * The ingredients inside the device.
+     *
+     * @note This list is internal to the device. Subclasses decide how the
+     *       ingredients are processed when the device is executed.
      */
-    // TODO do we need a way to check what ingredients are in it?
     private List<AlchemicIngredient> deviceContents = new ArrayList<AlchemicIngredient>();
 
 
@@ -37,9 +39,14 @@ public abstract class MultiContainerDevice extends Device {
     }
 
     /**
-     * // TODO do we copy the comments or is it inherited?
+     * Add the ingredient in the given container to this device.
      *
      * @param container The container to add
+     *
+     * @throws IllegalArgumentException The given container must be effective
+     *                                  | container == null
+     * @throws IllegalArgumentException The given container must not be empty
+     *                                  | container.isEmpty()
      */
     @Override
     public void add(IngredientContainer container) {

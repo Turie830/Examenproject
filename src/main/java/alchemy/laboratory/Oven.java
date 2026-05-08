@@ -31,13 +31,13 @@ public class Oven extends SingleContainerDevice implements TemperatureDevice {
         super(laboratory);
     }
 
-    // TODO verbeter comment
-
     /**
-     * Runs the oven
+     * Execute this oven.
      *
-     * @post if the target temperature is colder than the ingredient temperature,
-     * the ingredient temperature does not change, else heat to the targetTemperature
+     * @post If the target temperature is colder than the ingredient temperature,
+     *       the ingredient temperature does not change.
+     * @post If the target temperature is hotter than or equal to the ingredient temperature,
+     *       the ingredient is heated to the target temperature.
      */
     @Override
     public void execute() {
@@ -68,23 +68,26 @@ public class Oven extends SingleContainerDevice implements TemperatureDevice {
     /**
      * Gets the temperature target
      *
-     * @return the temperature this coolbox will reach when executed
+     * @return the temperature this oven will reach when executed
      */
     @Override
     public Temperature getTemperatureTarget() {
-        return temperatureTarget;
+        if (temperatureTarget == null) {
+            return null;
+        }
+        return new Temperature(temperatureTarget);
     }
 
     /**
      * Sets the temperature target to the given temperature
      *
      * @param temperature The new temperature target for this device, that the device will reach when executed
-     *                    <p>
-     *                                       TODO Do I need to copy these from the interface?
+     *
      * @throws IllegalArgumentException The given temperature must be effective
      *                                  | temperature == null
-     * @post The temperature of this device is set to the given temperature
-     * | new.getTemperature() == temperature
+     * @post The temperature target of this device has the same coldness and hotness as the given temperature
+     *       | new.getTemperatureTarget().getColdness() == temperature.getColdness()
+     *       | && new.getTemperatureTarget().getHotness() == temperature.getHotness()
      */
     @Override
     public void setTemperatureTarget(Temperature temperature) throws IllegalArgumentException {
@@ -92,6 +95,6 @@ public class Oven extends SingleContainerDevice implements TemperatureDevice {
             throw new IllegalArgumentException("Temperature cannot be null");
         }
 
-        temperatureTarget = temperature;
+        temperatureTarget = new Temperature(temperature);
     }
 }

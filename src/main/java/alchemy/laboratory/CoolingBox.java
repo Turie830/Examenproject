@@ -31,13 +31,13 @@ public class CoolingBox extends SingleContainerDevice implements TemperatureDevi
         super(laboratory);
     }
 
-    // TODO verbeter comment
-
     /**
-     * Runs the coolbox
+     * Execute this cooling box.
      *
-     * @post if the target temperature is hotter than the ingredient temperature,
-     * the ingredient temperature does not change, else cool to the targetTemperature
+     * @post If the target temperature is hotter than the ingredient temperature,
+     *       the ingredient temperature does not change.
+     * @post If the target temperature is colder than or equal to the ingredient temperature,
+     *       the ingredient is cooled to the target temperature.
      */
     @Override
     public void execute() {
@@ -62,7 +62,6 @@ public class CoolingBox extends SingleContainerDevice implements TemperatureDevi
         // can't throw since we put 1 container in so we get the same amount out
         createResultContainer(this.getDeviceContent());
         emptyDeviceContent();
-
     }
 
     /**
@@ -72,19 +71,22 @@ public class CoolingBox extends SingleContainerDevice implements TemperatureDevi
      */
     @Override
     public Temperature getTemperatureTarget() {
-        return temperatureTarget;
+        if (temperatureTarget == null) {
+            return null;
+        }
+        return new Temperature(temperatureTarget);
     }
 
     /**
      * Sets the temperature target to the given temperature
      *
      * @param temperature The new temperature target for this device, that the device will reach when executed
-     *                    <p>
-     *                    TODO Do I need to copy these from the interface?
+     *
      * @throws IllegalArgumentException The given temperature must be effective
      *                                  | temperature == null
-     * @post The temperature of this device is set to the given temperature
-     * | new.getTemperature() == temperature
+     * @post The temperature target of this device has the same coldness and hotness as the given temperature
+     *       | new.getTemperatureTarget().getColdness() == temperature.getColdness()
+     *       | && new.getTemperatureTarget().getHotness() == temperature.getHotness()
      */
     @Override
     public void setTemperatureTarget(Temperature temperature) throws IllegalArgumentException {
@@ -92,6 +94,6 @@ public class CoolingBox extends SingleContainerDevice implements TemperatureDevi
             throw new IllegalArgumentException("Temperature cannot be null");
         }
 
-        temperatureTarget = temperature;
+        temperatureTarget = new Temperature(temperature);
     }
 }

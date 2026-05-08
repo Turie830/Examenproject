@@ -5,7 +5,7 @@ import alchemy.ingredients.AlchemicIngredient;
 import alchemy.ingredients.IngredientContainer;
 
 /**
- * An interface for devices that can contain at most one ingredient container
+ * An abstract class for devices that can contain at most one ingredient container.
  *
  * @author Obe Willaert
  * @author Mauro Devolder
@@ -39,10 +39,16 @@ public abstract class SingleContainerDevice extends Device {
     }
 
     /**
+     * Add the ingredient in the given container to this device.
      *
      * @param container The container to add
-     *                  //TODO do we need the @throws here?
+     *
+     * @throws IllegalArgumentException The given container must be effective
+     *                                  | container == null
+     * @throws IllegalArgumentException The given container must not be empty
+     *                                  | container.isEmpty()
      */
+    // TODO do we want to create a copy or not? (see todo in OvenTest)
     @Override
     public void add(IngredientContainer container) {
         if (container == null) {
@@ -74,12 +80,33 @@ public abstract class SingleContainerDevice extends Device {
         deviceContent = null;
     }
 
-    // TODO comment
+    /**
+     * Gets the result
+     *
+     * @return null if the device has not ran yet
+     * @return a container with the same capacity and ingredient as the result container
+     */
+    // todo should this be a copy or not?
+    public IngredientContainer getResult() {
+        if (result == null) {
+            return null;
+        }
+        return new IngredientContainer(result.getCapacityUnit(), result.getIngredient());
+    }
 
     /**
+     * Create a result container for the given ingredient.
      *
+     * The result uses the ingredient's current unit when that unit is a valid
+     * container capacity and the ingredient fits in it. Otherwise, the first
+     * valid capacity unit that can contain the ingredient is used.
+     *
+     * @param resultIngredient The ingredient for which to create a result container
+     *
+     * @throws IllegalArgumentException The given result ingredient must be effective
+     *                                  | resultIngredient == null
+     * @throws IllegalArgumentException The given result ingredient must fit in a valid container
      */
-    // todo can be moved to device I think
     protected void createResultContainer(AlchemicIngredient resultIngredient) {
         if (resultIngredient == null) {
             throw new IllegalArgumentException("Result ingredient cannot be null");
@@ -94,7 +121,7 @@ public abstract class SingleContainerDevice extends Device {
             return;
         }
 
-        // else we try and find the
+        // Otherwise, try every valid capacity unit until one can contain the result.
         for (Unit capacityUnit : Unit.values()) {
             if (IngredientContainer.isValidCapacityUnit(capacityUnit)
                     && IngredientContainer.canContain(capacityUnit, resultIngredient)) {
@@ -103,8 +130,6 @@ public abstract class SingleContainerDevice extends Device {
             }
         }
 
-        // this can't happen since these are single container devices
-        // todo should we then take the largest amount possible (when we make it so that it's in device aswell)
         throw new IllegalArgumentException("Result ingredient does not fit in a valid container");
     }
 }
