@@ -25,6 +25,8 @@ import be.kuleuven.cs.som.annotate.Immutable;
  * @author Obe
  *
  * @version 1.0
+ *
+ * @note checkers of class Name are placed here (tip Tommy)
  */
 public class AlchemicIngredient {
 
@@ -273,22 +275,38 @@ public class AlchemicIngredient {
         return isValidName(name, false);
     }
 
+
     /**
      * Check whether the given string is a valid simple name for a mixed ingredient.
      *
      * In this kind of name, the words "mixed" and "with" are allowed.
+     * A mixture name must actually contain the sequence "mixed with".
      *
      * @param name
      *        The string to check.
      *
-     * @return True if and only if the given string is a valid mixture name,
-     *         where the words "mixed" and "with" are allowed.
-     *       | result == isValidName(name, true)
+     * @return False if the given string is not a valid name where "mixed" and "with"
+     *         are allowed.
+     *       | if (!isValidName(name, true)) then result == false
+     *
+     * @return True if and only if the given string is a valid mixture name.
+     *
+     * @note There has to be at least one word before and after 'mixed with'.
      */
     public static boolean isValidMixtureName(String name) {
-        return isValidName(name, true);
-        //ToDO: dit klopt niet
+        if (!isValidName(name, true)) {
+            return false;
+        }
+        String[] words = name.split(" ");
+
+        for (int i = 0; i < words.length - 1; i++) {
+            if (words[i].equals("mixed") && words[i+1].equals("with")) {
+                return i > 0 && i+2 < words.length;
+            }
+        }
+        return false;
     }
+
 
     /**
      * Check whether the given string is a valid name, taking into account
