@@ -2,6 +2,7 @@ package alchemy.recipes;
 
 import alchemy.Name;
 import alchemy.ingredients.Quantity;
+import be.kuleuven.cs.som.annotate.Basic;
 
 /**
  * A class for recipe steps that need ingredients
@@ -87,6 +88,7 @@ public class IngredientRecipeStep extends RecipeStep {
      *
      * @returns the ingredient name need for this step
      */
+    @Basic
     public Name getIngredientName() {
         return ingredientName;
     }
@@ -96,6 +98,7 @@ public class IngredientRecipeStep extends RecipeStep {
      *
      * @returns the ingredient quantity need for this step
      */
+    @Basic
     public Quantity getIngredientQuantity() {
         return ingredientQuantity;
     }

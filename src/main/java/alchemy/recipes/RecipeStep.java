@@ -1,6 +1,8 @@
 package alchemy.recipes;
 
 
+import be.kuleuven.cs.som.annotate.Basic;
+
 /**
  * A class for recipe steps
  *
@@ -48,6 +50,7 @@ public abstract class RecipeStep {
      *
      * @returns the operation of this step
      */
+    @Basic
     public Operation getOperation() {
         return operation;
     }

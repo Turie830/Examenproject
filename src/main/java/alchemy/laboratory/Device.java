@@ -1,6 +1,7 @@
 package alchemy.laboratory;
 
 import alchemy.ingredients.AlchemicIngredient;
+import be.kuleuven.cs.som.annotate.Basic;
 
 /**
  * An abstract class for devices
@@ -30,6 +31,10 @@ public abstract class Device {
      * Initialise a new Device
      *
      * @param laboratory The laboratory this device is located in
+     *
+     * @post laboratory is set as the laboratory for this device
+     *      | new.getLaboratory() == laboratory
+     *
      * @throws IllegalArgumentException laboratory must be effective
      *                                  | laboratory != null
      */
@@ -38,5 +43,15 @@ public abstract class Device {
             throw new IllegalArgumentException("Laboratory object can't be null");
         }
         // todo set the laboratory (can the device be moved from lab?)
+    }
+
+    /**
+     * Gets the laboratory this device is placed in
+     *
+     * @returns the laboratory where this device is located
+     */
+    @Basic
+    public Laboratory getLaboratory() {
+        return laboratory;
     }
 }

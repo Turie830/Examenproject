@@ -1,6 +1,8 @@
 package alchemy.recipes;
 
 
+import be.kuleuven.cs.som.annotate.Basic;
+
 /**
  * An enum for the operations possible in a receipt
  *
@@ -19,6 +21,7 @@ public enum Operation {
      *
      * @return
      */
+    @Basic
     public boolean requiresIngredient() {
         return this == ADD;
     }
