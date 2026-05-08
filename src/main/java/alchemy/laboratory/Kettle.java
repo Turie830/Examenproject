@@ -1,4 +1,4 @@
-// package alchemy.laboratory;
-//
-// public class Kettle extends Device {
-// }
+package alchemy.laboratory;
+
+//public class Kettle extends Device {
+//}

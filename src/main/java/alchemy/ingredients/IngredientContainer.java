@@ -19,14 +19,14 @@ import be.kuleuven.cs.som.annotate.Raw;
  * @invar The capacity unit of each container must be valid.
  *      | isValidCapacityUnit(getCapacityUnit())
  *
- * @invar If a container of a certain unit is not empty, the ingredient fits inside.
+ * @note TODO remove (see new version below)? @invar If a container of a certain unit is not empty, the ingredient fits inside.
  *      | isEmpty() ||
  *      |   (getIngredient().getState() == getCapacityUnit().getState()
  *      |   && getIngredient().getQuantity().toLowestUnit()
  *      |       <= getCapacityUnit().getFactorToBaseUnit())
  *
- *
- * ToDo: check men documentatie pls, kwn zeker of dit juist is 🥹😭. vooral invars :)
+ * @invar If this container is not empty, its ingredient must fit inside.
+ *      | isEmpty() || canContain(getCapacityUnit(), getIngredient())
  *
  * @author Arthur
  * @author Mauro
@@ -119,7 +119,7 @@ public class IngredientContainer {
      *        The unit to check.
      *
      * @return True if the given unit is effective, is not a base unit
-     *         (DROP or PINCH) and is not a storeroom unit (STOREROOM_LIQUID or STOREROOM_POWDER).
+     *         (DROP or PINCH) and is not a storeroom unit (STOREROOM or STOREROOM).
      *       | result ==
      *       |   unit != null
      *       |   && unit != Unit.DROP && unit != Unit.PINCH
@@ -132,7 +132,6 @@ public class IngredientContainer {
         return unit != null
                 && unit != Unit.DROP
                 && unit != Unit.PINCH
-                && unit != Unit.STOREROOM
                 && unit != Unit.STOREROOM;
     }
 
@@ -157,12 +156,14 @@ public class IngredientContainer {
      *       |   && ingredient.getQuantity().toLowestUnit()
      *       |       <= capacityUnit.getFactorToBaseUnit()
      */
-    // ToDo : mag static zijn? (ja zeker?): Kdenk et nie want da hangt toch af van wa da der in je container zit???
-    // ToDo: deze functie vind ik stom
+    // TODO: behoud static, maar maak ook een niet static variant om te kijken als het er bij kan
     // Todo: je moet ook kunnen vullen
     public static boolean canContain(Unit capacityUnit, AlchemicIngredient ingredient) {
         if (capacityUnit == null || ingredient == null)
             return false; // ToDo: is dit goed zo? of exception throwen beter?
+
+        // todo check isValidCapacityUnit()
+
 
         State state = ingredient.getType().getStandardState();
 

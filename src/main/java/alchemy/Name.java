@@ -420,10 +420,4 @@ public class Name {
 
 
 
-
-
-    //ToDO: volledige naam
-
-
-
 }
