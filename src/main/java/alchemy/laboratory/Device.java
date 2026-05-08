@@ -1,57 +1,73 @@
 package alchemy.laboratory;
 
-import alchemy.ingredients.AlchemicIngredient;
+import alchemy.ingredients.IngredientContainer;
 import be.kuleuven.cs.som.annotate.Basic;
 
 /**
- * An abstract class for devices
+ * An abstract class for devices.
+ *
+ * @invar The laboratory of each device must be effective.
+ *      | getLaboratory() != null
+ *
+ * @note this class does not contain any ingredient/devicecontent rules/variables
+ *      reason: kettle accepts a list, others only accept 1 => liskov
  *
  * @author Obe Willaert
  * @author Mauro Devolder
  * @author Arthur Pintelon
  * @version 1.0
- * @invar TODO
- * @invar The laboratory is effective
- * | getLaboratory() != null
  */
 public abstract class Device {
 
     /**
-     * A variable for storing the Laboratory this device sits in
+     * The laboratory this device is located in
      */
-    // TODO final? can this device be moved?
-    private Laboratory laboratory;
+    private final Laboratory laboratory;
 
     /**
-     * A variable for storing the result
-     */
-    private AlchemicIngredient result;
-
-    /**
-     * Initialise a new Device
+     * Initialise a new device
      *
-     * @param laboratory The laboratory this device is located in
+     * @param laboratory
+     *      The laboratory this device is located in
      *
-     * @post laboratory is set as the laboratory for this device
+     * @post The laboratory of this device is set to the given laboratory
      *      | new.getLaboratory() == laboratory
      *
-     * @throws IllegalArgumentException laboratory must be effective
-     *                                  | laboratory != null
+     * @throws IllegalArgumentException
+     *      The given laboratory must be effective
+     *      | laboratory == null
      */
-    public Device(Laboratory laboratory) {
+    protected Device(Laboratory laboratory) {
         if (laboratory == null) {
             throw new IllegalArgumentException("Laboratory object can't be null");
         }
-        // todo set the laboratory (can the device be moved from lab?)
+        this.laboratory = laboratory;
     }
 
     /**
-     * Gets the laboratory this device is placed in
+     * Return the laboratory this device is located in
      *
-     * @returns the laboratory where this device is located
+     * @return The laboratory this device is located in
      */
     @Basic
     public Laboratory getLaboratory() {
         return laboratory;
     }
+
+    /**
+     * Add the given container to this device
+     *
+     * @param container The container to add
+     * @throws IllegalArgumentException The given container must be effective
+     *                                  | container == null
+     * @throws IllegalArgumentException The given container must not be empty
+     *                                  | container.isEmpty()
+     */
+    public abstract void add(IngredientContainer container);
+
+    /**
+     * Execute the operation of this device.
+     */
+    public abstract void execute();
+
 }
