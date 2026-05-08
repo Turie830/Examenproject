@@ -1,4 +1,4 @@
 package alchemy.laboratory;
 
-public class Oven extends Device implements TemperatureDevice, SingleContainerDevice {
-}
+//public class Oven extends Device implements TemperatureDevice, SingleContainerDevice {
+//}
