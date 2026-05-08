@@ -42,7 +42,7 @@ public class IngredientType {
      * A variable referencing the default ingredient type, Water.
      */
     public static final IngredientType DEFAULT =
-            new IngredientType(Name.WATER, State.LIQUID, new Temperature(0, 20), false, false);
+            new IngredientType(Name.WATER, State.LIQUID, new Temperature(0, 20), false);
 
 
     /**********************************************************
@@ -50,8 +50,8 @@ public class IngredientType {
      **********************************************************/
 
     /**
-     * Create a new ingredient type with the given name, standard state,
-     * standard temperature and mixed state.
+     * Create a new regular ingredient type with the given name, standard state
+     * and standard temperature.
      *
      * The name is handled defensively: an invalid name results in an exception.
      * The standard state and standard temperature are handled totally: invalid
@@ -66,12 +66,6 @@ public class IngredientType {
      * @param standardTemperature
      *        The standard temperature of this new ingredient type.
      *
-     * @param isMixed
-     *        A boolean that shows whether this new ingredient type is mixed.
-     *
-     * @post The mixed state of this new ingredient type is equal to the given mixed state.
-     *     | new.isMixed() == isMixed
-     *
      * @post If the given standard state is valid, the standard state of this new
      *       ingredient type is equal to the given standard state.
      *     | if (isValidState(standardState)) then
@@ -82,26 +76,13 @@ public class IngredientType {
      *     | if (!isValidState(standardState)) then
      *     |   new.getStandardState() == DEFAULT.getStandardState()
      *
-     * @post If the given standard temperature is valid, the standard temperature
-     *       of this new ingredient type has the same coldness and hotness as the
-     *       given standard temperature.
-     *     | if (canHaveAsStandardTemperature(standardTemperature)) then
-     *     |   new.getStandardTemperatureObject().getColdness() == standardTemperature.getColdness()
-     *     |   && new.getStandardTemperatureObject().getHotness() == standardTemperature.getHotness()
-     *
-     * @post If the given standard temperature is not valid, the standard temperature
-     *       of this new ingredient type is equal to the default standard temperature.
-     *     | if (!canHaveAsStandardTemperature(standardTemperature)) then
-     *     |   new.getStandardTemperatureObject().getColdness() == DEFAULT.getStandardTemperatureObject().getColdness()
-     *     |   && new.getStandardTemperatureObject().getHotness() == DEFAULT.getStandardTemperatureObject().getHotness()
-     *
      * @throws IllegalNameException
      *         The given name is not a proper name for this ingredient type.
-     *       | name == null || name.isMixed() != isMixed
+     *       | !canHaveAsName(name)
      */
     @Raw
-    public IngredientType(Name name, State standardState, Temperature standardTemperature, boolean isMixed) {
-        this(name, standardState, standardTemperature, isMixed, true);
+    public IngredientType(Name name, State standardState, Temperature standardTemperature) {
+        this(name, standardState, standardTemperature, true);
     }
 
     /**
@@ -119,21 +100,16 @@ public class IngredientType {
      * @param standardTemperature
      *        The standard temperature of this new ingredient type.
      *
-     * @param isMixed
-     *        Whether this new ingredient type is mixed.
-     *
      * @param useDefaultOnInvalid
      *        Whether invalid state and temperature values should be replaced
      *        by values from the default ingredient type.
      *
      * @throws IllegalNameException
      *         The given name is not a proper name for this ingredient type.
-     *       | name == null || name.isMixed() != isMixed
+     *       | !canHaveAsName(name)
      */
     @Raw
-    private IngredientType(Name name, State standardState, Temperature standardTemperature, boolean isMixed, boolean useDefaultOnInvalid) {
-        this.isMixed = isMixed;
-
+    protected IngredientType(Name name, State standardState, Temperature standardTemperature, boolean useDefaultOnInvalid) {
         setName(name);
 
         this.standardState = getValidStateOrDefault(standardState, useDefaultOnInvalid);
@@ -154,12 +130,12 @@ public class IngredientType {
      *         and mixed state false.
      *       | this(name, DEFAULT.getStandardState(), DEFAULT.getStandardTemperatureObject(), false)
      *
-     * @throws IllegalArgumentException
+     * @throws IllegalNameException
      *         The given name is not a proper regular name.
-     *       | name == null || name.isMixed()
+     *       | !canHaveAsName(name)
      */
     public IngredientType(Name name) {
-        this(name, DEFAULT.getStandardState(), DEFAULT.getStandardTemperatureObject(), false);
+        this(name, DEFAULT.getStandardState(), DEFAULT.getStandardTemperatureObject());
     }
 
 
@@ -167,22 +143,17 @@ public class IngredientType {
      * MIXED
      **********************************************************/
 
-    //ToDO: beter subclass
-
-    /**
-     * Variable registering whether this ingredient type is mixed.
-     */
-    private final boolean isMixed;
-
     /**
      * Check whether this ingredient type is mixed.
      *
-     * @return True if and only if this ingredient type is mixed.
-     *       | result == this.isMixed
+     * A regular ingredient type is not mixed.
+     *
+     * @return False.
+     *       | result == false
      */
     @Basic @Immutable
     public boolean isMixed() {
-        return isMixed;
+        return false;
     }
 
 

@@ -26,7 +26,7 @@ public class IngredientTypeTest {
     public void constructor_ValidRegularIngredientType() {
         Name name = new Name("Salt");
         Temperature temperature = new Temperature(0, 50);
-        IngredientType type = new IngredientType(name, State.POWDER, temperature, false);
+        IngredientType type = new IngredientType(name, State.POWDER, temperature);
 
         assertEquals("Salt", name.getName());
         assertEquals("Salt", type.getSimpleName());
@@ -39,7 +39,8 @@ public class IngredientTypeTest {
     public void constructor_ValidMixedIngredientType() {
         Name name = Name.createMixtureName("Beer mixed with Coke");
         Temperature temperature = new Temperature(0, 30);
-        IngredientType type = new IngredientType(name, State.LIQUID, temperature, true);
+
+        IngredientType type = new MixedIngredientType(name, State.LIQUID, temperature);
 
         assertEquals("Beer mixed with Coke", name.getName());
         assertEquals("Beer mixed with Coke", type.getSimpleName());
@@ -51,7 +52,7 @@ public class IngredientTypeTest {
     @Test
     public void constructor_NullName() {
         assertThrows(IllegalNameException.class, () -> {
-            new IngredientType(null, State.LIQUID, new Temperature(0, 20), false);
+            new IngredientType(null, State.LIQUID, new Temperature(0, 20));
         });
     }
 
@@ -59,7 +60,7 @@ public class IngredientTypeTest {
     public void constructor_RegularNameForMixedType() {
         Name regularName = new Name("Water");
         assertThrows(IllegalNameException.class, () -> {
-            new IngredientType(regularName, State.LIQUID, new Temperature(0, 20), true);
+            new MixedIngredientType(regularName, State.LIQUID, new Temperature(0, 20));
         });
     }
 
@@ -67,14 +68,14 @@ public class IngredientTypeTest {
     public void constructor_MixtureNameForRegularType() {
         Name mixtureName = Name.createMixtureName("Beer mixed with Coke");
         assertThrows(IllegalNameException.class, () -> {
-            new IngredientType(mixtureName, State.LIQUID, new Temperature(0, 20), false);
+            new IngredientType(mixtureName, State.LIQUID, new Temperature(0, 20));
         });
     }
 
     @Test
     public void constructor_NullStandardState() {
         IngredientType type = new IngredientType(new Name("Salt"), null,
-                new Temperature(0, 50), false);
+                new Temperature(0, 50));
 
         assertEquals(IngredientType.DEFAULT.getStandardState(), type.getStandardState());
     }
@@ -82,14 +83,14 @@ public class IngredientTypeTest {
     @Test
     public void constructor_ValidStandardTemperature() {
         Temperature temperature = new Temperature(0, 75);
-        IngredientType type = new IngredientType(new Name("Milk"), State.LIQUID, temperature, false);
+        IngredientType type = new IngredientType(new Name("Milk"), State.LIQUID, temperature);
 
         assertArrayEquals(new long[] {0, 75}, type.getStandardTemperature());
     }
 
     @Test
     public void constructor_NullStandardTemperature() {
-        IngredientType type = new IngredientType(new Name("Milk"), State.LIQUID, null, false);
+        IngredientType type = new IngredientType(new Name("Milk"), State.LIQUID, null);
 
         assertArrayEquals(IngredientType.DEFAULT.getStandardTemperature(), type.getStandardTemperature());
     }
@@ -101,7 +102,7 @@ public class IngredientTypeTest {
     @Test
     public void constructor_ColdStandardTemperature() {
         IngredientType type = new IngredientType(new Name("Ice"), State.LIQUID,
-                new Temperature(10, 0), false);
+                new Temperature(10, 0));
 
         assertArrayEquals(IngredientType.DEFAULT.getStandardTemperature(), type.getStandardTemperature());
     }
@@ -109,7 +110,7 @@ public class IngredientTypeTest {
     @Test
     public void constructor_NeutralStandardTemperature() {
         IngredientType type = new IngredientType(new Name("Stone"), State.POWDER,
-                new Temperature(0, 0), false);
+                new Temperature(0, 0));
         assertArrayEquals(IngredientType.DEFAULT.getStandardTemperature(), type.getStandardTemperature());
     }
 
@@ -130,16 +131,16 @@ public class IngredientTypeTest {
 
     @Test
     public void canHaveAsName_MixedTypeAcceptsMixtureName() {
-        IngredientType type = new IngredientType(Name.createMixtureName("Beer mixed with Coke"), State.LIQUID,
-                new Temperature(0, 20), true);
+        MixedIngredientType type = new MixedIngredientType(Name.createMixtureName("Beer mixed with Coke"), State.LIQUID,
+                new Temperature(0, 20));
         assertTrue(type.canHaveAsName(Name.createMixtureName("Water mixed with Salt")));
     }
 
     @Test
     public void canHaveAsName_MixedTypeRejectsRegularName() {
-        IngredientType type = new IngredientType(
+        MixedIngredientType type = new MixedIngredientType(
                 Name.createMixtureName("Beer mixed with Coke"), State.LIQUID,
-                new Temperature(0, 20), true);
+                new Temperature(0, 20));
 
         assertFalse(type.canHaveAsName(new Name("Water")));
     }
@@ -187,7 +188,7 @@ public class IngredientTypeTest {
     @Test
     public void getStandardTemperature() {
         IngredientType type = new IngredientType(new Name("Water"), State.LIQUID,
-                new Temperature(0, 20), false);
+                new Temperature(0, 20));
 
         long[] temperature = type.getStandardTemperature();
         temperature[0] = 999;
@@ -199,7 +200,7 @@ public class IngredientTypeTest {
     @Test
     public void constructor_StandardTemperatureIsCopied() {
         Temperature temperature = new Temperature(0, 20);
-        IngredientType type = new IngredientType(new Name("Water"), State.LIQUID, temperature, false);
+        IngredientType type = new IngredientType(new Name("Water"), State.LIQUID, temperature);
 
         temperature.heat(50);
 
@@ -210,7 +211,7 @@ public class IngredientTypeTest {
     @Test
     public void getStandardTemperatureDifference_EffectiveTemperature() {
         IngredientType type = new IngredientType(new Name("Water"), State.LIQUID,
-                new Temperature(0, 20), false);
+                new Temperature(0, 20));
 
         Temperature other = new Temperature(0, 100);
 
@@ -220,7 +221,7 @@ public class IngredientTypeTest {
     @Test
     public void getStandardTemperatureDifference_NullTemperature() {
         IngredientType type = new IngredientType(new Name("Water"), State.LIQUID,
-                new Temperature(0, 100), false);
+                new Temperature(0, 100));
 
         assertEquals(80, type.getStandardTemperatureDifference(null));
     }
