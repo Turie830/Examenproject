@@ -159,9 +159,10 @@ public class IngredientContainer {
      */
     // ToDo : mag static zijn? (ja zeker?): Kdenk et nie want da hangt toch af van wa da der in je container zit???
     // ToDo: deze functie vind ik stom
+    // Todo: je moet ook kunnen vullen
     public static boolean canContain(Unit capacityUnit, AlchemicIngredient ingredient) {
         if (capacityUnit == null || ingredient == null)
-            return false;// ToDo: is dit goed zo? of exception throwen beter?
+            return false; // ToDo: is dit goed zo? of exception throwen beter?
 
         State state = ingredient.getType().getStandardState();
 
