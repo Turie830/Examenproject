@@ -17,17 +17,18 @@ public interface TemperatureDevice {
     /**
      * Return the configured temperature of this temperature device
      */
-    Temperature getTemperature();
+    Temperature getTemperatureTarget();
 
     /**
      * Set the configured temperature of this temperature device
      *
      * @param temperature The new temperature for this device
+     *
      * @throws IllegalArgumentException The given temperature must be effective
      *                                  | temperature == null
+     *
      * @post The temperature of this device is set to the given temperature
      * | new.getTemperature() == temperature
      */
-    // TODO verify the if temp rules are this way
-    void setTemperature(Temperature temperature) throws IllegalArgumentException;
+    void setTemperatureTarget(Temperature temperature) throws IllegalArgumentException;
 }

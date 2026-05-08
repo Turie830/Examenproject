@@ -16,7 +16,7 @@ public abstract class SingleContainerDevice extends Device {
     /**
      * The ingredient in the device
      */
-    private AlchemicIngredient deviceContents;
+    private AlchemicIngredient deviceContent;
 
 
     /**
@@ -35,7 +35,6 @@ public abstract class SingleContainerDevice extends Device {
     /**
      *
      * @param container The container to add
-     *                  <p>
      *                  //TODO do we need the @throws here?
      */
     @Override
@@ -48,5 +47,14 @@ public abstract class SingleContainerDevice extends Device {
         }
 
         deviceContents = container.getIngredient();
+    }
+
+    /**
+     * Gets the content of this device
+     *
+     * @return the content of this device
+     */
+    protected AlchemicIngredient getDeviceContent() {
+        return deviceContent;
     }
 }
