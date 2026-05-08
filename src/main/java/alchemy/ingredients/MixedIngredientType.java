@@ -2,6 +2,7 @@ package alchemy.ingredients;
 
 import alchemy.Name;
 import alchemy.Temperature;
+import alchemy.exceptions.IllegalNameException;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
@@ -49,6 +50,7 @@ public class MixedIngredientType extends IngredientType{
         super(name, standardState, standardTemperature);
     }
 
+
     /**
      * Initialize this new mixed ingredient type with the given name.
      *
@@ -65,6 +67,7 @@ public class MixedIngredientType extends IngredientType{
         this(name, DEFAULT.getStandardState(), DEFAULT.getStandardTemperatureObject());
     }
 
+
     /**
      * Check whether this ingredient type is mixed.
      *
@@ -78,4 +81,46 @@ public class MixedIngredientType extends IngredientType{
         return true;
     }
 
+
+    /**
+     * Return the special name of this mixed ingredient type.
+     *
+     * @return The special name of this mixed ingredient type.
+     *       | result == getName().getSpecialName()
+     */
+    @Basic
+    public String getSpecialName() {
+        return getName().getSpecialName();
+    }
+
+
+    /**
+     * Check whether this mixed ingredient type has a special name.
+     *
+     * @return True if and only if the special name is effective.
+     *       | result == (getSpecialName() != null)
+     */
+    public boolean hasSpecialName() {
+        return getName().hasSpecialName();
+    }
+
+
+    /**
+     * Set the special name of this mixed ingredient type.
+     *
+     * @param specialName
+     *        The special name to set.
+     *
+     * @effect The special name of the name of this mixed ingredient type
+     *         is set to the given special name.
+     *       | getName().setSpecialName(specialName)
+     *
+     * @throws IllegalNameException
+     *         The given special name is effective but not valid.
+     *       | specialName != null && !AlchemicIngredient.isValidName(specialName)
+     */
+    @Raw
+    public void setSpecialName(String specialName) throws IllegalNameException {
+        getName().setSpecialName(specialName);
+    }
 }

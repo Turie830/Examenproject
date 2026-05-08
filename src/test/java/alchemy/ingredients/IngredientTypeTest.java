@@ -35,19 +35,7 @@ public class IngredientTypeTest {
         assertFalse(type.isMixed());
     }
 
-    @Test
-    public void constructor_ValidMixedIngredientType() {
-        Name name = Name.createMixtureName("Beer mixed with Coke");
-        Temperature temperature = new Temperature(0, 30);
 
-        IngredientType type = new MixedIngredientType(name, State.LIQUID, temperature);
-
-        assertEquals("Beer mixed with Coke", name.getName());
-        assertEquals("Beer mixed with Coke", type.getSimpleName());
-        assertEquals(State.LIQUID, type.getStandardState());
-        assertArrayEquals(new long[] {0, 30}, type.getStandardTemperature());
-        assertTrue(type.isMixed());
-    }
 
     @Test
     public void constructor_NullName() {
@@ -56,21 +44,7 @@ public class IngredientTypeTest {
         });
     }
 
-    @Test
-    public void constructor_RegularNameForMixedType() {
-        Name regularName = new Name("Water");
-        assertThrows(IllegalNameException.class, () -> {
-            new MixedIngredientType(regularName, State.LIQUID, new Temperature(0, 20));
-        });
-    }
 
-    @Test
-    public void constructor_MixtureNameForRegularType() {
-        Name mixtureName = Name.createMixtureName("Beer mixed with Coke");
-        assertThrows(IllegalNameException.class, () -> {
-            new IngredientType(mixtureName, State.LIQUID, new Temperature(0, 20));
-        });
-    }
 
     @Test
     public void constructor_NullStandardState() {
@@ -124,7 +98,7 @@ public class IngredientTypeTest {
     @Test
     public void canHaveAsName_RegularTypeRejectsMixtureName() {
         IngredientType type = new IngredientType(new Name("Water"), State.LIQUID,
-                new Temperature(0, 20), false);
+                new Temperature(0, 20));
 
         assertFalse(type.canHaveAsName(Name.createMixtureName("Beer mixed with Coke")));
     }
