@@ -1,5 +1,8 @@
 package alchemy.laboratory;
 
+import alchemy.ingredients.AlchemicIngredient;
+import alchemy.ingredients.IngredientContainer;
+
 /**
  * An interface for devices that can contain at most one ingredient container
  *
@@ -8,10 +11,42 @@ package alchemy.laboratory;
  * @author Arthur Pintelon
  * @version 1.0
  */
-public interface SingleContainerDevice {
+public abstract class SingleContainerDevice extends Device {
 
     /**
-     * Check whether this device currently contains an ingredient container
+     * The ingredient in the device
      */
-    boolean hasContainer();
+    private AlchemicIngredient deviceContents;
+
+
+    /**
+     * Initialise a new single container device
+     *
+     * @param laboratory The laboratory this device is located in
+     * @throws IllegalArgumentException The given laboratory must be effective
+     *                                  | laboratory == null
+     * @post The laboratory of this device is set to the given laboratory
+     * | new.getLaboratory() == laboratory
+     */
+    public SingleContainerDevice(Laboratory laboratory) {
+        super(laboratory);
+    }
+
+    /**
+     *
+     * @param container The container to add
+     *                  <p>
+     *                  //TODO do we need the @throws here?
+     */
+    @Override
+    public void add(IngredientContainer container) {
+        if (container == null) {
+            throw new IllegalArgumentException("Container cannot be null");
+        }
+        if (container.isEmpty()) {
+            throw new IllegalArgumentException("Container cannot be empty");
+        }
+
+        deviceContents = container.getIngredient();
+    }
 }

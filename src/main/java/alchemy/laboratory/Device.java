@@ -22,7 +22,8 @@ public abstract class Device {
     /**
      * The laboratory this device is located in
      */
-    private final Laboratory laboratory;
+    // TODO bidirectionality with laboratory
+    private Laboratory laboratory;
 
     /**
      * Initialise a new device
@@ -37,10 +38,11 @@ public abstract class Device {
      *      The given laboratory must be effective
      *      | laboratory == null
      */
-    protected Device(Laboratory laboratory) {
+    public Device(Laboratory laboratory) {
         if (laboratory == null) {
             throw new IllegalArgumentException("Laboratory object can't be null");
         }
+        // TODO use method here
         this.laboratory = laboratory;
     }
 
@@ -58,6 +60,8 @@ public abstract class Device {
      * Add the given container to this device
      *
      * @param container The container to add
+     *
+     * //TODO do we need the @throws here?
      * @throws IllegalArgumentException The given container must be effective
      *                                  | container == null
      * @throws IllegalArgumentException The given container must not be empty
