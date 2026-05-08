@@ -1,6 +1,9 @@
 package alchemy.laboratory;
 
 import alchemy.Temperature;
+import alchemy.ingredients.AlchemicIngredient;
+
+import java.util.Random;
 
 /**
  * A class for ovens
@@ -38,31 +41,44 @@ public class Oven extends SingleContainerDevice implements TemperatureDevice {
      *       the ingredient temperature does not change.
      * @post If the target temperature is hotter than or equal to the ingredient temperature,
      *       the ingredient is heated to the target temperature.
+     * @throws IllegalStateException The device must have an ingredient to cool
+     *      | TODO getDeviceContent is protected so what expression?
+     * @throws IllegalStateException The device must have a target temperature
+     *      | getTemperatureTarget() == null
      */
     @Override
-    public void execute() {
+    public void execute() throws IllegalStateException {
+        AlchemicIngredient ingredient = this.getDeviceContent();
 
-        long ingredientColdness = this.getDeviceContent().getColdness();
-        long ingredientHotness = this.getDeviceContent().getHotness();
+        if (ingredient == null) {
+            throw new IllegalStateException("The device should have ingredients in it.");
+        }
+        if (getTemperatureTarget() == null) {
+            throw new IllegalStateException("The temperature target should not be null.");
+        }
+
+        long ingredientColdness = ingredient.getColdness();
+        long ingredientHotness = ingredient.getHotness();
+
         Temperature ingredientTemp = new Temperature(ingredientColdness, ingredientHotness);
 
+        // Check the ingredient needs to be heated
+        if (ingredientTemp.isColderThan(temperatureTarget)) {
+            // calculate heating amount
+            long heatAmount = ingredientTemp.difference(temperatureTarget);
 
-        // Check if the ingredient is colder or equal to the targetTemperature
-        if (ingredientTemp.isHotterThan(temperatureTarget)) {
-            // do nothing
+            // can be 5 of (either direction)
+            Random rand = new Random();
+            int n = rand.nextInt(11) - 5; // random between 0 and 10 (inclusive) then shift 5 left
+
+            // heat the ingredient by the amount
+            ingredient.heat(heatAmount);
             return;
         }
 
-        // calculate cooling amount
-        long coolAmount = ingredientTemp.difference(temperatureTarget);
-
-        // cool the ingredient by the amount
-        this.getDeviceContent().heat(coolAmount);
-
         // can't throw since we put 1 container in so we get the same amount out
-        createResultContainer(this.getDeviceContent());
+        createResultContainer(ingredient);
         emptyDeviceContent();
-
     }
 
     /**

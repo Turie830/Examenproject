@@ -53,14 +53,29 @@ public class OvenTest {
     }
 
     @Test
-    public void execute_TargetHotterThanIngredient_HeatsIngredientToTarget() {
+    public void execute_NoIngredient_ThrowsException() {
+        oven.setTemperatureTarget(new Temperature(0, 80));
+
+        assertThrows(IllegalStateException.class, () -> oven.execute());
+    }
+
+    @Test
+    public void execute_NoTemperatureTarget_ThrowsException() {
+        oven.add(new IngredientContainer(Unit.BOTTLE, ingredient));
+
+        assertThrows(IllegalStateException.class, () -> oven.execute());
+    }
+
+    @Test
+    public void execute_TargetHotterThanIngredient_HeatsIngredientWithinFiveDegreesOfTarget() {
         oven.add(new IngredientContainer(Unit.BOTTLE, ingredient));
         oven.setTemperatureTarget(new Temperature(0, 80));
 
         oven.execute();
 
         assertEquals(0, ingredient.getColdness());
-        assertEquals(80, ingredient.getHotness());
+        assertTrue(ingredient.getHotness() >= 75);
+        assertTrue(ingredient.getHotness() <= 85);
     }
 
     @Test

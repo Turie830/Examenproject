@@ -52,6 +52,20 @@ public class CoolingBoxTest {
     }
 
     @Test
+    public void execute_NoIngredient_ThrowsException() {
+        coolingBox.setTemperatureTarget(new Temperature(30, 0));
+
+        assertThrows(IllegalStateException.class, () -> coolingBox.execute());
+    }
+
+    @Test
+    public void execute_NoTemperatureTarget_ThrowsException() {
+        coolingBox.add(new IngredientContainer(Unit.BOTTLE, ingredient));
+
+        assertThrows(IllegalStateException.class, () -> coolingBox.execute());
+    }
+
+    @Test
     public void execute_TargetColderThanIngredient_CoolsIngredientToTarget() {
         coolingBox.add(new IngredientContainer(Unit.BOTTLE, ingredient));
         coolingBox.setTemperatureTarget(new Temperature(30, 0));
