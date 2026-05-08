@@ -130,7 +130,6 @@ public class NameTest {
     }
 
 
-    //ToDO: dit klopt niet doordat isValidMixtureName() niet klopt
     @Test
     public void createMixtureName_InvalidMixtureName() {
         assertThrows(IllegalArgumentException.class, () -> Name.createMixtureName(null));

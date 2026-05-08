@@ -424,14 +424,4 @@ public class Temperature {
 
 
 
-
-
-
-
-
-
-
-
-
-    //ToDO: Full name met Heated / Cooled (eerst doen in Name)
 }
