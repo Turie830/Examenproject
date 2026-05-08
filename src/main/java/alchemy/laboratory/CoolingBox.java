@@ -1,19 +1,21 @@
 package alchemy.laboratory;
 
 import alchemy.Temperature;
-import alchemy.ingredients.IngredientContainer;
 
+/**
+ * A class for cooling boxes
+ *
+ * @author Obe Willaert
+ * @author Mauro Devolder
+ * @author Arthur Pintelon
+ * @version 1.0
+ */
 public class CoolingBox extends SingleContainerDevice implements TemperatureDevice {
 
     /**
      * The temperature target of the cooling box
      */
     private Temperature temperatureTarget;
-
-    /**
-     * The result container after executing
-     */
-    private IngredientContainer result;
 
 
     /**
@@ -56,6 +58,11 @@ public class CoolingBox extends SingleContainerDevice implements TemperatureDevi
 
         // cool the ingredient by the amount
         this.getDeviceContent().cool(coolAmount);
+
+        // can't throw since we put 1 container in so we get the same amount out
+        createResultContainer(this.getDeviceContent());
+        emptyDeviceContent();
+
     }
 
     /**

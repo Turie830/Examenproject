@@ -1,5 +1,6 @@
 package alchemy.laboratory;
 
+import alchemy.Unit;
 import alchemy.ingredients.AlchemicIngredient;
 import alchemy.ingredients.IngredientContainer;
 
@@ -17,6 +18,11 @@ public abstract class SingleContainerDevice extends Device {
      * The ingredient in the device
      */
     private AlchemicIngredient deviceContent;
+
+    /**
+     * The result container after executing
+     */
+    private IngredientContainer result;
 
 
     /**
@@ -46,7 +52,7 @@ public abstract class SingleContainerDevice extends Device {
             throw new IllegalArgumentException("Container cannot be empty");
         }
 
-        deviceContents = container.getIngredient();
+        deviceContent = container.getIngredient();
     }
 
     /**
@@ -56,5 +62,49 @@ public abstract class SingleContainerDevice extends Device {
      */
     protected AlchemicIngredient getDeviceContent() {
         return deviceContent;
+    }
+
+    /**
+     * Empties the device of any inputs
+     *
+     * @post the deviceContent is set to null
+     * | getDeviceContent() == null;
+     */
+    protected void emptyDeviceContent() {
+        deviceContent = null;
+    }
+
+    // TODO comment
+
+    /**
+     *
+     */
+    // todo can be moved to device I think
+    protected void createResultContainer(AlchemicIngredient resultIngredient) {
+        if (resultIngredient == null) {
+            throw new IllegalArgumentException("Result ingredient cannot be null");
+        }
+
+        Unit resultUnit = resultIngredient.getQuantity().getUnit();
+
+        // checks if we can use the same unit as the ingredient
+        if (IngredientContainer.isValidCapacityUnit(resultUnit)
+                && IngredientContainer.canContain(resultUnit, resultIngredient)) {
+            result = new IngredientContainer(resultUnit, resultIngredient);
+            return;
+        }
+
+        // else we try and find the
+        for (Unit capacityUnit : Unit.values()) {
+            if (IngredientContainer.isValidCapacityUnit(capacityUnit)
+                    && IngredientContainer.canContain(capacityUnit, resultIngredient)) {
+                result = new IngredientContainer(capacityUnit, resultIngredient);
+                return;
+            }
+        }
+
+        // this can't happen since these are single container devices
+        // todo should we then take the largest amount possible (when we make it so that it's in device aswell)
+        throw new IllegalArgumentException("Result ingredient does not fit in a valid container");
     }
 }

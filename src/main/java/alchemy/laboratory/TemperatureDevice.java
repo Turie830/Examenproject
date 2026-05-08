@@ -4,8 +4,6 @@ import alchemy.Temperature;
 
 /**
  * An interface for devices that have a configurable temperature
- * <p>
- * A temperature device can be configured before executing its alchemic operation
  *
  * @author Obe Willaert
  * @author Mauro Devolder
