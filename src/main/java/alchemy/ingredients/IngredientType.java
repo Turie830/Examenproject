@@ -403,14 +403,4 @@ public class IngredientType {
     }
 
 
-
-
-
-
-    //ToDO: Nog later nodig: integratie met AlchemicIngredient, Quantity, Kettle/mengsels, full name.
-
-
-
-
-
 }
