@@ -196,28 +196,6 @@ public enum Unit {
     }
 
     /**
-     * Gets the spoon unit for the given state.
-     *
-     * @param state
-     *      The state for which to get the spoon unit
-     *
-     * @return The spoon unit for the given state.
-     *      | result == Unit.SPOON
-     *
-     * @throws IllegalArgumentException
-     *      The given state is not effective.
-     *      | state == null
-     */
-    @Immutable
-    public static Unit getSpoonUnit(State state) throws IllegalArgumentException {
-        if (state == null) {
-            throw new IllegalArgumentException("State cannot be null.");
-        }
-
-        return Unit.SPOON;
-    }
-
-    /**
      * Convert the given amount expressed in this unit to the corresponding
      * amount expressed in the base unit for the given state.
      *

@@ -102,7 +102,7 @@ public class Quantity {
      */
     @Immutable
     public Long toSpoons(State state) {
-        return toLowestUnit(state) / Unit.getSpoonUnit(state).getFactorToBaseUnit(state);
+        return toLowestUnit(state) / Unit.SPOON.getFactorToBaseUnit(state);
     }
 
     /**

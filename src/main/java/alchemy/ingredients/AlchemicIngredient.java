@@ -88,7 +88,7 @@ public class AlchemicIngredient {
         this.temperature = this.type.getStandardTemperatureObject();
 
         if (quantity == null) {
-            this.quantity = new Quantity(0L, Unit.getSpoonUnit(this.type.getStandardState()));
+            this.quantity = new Quantity(0L, Unit.SPOON);
         }
         else {
             this.quantity = quantity;
@@ -361,6 +361,10 @@ public class AlchemicIngredient {
         }
 
         if (!Name.hasOnlyAllowedCharacters(name)) {
+            return false;
+        }
+
+        if (!allowMixedAndWith && name.contains(",")) {
             return false;
         }
 
