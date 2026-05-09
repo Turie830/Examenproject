@@ -2,19 +2,12 @@ package alchemy.laboratory;
 
 import alchemy.Unit;
 import alchemy.ingredients.AlchemicIngredient;
-import alchemy.ingredients.IngredientContainer;
-import alchemy.ingredients.Quantity;
 import alchemy.ingredients.State;
-import alchemy.recipes.Recipe;
 import be.kuleuven.cs.som.annotate.Basic;
-import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A class for laboratories.
@@ -240,7 +233,10 @@ public class Laboratory {
         return result;
     }
 
-    findIngredient(name) // ToDo: of toch zelfde als getingredient? (nee zeker, anders en wrs veiliger zo)
+    // todo I modified it to fix build errors
+    public AlchemicIngredient findIngredient(String name) {
+        return null;
+    }// ToDo: of toch zelfde als getingredient? (nee zeker, anders en wrs veiliger zo)
 
 
     /**
