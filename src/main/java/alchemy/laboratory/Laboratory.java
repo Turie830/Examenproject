@@ -2,12 +2,19 @@ package alchemy.laboratory;
 
 import alchemy.Unit;
 import alchemy.ingredients.AlchemicIngredient;
+import alchemy.ingredients.IngredientContainer;
+import alchemy.ingredients.Quantity;
 import alchemy.ingredients.State;
+import alchemy.recipes.Recipe;
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A class for laboratories.
@@ -195,48 +202,185 @@ public class Laboratory {
     private final List<AlchemicIngredient> ingredients = new ArrayList<>();
 
 
-    /**
-     * Return the number of ingredients currently in this laboratory.
-     */
-    @Basic
-    public int getNbIngredients() {
-        return ingredients.size();
-    }
+    // ToDo: is public List<AlchemicIngredient> getIngredients() nodig?
+
 
     /**
-     * Check if an ingredient with a given name exists in this laboratory.
-     * The name can be a simple name, or a special name (mixes).
+     * Return the ingredient in this laboratory whose simple name or
+     * special name (mixed ingredient) matches the given name.
      *
-     * @param name
-     *        The name to look up.
-     */
-    public boolean hasIngredient(String name) {
-        return findIngredient(name) != null;
-    }
-
-
-    /**
-     * Return the ingredient with the given name from this laboratory.
-     * The name can be a simple name, or a special name (mixes).     *
      * @param name
      *        The name to look up.
      *
      * @throws IllegalArgumentException
-     *         No ingredient in this laboratory has this name.
-     *       | !hasIngredient(name)
+     *         The given name is not effective, or no ingredient with that
+     *         name is in this laboratory.
+     *       | name == null || !hasIngredient(name)
      */
     public AlchemicIngredient getIngredient(String name) throws IllegalArgumentException {
-        AlchemicIngredient result = findIngredient(name);
-        if (result == null) {
-            throw new IllegalArgumentException("No ingredient with name " + name);
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
         }
-        return result;
+        for (AlchemicIngredient ing : ingredients) {
+            // simple name
+            if (name.equals(ing.getSimpleName())) {
+                return ing;
+            }
+            // special name
+            if (ing.getType().isMixed()
+                    && ing.getType().getName().hasSpecialName()
+                    && name.equals(ing.getType().getName().getSpecialName())) {
+                return ing;
+            }
+        }
+        throw new IllegalArgumentException("No ingredient that name");
     }
 
-    // todo I modified it to fix build errors
-    public AlchemicIngredient findIngredient(String name) {
-        return null;
-    }// ToDo: of toch zelfde als getingredient? (nee zeker, anders en wrs veiliger zo)
+
+    /**
+     * Check if an ingredient with the given name exists in this laboratory.
+     * The name can be a simple name or a special name.
+     *
+     * @param name
+     *        The name to look up.
+     *
+     * @return False if the given name is null or if no ingredient in this
+     *         laboratory has the given name. True otherwise.
+     */
+    public boolean hasIngredient(String name) {
+        if (name == null) {
+            return false;
+        }
+        try {
+            getIngredient(name);
+            return true;
+        } catch (IllegalArgumentException exception) {
+            return false;
+        }
+    }
+
+
+    /**
+     * Store the contents of the given ingredient container in this laboratory.
+     * After this call the container is empty ('container wordt vernietigd'). ToDo: dit juiste interpreattie van vernietigen?
+     *
+     *
+     * The ingredient gets brought to its standard temperaturen using Oven or CoolingBox
+     * If an ingredient with the same simple name already exists in this laboratory, merge the two via the Kettle.
+     *
+     * @param container
+     *        The container whose contents should be stored.
+     *
+     * @post After this call, the given container is empty.
+     *     | container.isEmpty()
+     *
+     * @post The ingredient that was in the container is now stored in this laboratory.
+     *
+     * @throws IllegalArgumentException
+     *         The given container is not effective.
+     *       | container == null
+     *
+     * @throws IllegalArgumentException
+     *         The given container is empty.
+     *       | container.isEmpty()
+     *
+     * @throws IllegalStateException
+     *         There is not enough remaining capacity for the ingredient.
+     *       | !hasRoomFor(container.getIngredient())
+     */
+    public void store(IngredientContainer container)                    // ToDo: check deze pls, ingewikkeld
+            throws IllegalArgumentException, IllegalStateException {
+        if (container == null) {
+            throw new IllegalArgumentException("Container cannot be null");
+        }
+        if (container.isEmpty()) {
+            throw new IllegalArgumentException("Container is empty");
+        }
+
+        AlchemicIngredient toStore = container.getIngredient();
+        if (!hasRoomFor(toStore)) {
+            throw new IllegalStateException("Not enough capacity in laboratory");
+        }
+        // ToDo: bring `toStore` back to its standard temperature here, using
+        //       getDevice(Oven.class) or getDevice(CoolingBox.class).
+        String simpleName = toStore.getSimpleName();
+        if (!hasIngredient(simpleName)) {
+            ingredients.add(toStore);
+        } else {
+            AlchemicIngredient existing = getIngredient(simpleName);
+            // TODO: mix `existing` and `toStore` via getDevice(Kettle.class) and replace
+            //       `existing` in the list with the resulting merged ingredient.
+            container.empty();
+        }
+    }
+
+
+    /**
+     * Take the requested quantity of the ingredient with the given name out of
+     * this laboratory and return it inside a new container.
+     *
+     * The container we return uses the smallest container unit (for the ingredient)
+     * that the amount of ingredient still fits into.
+     *
+     * @param name
+     *        The (simple or special) name of the ingredient to put in a container.
+     *
+     * @param quantity
+     *        How much of it should be put in a container.
+     *
+     * @return A new container holding an ingredient of the same type as the one
+     *         that was in the laboratory, with the requested quantity.
+     *
+     * @post The total stored amount of the matched ingredient
+     *       has decreased by the requested amount.
+     *
+     * @throws IllegalArgumentException
+     *         The given name or quantity is not effective, no ingredient with the
+     *         given name is in this laboratory, the requested unit does
+     *         not match the ingredient's state, or the requested amount is greater than
+     *         the available amount (in the Laboratory).
+     */
+    public IngredientContainer request(String name, Quantity quantity)
+            throws IllegalArgumentException {
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+        if (quantity == null) {
+            throw new IllegalArgumentException("Quantity cannot be null");
+        }
+
+        // getIngredient throws IllegalArgumentException if there is no ingredient as in request()
+        AlchemicIngredient existing = getIngredient(name);
+
+        State state = existing.getType().getStandardState();
+        // The requested unit must be valid for the ingredient's state.
+        if (!quantity.getUnit().isValidFor(state)) {
+            throw new IllegalArgumentException(
+                    "Requested quantity unit is not valid for the ingredient's state");
+        }
+
+        long requested = quantity.toLowestUnit(state);
+        long available = existing.getAmountInLowestUnit();
+        if (requested > available) {
+            throw new IllegalArgumentException("Not enough quantity available");
+        }
+
+        Unit containerUnit = smallestContainerUnitFor(requested, state);
+        if (containerUnit == null) {
+            throw new IllegalArgumentException(
+                    "Requested quantity does not fit in any container");
+        }
+
+        // Create a new ingredient with the requested quantity and put it in a new container.
+        AlchemicIngredient out = new AlchemicIngredient(existing.getType(), quantity);
+        IngredientContainer result = new IngredientContainer(containerUnit, out);
+
+        replaceWithRemaining(existing, available - requested, state);
+        return result;
+    } // ToDo: controle met frisse gedachten
+
+
+
 
 
     /**
