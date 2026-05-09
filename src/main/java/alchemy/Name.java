@@ -40,6 +40,7 @@ public class Name {
     /**
      * A string containing all allowed special characters in names.
      */
+    // TODO kettle says it wants , in the name but not allowed?
     private static final String ALLOWED_SPECIAL_CHARACTERS = "'()";
 
     /**
@@ -355,11 +356,11 @@ public class Name {
      */
     @Model
     public static boolean hasCorrectCapitalization(String word, boolean allowMixedAndWith) {
-        if (word.equals("mixed") || word.equals("with")) {
+        if (word.equals("mixed") || word.equals("with") || word.equals("and")) {
             return allowMixedAndWith;
         }
 
-        if (word.equals("Mixed") || word.equals("With")) {
+        if (word.equals("Mixed") || word.equals("With") || word.equals("And")) {
             return false;
         }
 
