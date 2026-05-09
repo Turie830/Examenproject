@@ -72,7 +72,7 @@ public abstract class SingleContainerDevice extends Device {
     /**
      * Gets the content of this device
      *
-     * @return the content of this device
+     * @return the content of this device (could be null)
      */
     protected AlchemicIngredient getActualDeviceContent() {
         return deviceContent;
