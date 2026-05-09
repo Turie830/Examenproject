@@ -3,9 +3,11 @@ package alchemy.laboratory;
 import alchemy.Unit;
 import alchemy.ingredients.AlchemicIngredient;
 import alchemy.ingredients.IngredientContainer;
+import be.kuleuven.cs.som.annotate.Basic;
 
 /**
  * An abstract class for devices that can contain at most one ingredient container.
+ *
  *
  * @author Obe Willaert
  * @author Mauro Devolder
@@ -47,6 +49,8 @@ public abstract class SingleContainerDevice extends Device {
      *                                  | container == null
      * @throws IllegalArgumentException The given container must not be empty
      *                                  | container.isEmpty()
+     * @throws IllegalStateException There can't be anything in the device
+     *                                  | TODO how to do this getDeviceContent is protected
      */
     // TODO do we want to create a copy or not? (see todo in OvenTest)
     @Override
@@ -57,8 +61,12 @@ public abstract class SingleContainerDevice extends Device {
         if (container.isEmpty()) {
             throw new IllegalArgumentException("Container cannot be empty");
         }
+        if (deviceContent != null) {
+            throw new IllegalStateException("Cannot add more than one ingredient");
+        }
 
         deviceContent = container.getIngredient();
+        container.empty();
     }
 
     /**
@@ -66,7 +74,23 @@ public abstract class SingleContainerDevice extends Device {
      *
      * @return the content of this device
      */
-    protected AlchemicIngredient getDeviceContent() {
+    protected AlchemicIngredient getActualDeviceContent() {
+        return deviceContent;
+    }
+
+    /**
+     * Gets a copy of the content of this device.
+     *
+     * @return A copy of the content of this device,
+     * or null if this device has no content.
+     * | result == null || result != getActualDeviceContent()
+     */
+    @Basic
+    public AlchemicIngredient getDeviceContent() {
+        if (deviceContent == null) {
+            return null;
+        }
+        //TODO create a copy of ingredient (needs constructor or .copy method) + update test cases
         return deviceContent;
     }
 
@@ -86,7 +110,6 @@ public abstract class SingleContainerDevice extends Device {
      * @return null if the device has not ran yet
      * @return a container with the same capacity and ingredient as the result container
      */
-    // todo should this be a copy or not?
     public IngredientContainer getResult() {
         if (result == null) {
             return null;

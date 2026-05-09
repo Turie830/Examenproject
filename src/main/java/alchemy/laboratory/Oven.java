@@ -48,7 +48,7 @@ public class Oven extends SingleContainerDevice implements TemperatureDevice {
      */
     @Override
     public void execute() throws IllegalStateException {
-        AlchemicIngredient ingredient = this.getDeviceContent();
+        AlchemicIngredient ingredient = this.getActualDeviceContent();
 
         if (ingredient == null) {
             throw new IllegalStateException("The device should have ingredients in it.");

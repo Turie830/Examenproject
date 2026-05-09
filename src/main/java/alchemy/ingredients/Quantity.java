@@ -56,6 +56,8 @@ public class Quantity {
         this.unit = unit;
     }
 
+    // todo copy constructor or method
+
     /**
      * Gets the amount of this quantity
      * @return the amount

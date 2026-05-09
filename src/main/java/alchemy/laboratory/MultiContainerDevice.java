@@ -59,4 +59,6 @@ public abstract class MultiContainerDevice extends Device {
 
         deviceContents.add(container.getIngredient());
     }
+
+    // todo: isEmpty (for results and contents separate or shared?) + getNbItems and getItemAt (? ex. kettle you can't do this?)
 }

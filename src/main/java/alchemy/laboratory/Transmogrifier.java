@@ -1,4 +1,6 @@
 package alchemy.laboratory;
 
-//public class Transmogrifier extends Device {
+//public class Transmogrifier extends SingleContainerDevice {
+//
+//
 //}

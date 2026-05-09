@@ -46,7 +46,7 @@ public class CoolingBox extends SingleContainerDevice implements TemperatureDevi
      */
     @Override
     public void execute() throws IllegalStateException {
-        AlchemicIngredient ingredient = this.getDeviceContent();
+        AlchemicIngredient ingredient = this.getActualDeviceContent();
 
         if (ingredient == null) {
             throw new IllegalStateException("The device should have ingredients in it.");
