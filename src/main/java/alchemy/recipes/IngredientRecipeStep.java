@@ -3,6 +3,7 @@ package alchemy.recipes;
 import alchemy.Name;
 import alchemy.ingredients.Quantity;
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
 
 /**
  * A class for recipe steps that need ingredients
@@ -89,6 +90,7 @@ public class IngredientRecipeStep extends RecipeStep {
      * @returns the ingredient name need for this step
      */
     @Basic
+    @Immutable
     public Name getIngredientName() {
         return ingredientName;
     }
@@ -99,10 +101,12 @@ public class IngredientRecipeStep extends RecipeStep {
      * @returns the ingredient quantity need for this step
      */
     @Basic
+    @Immutable
     public Quantity getIngredientQuantity() {
         return ingredientQuantity;
     }
 
+    // todo comment needed here (@override)
     @Override
     public boolean isValidRecipeStep() {
         return getOperation().requiresIngredient()

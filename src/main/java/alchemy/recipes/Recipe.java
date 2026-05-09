@@ -30,7 +30,6 @@ public class Recipe {
     /**
      * A List for storing the steps of this recipe
      */
-    // TODO check if the last step is a mix step, if not add it
     private final List<RecipeStep> steps = new ArrayList<RecipeStep>();
 
     /**
@@ -63,8 +62,16 @@ public class Recipe {
             }
         }
 
+        // last step must always be a mix step
+        if (steps.getLast().getOperation() != Operation.MIX) {
+            RecipeStep mixStep = new SimpleRecipeStep(Operation.MIX);
+            steps.add(mixStep);
+        }
+
         // Add the steps to the list, this creates a copy of a step
         this.steps.addAll(steps);
+
+
     }
 
 
@@ -89,6 +96,9 @@ public class Recipe {
      *
      * @return The recipe at the given index.
      *       | result == steps.get(index)
+     *
+     * @note this does not return a copy since every field in a recipeStep is final
+     * TODO verify if this follows liskov
      */
     @Basic
     public RecipeStep getStepAt(int index)  {

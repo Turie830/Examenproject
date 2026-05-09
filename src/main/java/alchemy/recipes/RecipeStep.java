@@ -2,6 +2,7 @@ package alchemy.recipes;
 
 
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
 
 /**
  * A class for recipe steps
@@ -51,6 +52,7 @@ public abstract class RecipeStep {
      * @returns the operation of this step
      */
     @Basic
+    @Immutable
     public Operation getOperation() {
         return operation;
     }
