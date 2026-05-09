@@ -12,6 +12,7 @@
 
 # Package Files #
 *.jar
+!librarianBart/maven-repo/**/*.jar
 *.war
 *.nar
 *.ear
