@@ -77,6 +77,18 @@ public class AlchemicIngredient {
      *       standard temperature of its type.
      *     | new.getTemperature()[0] == new.getType().getStandardTemperature()[0]
      *     | && new.getTemperature()[1] == new.getType().getStandardTemperature()[1]
+     *
+     * @post If the given quantity is effective, the quantity of this new alchemic
+     *       ingredient is equal to the given quantity.
+     *     | if (quantity != null) then
+     *     |   new.getQuantity() == quantity
+     *
+     * @post If the given quantity is not effective, the quantity of this new
+     *       alchemic ingredient is a default quantity of one spoon in the
+     *       standard state of its type.
+     *     | if (quantity == null) then
+     *     |   new.getAmount() == 1
+     *     |   && new.getUnit() == Unit.getSpoonUnit(new.getType().getStandardState())
      */
     public AlchemicIngredient(IngredientType type, Quantity quantity) {
         if (type == null) {
@@ -88,7 +100,8 @@ public class AlchemicIngredient {
         this.temperature = this.type.getStandardTemperatureObject();
 
         if (quantity == null) {
-            this.quantity = new Quantity(0L, Unit.getSpoonUnit(this.type.getStandardState()));
+            //amount set to 1L, because 0L would have no meaning
+            this.quantity = new Quantity(1L, Unit.getSpoonUnit(this.type.getStandardState()));
         }
         else {
             this.quantity = quantity;
