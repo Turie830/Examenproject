@@ -138,6 +138,23 @@ public class IngredientType {
         this(name, DEFAULT.getStandardState(), DEFAULT.getStandardTemperatureObject());
     }
 
+    /**
+     * Initialize this new regular ingredient type with the given name and
+     * standard temperature.
+     * <p>
+     * The standard state is liquid.
+     *
+     * @param name                The name of this new ingredient type.
+     * @param standardTemperature The standard temperature of this new ingredient type.
+     * @throws IllegalNameException The given name is not a proper name for this ingredient type.
+     *                              | !canHaveAsName(name)
+     * @effect This new ingredient type is initialized with the given name,
+     * liquid as standard state, and the given standard temperature.
+     * | this(name, State.LIQUID, standardTemperature)
+     */
+    public IngredientType(Name name, Temperature standardTemperature) {
+        this(name, State.LIQUID, standardTemperature);
+    }
 
     // todo copy constructor or method
 
