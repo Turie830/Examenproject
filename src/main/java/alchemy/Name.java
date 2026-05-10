@@ -41,7 +41,7 @@ public class Name {
      * A string containing all allowed special characters in names.
      */
     // TODO kettle says it wants , in the name but not allowed?
-    private static final String ALLOWED_SPECIAL_CHARACTERS = "'()";
+    private static final String ALLOWED_SPECIAL_CHARACTERS = "'(),";
 
     /**
      * An array containing all words that may not occur as separate words

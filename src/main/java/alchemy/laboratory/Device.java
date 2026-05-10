@@ -37,7 +37,7 @@ public abstract class Device {
      *      | new.getLaboratory() == laboratory
      *
      * @throws IllegalArgumentException
-     *      The given laboratory must be effective
+     *      when the laboratory is not effective
      *      | laboratory == null
      */
     public Device(Laboratory laboratory) {

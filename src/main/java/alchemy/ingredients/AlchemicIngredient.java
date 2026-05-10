@@ -364,6 +364,7 @@ public class AlchemicIngredient {
             return false;
         }
 
+        // TODO check if we want to allow , in non mixed names
         if (!allowMixedAndWith && name.contains(",")) {
             return false;
         }

@@ -25,7 +25,7 @@ public class Kettle extends MultiContainerDevice {
      * Initialise a new multi container device
      *
      * @param laboratory The laboratory this device is located in
-     * @throws IllegalArgumentException The given laboratory must be effective
+     * @throws IllegalArgumentException when the laboratory is not effective
      *                                  | laboratory == null
      * @post The laboratory of this device is set to the given laboratory
      * | new.getLaboratory() == laboratory
@@ -91,7 +91,8 @@ public class Kettle extends MultiContainerDevice {
         State bestState = State.POWDER;
 
         for (AlchemicIngredient ingredient : ingredients) {
-            long difference = standardDifferenceFromDefault(ingredient.getType());
+            // null = default (when using difference which getStandardTemperatureDifference does)
+            long difference = ingredient.getType().getStandardTemperatureDifference(null);
             State state = ingredient.getType().getStandardState();
 
             if (difference < bestDifference
@@ -102,16 +103,6 @@ public class Kettle extends MultiContainerDevice {
         }
 
         return bestState;
-    }
-
-    /**
-     * Calculate the distance from the default temperature for the given type
-     *
-     * @param type The type to compare
-     * @return the absolute temperature difference with the default temperature
-     */
-    private long standardDifferenceFromDefault(IngredientType type) {
-        return type.getStandardTemperatureDifference(new Temperature(0, 20));
     }
 
     /**
@@ -132,14 +123,16 @@ public class Kettle extends MultiContainerDevice {
         for (AlchemicIngredient ingredient : ingredients) {
             long difference = ingredient.getType().getStandardTemperatureDifference(temperatureDefault);
 
+            long[] candidate = ingredient.getType().getStandardTemperature();
+            Temperature candidateTemperature = new Temperature(candidate[0], candidate[1]);
+
             if (difference < bestDifference) {
                 bestDifference = difference;
-                bestTemperature = new Temperature(ingredient.getColdness(), ingredient.getHotness());
+                bestTemperature = candidateTemperature;
 
             } else if (difference == bestDifference) {
-                Temperature temp_object = new Temperature(ingredient.getColdness(), ingredient.getHotness());
-                if (temp_object.isHotterThan(bestTemperature)) {
-                    bestTemperature = temp_object;
+                if (candidateTemperature.isHotterThan(bestTemperature)) {
+                    bestTemperature = candidateTemperature;
                 }
             }
         }
@@ -159,10 +152,12 @@ public class Kettle extends MultiContainerDevice {
         // TreeSet: gesorteerde set
         Set<String> simpleNames = new TreeSet<String>();
 
+        // add every simpleName
         for (AlchemicIngredient ingredient : ingredients) {
             simpleNames.add(ingredient.getSimpleName());
         }
 
+        // convert the now sorted and deduped set to a list
         return new ArrayList<String>(simpleNames);
     }
 
@@ -195,9 +190,8 @@ public class Kettle extends MultiContainerDevice {
             return names.get(0) + " and " + names.get(1);
         }
 
-        // todo replace " " with ", " but these are not allowed as a name???
         // so test fails as expected
-        return String.join(" ", names.subList(0, names.size() - 1))
+        return String.join(", ", names.subList(0, names.size() - 1))
                 + " and "
                 + names.getLast();
     }
@@ -258,6 +252,8 @@ public class Kettle extends MultiContainerDevice {
         }
 
 
+        // todo: possibly change quantity so that amount > 0 instead of >=0
+        // currently we could have an ingredient with weight 0 so totalWeigt could be 0
         long averageColdness = Math.round(totalColdness / totalWeight);
         long averageHotness = Math.round(totalHotness / totalWeight);
 
@@ -270,9 +266,6 @@ public class Kettle extends MultiContainerDevice {
 
     }
 
-    private double signedTemperature(long[] temperature) {
-        return temperature[1] - temperature[0];
-    }
 
     /**
      * Get the weight of an ingredient in spoons
