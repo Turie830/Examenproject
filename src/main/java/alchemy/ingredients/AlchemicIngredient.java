@@ -20,6 +20,9 @@ import be.kuleuven.cs.som.annotate.Immutable;
  * @invar The quantity of each alchemic ingredient must be effective.
  *      | getQuantity() != null
  *
+ * @invar The current state of each alchemic ingredient must be effective.
+ *      | getState() != null
+ *
  * @author Arthur
  * @author Mauro
  * @author Obe
@@ -47,7 +50,12 @@ public class AlchemicIngredient {
     /**
      * Variable referencing the quantity of this alchemic ingredient.
      */
-    private final Quantity quantity;
+    private Quantity quantity;
+
+    /**
+     * Variable storing the current state of this alchemic ingredient.
+     */
+    private State state;
 
 
     /**********************************************************
@@ -98,10 +106,11 @@ public class AlchemicIngredient {
             this.type = type;
         }
         this.temperature = this.type.getStandardTemperatureObject();
+        this.state = this.type.getStandardState();
 
         if (quantity == null) {
             //amount set to 1L, because 0L would have no meaning
-            this.quantity = new Quantity(1L, Unit.getSpoonUnit(this.type.getStandardState()));
+            this.quantity = new Quantity(1L, Unit.SPOON);
         }
         else {
             this.quantity = quantity;
@@ -151,6 +160,31 @@ public class AlchemicIngredient {
         return type;
     }
 
+    /**********************************************************
+     * STATE - TOTAL
+     **********************************************************/
+
+    /**
+     * Return the current state of this alchemic ingredient.
+     *
+     * @return The current state of this alchemic ingredient.
+     *       | result == this.state
+     */
+    @Basic
+    public State getState() {
+        return state;
+    }
+
+    /**
+     *
+     * @param state
+     * @param quantity
+     *
+     */
+    public void changeStateTo(State state, Quantity quantity) {
+        //ToDO: implement when transmogrifier is being made
+    }
+
 
     /**********************************************************
      * QUANTITY - TOTAL
@@ -191,23 +225,23 @@ public class AlchemicIngredient {
 
     /**
      * Return the amount of this alchemic ingredient in the lowest unit
-     * of its standard state.
+     * of its state.
      *
      * @return The amount of this alchemic ingredient in the lowest unit.
-     *       | result == getQuantity().toLowestUnit(getType().getStandardState())
+     *       | result == getQuantity().toLowestUnit(getType().getState())
      */
     public Long getAmountInLowestUnit() {
-        return getQuantity().toLowestUnit(getType().getStandardState());
+        return getQuantity().toLowestUnit(getState());
     }
 
     /**
      * Return the amount of this alchemic ingredient in spoons.
      *
      * @return The largest whole number of spoons contained in this ingredient.
-     *       | result == getQuantity().toSpoons(getType().getStandardState())
+     *       | result == getQuantity().toSpoons(getType().getState())
      */
     public long getAmountInSpoons() {
-        return getQuantity().toSpoons(getType().getStandardState());
+        return getQuantity().toSpoons(getState());
     }
 
 
