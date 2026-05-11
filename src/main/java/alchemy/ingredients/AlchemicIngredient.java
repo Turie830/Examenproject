@@ -183,10 +183,16 @@ public class AlchemicIngredient {
      *
      * @param newState
      *        The new state for this alchemic ingredient.
+     *
+     * @throws IllegalStateException
+     *         If the given state is not effective or equal to the current state,
+     *         this ingredient is not changed.
+     *         | newState == null
+     *         | newState == getState()
      */
     public void changeStateTo(State newState) {
         if (newState == null || newState == getState()) {
-            return;
+            throw new IllegalStateException();
         }
         long spoonAmount = getQuantity().toSpoons(getState());
 
