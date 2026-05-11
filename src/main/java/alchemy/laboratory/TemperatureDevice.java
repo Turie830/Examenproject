@@ -4,8 +4,6 @@ import alchemy.Temperature;
 
 /**
  * An interface for devices that have a configurable temperature
- * <p>
- * A temperature device can be configured before executing its alchemic operation
  *
  * @author Obe Willaert
  * @author Mauro Devolder
@@ -16,18 +14,22 @@ public interface TemperatureDevice {
 
     /**
      * Return the configured temperature of this temperature device
+     *
+     * @return A copy of the configured temperature of this temperature device
      */
-    Temperature getTemperature();
+    Temperature getTemperatureTarget();
 
     /**
      * Set the configured temperature of this temperature device
      *
      * @param temperature The new temperature for this device
+     *
      * @throws IllegalArgumentException The given temperature must be effective
      *                                  | temperature == null
-     * @post The temperature of this device is set to the given temperature
-     * | new.getTemperature() == temperature
+     *
+     * @post The temperature target of this device has the same coldness and hotness as the given temperature
+     *       | new.getTemperatureTarget().getColdness() == temperature.getColdness()
+     *       | && new.getTemperatureTarget().getHotness() == temperature.getHotness()
      */
-    // TODO verify the if temp rules are this way
-    void setTemperature(Temperature temperature) throws IllegalArgumentException;
+    void setTemperatureTarget(Temperature temperature) throws IllegalArgumentException;
 }

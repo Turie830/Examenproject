@@ -110,7 +110,7 @@ public class AlchemicIngredient {
 
         if (quantity == null) {
             //amount set to 1L, because 0L would have no meaning
-            this.quantity = new Quantity(1L, Unit.getSpoonUnit(this.type.getStandardState()));
+            this.quantity = new Quantity(1L, Unit.SPOON);
         }
         else {
             this.quantity = quantity;
@@ -174,30 +174,33 @@ public class AlchemicIngredient {
     }
 
     /**
-     * Change the current state of this alchemic ingredient to the given state.
+     * Converts to the given state
      *
-     * If the given state is not effective or equal to the current state,
-     * this ingredient is not changed.
+     * @param newState The state to convert to
      *
-     * The quantity is converted to a valid quantity for the new state.
+     * @post the state is changed to the given state
+     *      | getState() == newState
      *
-     * @param newState
-     *        The new state for this alchemic ingredient.
+     * @post the quantity is changed to the equivalent spoon amount, in this conversion a drop or a pinch could get lost
+     *      | getQuantity().getAmount() == old.getQuantity().toSpoons(old.getState())
+     *      | getQuantity().getUnit() == Unit.SPOON
      *
-     * @throws IllegalStateException
-     *         If the given state is not effective or equal to the current state,
-     *         this ingredient is not changed.
-     *         | newState == null
-     *         | newState == getState()
+     * @throws IllegalArgumentException
+     *          when newState is not effective
+     *          | newState == null
      */
-    public void changeStateTo(State newState) {
-        if (newState == null || newState == getState()) {
-            throw new IllegalStateException();
+    public void changeState(State newState) throws IllegalArgumentException {
+        if (newState == null) {
+            throw new IllegalArgumentException("State cannot be null");
+        }
+        if (newState == getState()) {
+            return;
         }
         long spoonAmount = getQuantity().toSpoons(getState());
 
         this.state = newState;
-        this.quantity = new Quantity(spoonAmount, Unit.getSpoonUnit(newState));
+        this.quantity = new Quantity(spoonAmount, Unit.SPOON);
+
     }
 
 

@@ -56,6 +56,8 @@ public class Quantity {
         this.unit = unit;
     }
 
+    // todo copy constructor or method
+
     /**
      * Gets the amount of this quantity
      * @return the amount
@@ -100,7 +102,7 @@ public class Quantity {
      */
     @Immutable
     public Long toSpoons(State state) {
-        return toLowestUnit(state) / Unit.getSpoonUnit(state).getFactorToBaseUnit(state);
+        return toLowestUnit(state) / Unit.SPOON.getFactorToBaseUnit(state);
     }
 
     /**

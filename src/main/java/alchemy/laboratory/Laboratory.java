@@ -5,16 +5,11 @@ import alchemy.ingredients.AlchemicIngredient;
 import alchemy.ingredients.IngredientContainer;
 import alchemy.ingredients.Quantity;
 import alchemy.ingredients.State;
-import alchemy.recipes.Recipe;
 import be.kuleuven.cs.som.annotate.Basic;
-import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A class for laboratories.

@@ -46,8 +46,8 @@ public class AlchemicIngredientTest {
         AlchemicIngredient ingredient = new AlchemicIngredient(type, null);
 
         assertNotNull(ingredient.getQuantity());
-        assertEquals(0L, ingredient.getAmount());
-        assertEquals(Unit.getSpoonUnit(type.getStandardState()), ingredient.getUnit());
+        assertEquals(1L, ingredient.getAmount());
+        assertEquals(Unit.SPOON, ingredient.getUnit());
     }
 
     @Test
@@ -59,8 +59,8 @@ public class AlchemicIngredientTest {
         AlchemicIngredient ingredient = new AlchemicIngredient(type);
 
         assertSame(type, ingredient.getType());
-        assertEquals(0L, ingredient.getAmount());
-        assertEquals(Unit.getSpoonUnit(State.POWDER), ingredient.getUnit());
+        assertEquals(1L, ingredient.getAmount());
+        assertEquals(Unit.SPOON, ingredient.getUnit());
     }
 
     @Test
@@ -69,8 +69,8 @@ public class AlchemicIngredientTest {
 
         assertSame(IngredientType.DEFAULT, ingredient.getType());
         assertEquals("Water", ingredient.getSimpleName());
-        assertEquals(0L, ingredient.getAmount());
-        assertEquals(Unit.getSpoonUnit(IngredientType.DEFAULT.getStandardState()), ingredient.getUnit());
+        assertEquals(1L, ingredient.getAmount());
+        assertEquals(Unit.SPOON, ingredient.getUnit());
     }
 
     @Test
@@ -268,6 +268,33 @@ public class AlchemicIngredientTest {
         assertFalse(AlchemicIngredient.isValidMixtureName("Beer with Coke"));
         assertFalse(AlchemicIngredient.isValidMixtureName("mixed with Coke"));
         assertFalse(AlchemicIngredient.isValidMixtureName("Beer mixed with"));
+    }
+
+    @Test
+    public void changeState_nullState_throws() {
+        AlchemicIngredient ing = new AlchemicIngredient();
+        assertThrows(IllegalArgumentException.class, () -> ing.changeState(null));
+    }
+
+    @Test
+    public void changeState_sameState_DoesNothing() {
+        AlchemicIngredient ing = new AlchemicIngredient();
+        Quantity before = ing.getQuantity();
+        ing.changeState(State.LIQUID);
+
+        assertEquals(State.LIQUID, ing.getState());
+        assertEquals(before, ing.getQuantity());
+    }
+
+    @Test
+    public void changeState_Success() {
+        AlchemicIngredient ing = new AlchemicIngredient();
+        Quantity before = ing.getQuantity();
+        ing.changeState(State.POWDER);
+
+        assertEquals(State.POWDER, ing.getState());
+        assertEquals(1L, ing.getQuantity().getAmount());
+        assertEquals(Unit.SPOON, ing.getQuantity().getUnit());
     }
 
 

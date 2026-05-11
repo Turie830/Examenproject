@@ -67,6 +67,8 @@ public class MixedIngredientType extends IngredientType{
         this(name, DEFAULT.getStandardState(), DEFAULT.getStandardTemperatureObject());
     }
 
+    // todo copy constructor or method
+
 
     /**
      * Check whether this ingredient type is mixed.

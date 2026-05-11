@@ -20,9 +20,12 @@ import be.kuleuven.cs.som.annotate.Basic;
 public abstract class Device {
 
     /**
-     * The laboratory this device is located in
+     * The laboratory this device is located in.
+     *
+     * @note A laboratory currently does not keep track of its devices.
+     *       Therefore, this association is only stored from device to laboratory.
      */
-    private final Laboratory laboratory;
+    private Laboratory laboratory;
 
     /**
      * Initialise a new device
@@ -34,10 +37,10 @@ public abstract class Device {
      *      | new.getLaboratory() == laboratory
      *
      * @throws IllegalArgumentException
-     *      The given laboratory must be effective
+     *      when the laboratory is not effective
      *      | laboratory == null
      */
-    protected Device(Laboratory laboratory) {
+    public Device(Laboratory laboratory) {
         if (laboratory == null) {
             throw new IllegalArgumentException("Laboratory object can't be null");
         }
@@ -58,6 +61,7 @@ public abstract class Device {
      * Add the given container to this device
      *
      * @param container The container to add
+     *
      * @throws IllegalArgumentException The given container must be effective
      *                                  | container == null
      * @throws IllegalArgumentException The given container must not be empty

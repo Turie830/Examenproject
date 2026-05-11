@@ -71,21 +71,6 @@ public class UnitTest {
     }
 
     @Test
-    public void getSpoonUnit_LiquidState_ReturnsSharedSpoon() {
-        assertEquals(Unit.SPOON, Unit.getSpoonUnit(State.LIQUID));
-    }
-
-    @Test
-    public void getSpoonUnit_PowderState_ReturnsSharedSpoon() {
-        assertEquals(Unit.SPOON, Unit.getSpoonUnit(State.POWDER));
-    }
-
-    @Test
-    public void getSpoonUnit_NullState_ThrowsIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> Unit.getSpoonUnit(null));
-    }
-
-    @Test
     public void convertToBaseUnit_PositiveAmount_ReturnsAmountInBaseUnitForState() {
         assertEquals(80L, Unit.SPOON.convertToBaseUnit(10L, State.LIQUID));
         assertEquals(60L, Unit.SPOON.convertToBaseUnit(10L, State.POWDER));
