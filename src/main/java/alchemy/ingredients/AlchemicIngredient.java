@@ -174,13 +174,24 @@ public class AlchemicIngredient {
     }
 
     /**
+     * Change the current state of this alchemic ingredient to the given state.
      *
-     * @param state
-     * @param quantity
+     * If the given state is not effective or equal to the current state,
+     * this ingredient is not changed.
      *
+     * The quantity is converted to a valid quantity for the new state.
+     *
+     * @param newState
+     *        The new state for this alchemic ingredient.
      */
-    public void changeStateTo(State state, Quantity quantity) {
-        //ToDO: implement when transmogrifier is being made
+    public void changeStateTo(State newState) {
+        if (newState == null || newState == getState()) {
+            return;
+        }
+        long spoonAmount = getQuantity().toSpoons(getState());
+
+        this.state = newState;
+        this.quantity = new Quantity(spoonAmount, Unit.getSpoonUnit(newState));
     }
 
 
