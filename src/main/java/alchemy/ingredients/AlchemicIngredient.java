@@ -1,8 +1,8 @@
 package alchemy.ingredients;
 
 import alchemy.Name;
-import alchemy.Temperature;
 import alchemy.Unit;
+import alchemy.Temperature;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 
@@ -141,8 +141,6 @@ public class AlchemicIngredient {
     public AlchemicIngredient() {
         this(IngredientType.DEFAULT);
     }
-
-    // todo copy constructor or copy method
 
 
     /**********************************************************

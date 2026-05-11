@@ -1,4 +1,401 @@
 package alchemy.laboratory;
 
+import alchemy.Unit;
+import alchemy.ingredients.AlchemicIngredient;
+import alchemy.ingredients.IngredientContainer;
+import alchemy.ingredients.Quantity;
+import alchemy.ingredients.State;
+import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A class for laboratories.
+ *
+ * A laboratory has a fixed capacity (in storerooms),
+ * stores alchemic ingredients, and has a maximum of one
+ * device of every kind. Devices are linked bidirectionally to their
+ * laboratory (a device registers itself in the laboratory at construction).
+ *
+ * @invar The storerooms capacity of every laboratory is positive.
+ *      | getStorerooms() >= 0
+ *
+ * @invar Each laboratory has maximum one device of each type.
+ *      | for each type in Class<? extends Device>:     // ToDo ? invullen
+ *      |     count(d in getDevices() | d.getClass() == type) <= 1
+ *
+ * @invar Every device in a laboratory references that laboratory back (bidirectional link).
+ *      | for each d in getDevices():
+ *      |     d.getLaboratory() == this
+ *
+ * @invar No two different ingredients in a laboratory share the same simple name.
+ *      Same-name ingredients are merged on storage, so they always appear as one.
+ *      | for any two distinct ingredients a and b in getIngredients():
+ *      |     a.getSimpleName() is not equal to b.getSimpleName()
+ *
+ * @invar The total stored amount per state never exceeds the capacity for that state.
+ *      | for each state in State.values():
+ *      |     getUsedAmountInLowestUnit(state) <= getCapacityInLowestUnit(state)
+ *
+ * @author Obe Willaert
+ * @author Mauro Devolder
+ * @author Arthur Pintelon
+ *
+ * @version 1.0
+ */
+
 public class Laboratory {
+
+    /**
+     * constructors
+     */
+
+    /**
+     * Initialize this new laboratory with the given storerooms capacity,
+     * with no ingredients and no devices.
+     *
+     * @param storerooms
+     *        The number of storerooms of capacity for this laboratory (>=0).
+     *
+     * @post The number of storerooms of this new laboratory equals the given amount.
+     *     | new.getStorerooms() == storerooms
+     *
+     * @post This new laboratory has no ingredients.
+     *     | new.getNbIngredients() == 0
+     *
+     * @post This new laboratory has no devices.
+     *     | new.getNbDevices() == 0
+     *
+     * @throws IllegalArgumentException
+     *         The given number of storerooms is negative.
+     *       | storerooms < 0
+     */
+    @Raw
+    public Laboratory(int storerooms) throws IllegalArgumentException {
+        if (storerooms < 0) {
+            throw new IllegalArgumentException("Storerooms cannot be negative");
+        }
+        this.storerooms = storerooms;
+    }
+
+    /**
+     * Capacity             ToDo: contoleer op totaal enzo
+     */
+
+    /**
+     * Variable storing the storerooms capacity of this laboratory.
+     * Final means it is set once in the constructor and never changes.
+     */
+    private final int storerooms;
+
+
+    /**
+     * Return the storerooms capacity of this laboratory.
+     */
+    @Basic
+    public int getStorerooms() {
+        return storerooms;
+    }
+
+
+    /**
+     * Return the total capacity of this laboratory in the lowest unit
+     * for the given state (liquids - drops, powders - pinches).
+     *
+     * @param state
+     *        The state we want the capacity in (= LIQUID or POWDER).
+     *
+     * @return The number of storerooms multiplied by how many lowest-units fit in one storeroom.
+     *       | result = getStorerooms() * Unit.STOREROOM.getFactorToBaseUnit(state)
+     *
+     * @throws IllegalArgumentException         ToDo: moet dit of is da er heel over?
+     *         The given state is not effective.
+     *       | state == null
+     */
+    public long getCapacityInLowestUnit(State state) throws IllegalArgumentException {
+        if (state == null) {
+            throw new IllegalArgumentException("State cannot be null");
+        }
+        return (long) storerooms * Unit.STOREROOM.getFactorToBaseUnit(state);
+    }
+
+
+    /**
+     *
+     * @param state
+     *        The state we want the total in (= LIQUID or POWDER).
+     *
+     * @return The sum of the amounts of every ingredient
+     *         in this laboratory, in the lowest unit.
+     *         | result ==
+     *         |   sum of ing.getAmountInLowestUnit() for each ing in getIngredients()
+     *
+     *  ToDo: moet er een throw? illegalargument?
+     */
+    public long getUsedAmountInLowestUnit(State state) {
+        long total = 0L;
+        for (AlchemicIngredient ing : ingredients) {
+            if (ing.getType().getStandardState() == state) {
+                total += ing.getAmountInLowestUnit();
+            }
+        }
+        return total;
+    }
+
+
+    /**
+     * Check if this laboratory has enough capacity to add
+     * the given ingredient or not.
+     *
+     * An ingredient can be liquid or powder. hasRoomFor looks at how much is already stored    ToDo: is dit te 'engelse' uitleg?
+     * in that state, add the new amount and check that it stays below the capacity.
+     *
+     * @param ingredient
+     *        The ingredient check room for.
+     *
+     * @return False if the given ingredient is not effective.
+     *       | if (ingredient == null) then result == false
+     *
+     * @return True if (currently used) + (new amount) is less then or equal to the capacity.
+     *         everything is calculated in the lowest unit for the ingredient's state.
+     *       | result ==
+     *       |   (getUsedAmountInLowestUnit(ingredient.getType().getStandardState())
+     *       |    + ingredient.getAmountInLowestUnit())
+     *       |   <= getCapacityInLowestUnit(ingredient.getType().getStandardState())
+     */
+    public boolean hasRoomFor(AlchemicIngredient ingredient) {
+        if (ingredient == null) {
+            return false;
+        }
+        State state = ingredient.getType().getStandardState();
+
+        long used = getUsedAmountInLowestUnit(state);
+        long extra = ingredient.getAmountInLowestUnit();
+        boolean ret = used + extra <= getCapacityInLowestUnit(state);
+
+        return ret;
+    }
+
+
+    /**
+     * Ingredients
+     */
+
+
+    /**
+     * The list of ingredients stored in this laboratory.
+     *
+     * Per simple name there is a maximum of one ingredient in this list.
+     * (Because two ingredients with the same name merge into one).
+     *
+     * @invar No two ingredients share the same simple name.
+     *
+     * @invar Every ingredient is effective (not null).
+     */
+    private final List<AlchemicIngredient> ingredients = new ArrayList<>();
+
+
+    // ToDo: is public List<AlchemicIngredient> getIngredients() nodig?
+
+
+    /**
+     * Return the ingredient in this laboratory whose simple name or
+     * special name (mixed ingredient) matches the given name.
+     *
+     * @param name
+     *        The name to look up.
+     *
+     * @throws IllegalArgumentException
+     *         The given name is not effective, or no ingredient with that
+     *         name is in this laboratory.
+     *       | name == null || !hasIngredient(name)
+     */
+    public AlchemicIngredient getIngredient(String name) throws IllegalArgumentException {
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+        for (AlchemicIngredient ing : ingredients) {
+            // simple name
+            if (name.equals(ing.getSimpleName())) {
+                return ing;
+            }
+            // special name
+            if (ing.getType().isMixed()
+                    && ing.getType().getName().hasSpecialName()
+                    && name.equals(ing.getType().getName().getSpecialName())) {
+                return ing;
+            }
+        }
+        throw new IllegalArgumentException("No ingredient that name");
+    }
+
+
+    /**
+     * Check if an ingredient with the given name exists in this laboratory.
+     * The name can be a simple name or a special name.
+     *
+     * @param name
+     *        The name to look up.
+     *
+     * @return False if the given name is null or if no ingredient in this
+     *         laboratory has the given name. True otherwise.
+     */
+    public boolean hasIngredient(String name) {
+        if (name == null) {
+            return false;
+        }
+        try {
+            getIngredient(name);
+            return true;
+        } catch (IllegalArgumentException exception) {
+            return false;
+        }
+    }
+
+
+    /**
+     * Store the contents of the given ingredient container in this laboratory.
+     * After this call the container is empty ('container wordt vernietigd'). ToDo: dit juiste interpreattie van vernietigen?
+     *
+     *
+     * The ingredient gets brought to its standard temperaturen using Oven or CoolingBox
+     * If an ingredient with the same simple name already exists in this laboratory, merge the two via the Kettle.
+     *
+     * @param container
+     *        The container whose contents should be stored.
+     *
+     * @post After this call, the given container is empty.
+     *     | container.isEmpty()
+     *
+     * @post The ingredient that was in the container is now stored in this laboratory.
+     *
+     * @throws IllegalArgumentException
+     *         The given container is not effective.
+     *       | container == null
+     *
+     * @throws IllegalArgumentException
+     *         The given container is empty.
+     *       | container.isEmpty()
+     *
+     * @throws IllegalStateException
+     *         There is not enough remaining capacity for the ingredient.
+     *       | !hasRoomFor(container.getIngredient())
+     */
+    public void store(IngredientContainer container)                    // ToDo: check deze pls, ingewikkeld
+            throws IllegalArgumentException, IllegalStateException {
+        if (container == null) {
+            throw new IllegalArgumentException("Container cannot be null");
+        }
+        if (container.isEmpty()) {
+            throw new IllegalArgumentException("Container is empty");
+        }
+
+        AlchemicIngredient toStore = container.getIngredient();
+        if (!hasRoomFor(toStore)) {
+            throw new IllegalStateException("Not enough capacity in laboratory");
+        }
+        // ToDo: bring `toStore` back to its standard temperature here, using
+        //       getDevice(Oven.class) or getDevice(CoolingBox.class).
+        String simpleName = toStore.getSimpleName();
+        if (!hasIngredient(simpleName)) {
+            ingredients.add(toStore);
+        } else {
+            AlchemicIngredient existing = getIngredient(simpleName);
+            // TODO: mix `existing` and `toStore` via getDevice(Kettle.class) and replace
+            //       `existing` in the list with the resulting merged ingredient.
+            container.empty();
+        }
+    }
+
+
+    /**
+     * Take the requested quantity of the ingredient with the given name out of
+     * this laboratory and return it inside a new container.
+     *
+     * The container we return uses the smallest container unit (for the ingredient)
+     * that the amount of ingredient still fits into.
+     *
+     * @param name
+     *        The (simple or special) name of the ingredient to put in a container.
+     *
+     * @param quantity
+     *        How much of it should be put in a container.
+     *
+     * @return A new container holding an ingredient of the same type as the one
+     *         that was in the laboratory, with the requested quantity.
+     *
+     * @post The total stored amount of the matched ingredient
+     *       has decreased by the requested amount.
+     *
+     * @throws IllegalArgumentException
+     *         The given name or quantity is not effective, no ingredient with the
+     *         given name is in this laboratory, the requested unit does
+     *         not match the ingredient's state, or the requested amount is greater than
+     *         the available amount (in the Laboratory).
+     */
+    public IngredientContainer request(String name, Quantity quantity)
+            throws IllegalArgumentException {
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+        if (quantity == null) {
+            throw new IllegalArgumentException("Quantity cannot be null");
+        }
+
+        // getIngredient throws IllegalArgumentException if there is no ingredient as in request()
+        AlchemicIngredient existing = getIngredient(name);
+
+        State state = existing.getType().getStandardState();
+        // The requested unit must be valid for the ingredient's state.
+        if (!quantity.getUnit().isValidFor(state)) {
+            throw new IllegalArgumentException(
+                    "Requested quantity unit is not valid for the ingredient's state");
+        }
+
+        long requested = quantity.toLowestUnit(state);
+        long available = existing.getAmountInLowestUnit();
+        if (requested > available) {
+            throw new IllegalArgumentException("Not enough quantity available");
+        }
+
+        // todo fix: commented it out to verify if tests were working
+        //Unit containerUnit = smallestContainerUnitFor(requested, state);
+//        if (containerUnit == null) {
+//            throw new IllegalArgumentException(
+//                    "Requested quantity does not fit in any container");
+//        }
+//
+//        // Create a new ingredient with the requested quantity and put it in a new container.
+//        AlchemicIngredient out = new AlchemicIngredient(existing.getType(), quantity);
+//        IngredientContainer result = new IngredientContainer(containerUnit, out);
+//
+//        replaceWithRemaining(existing, available - requested, state);
+//        return result;
+        // todo remove
+        return new IngredientContainer(Unit.SPOON);
+    } // ToDo: controle met frisse gedachten
+
+
+
+
+
+    /**
+     * Devices --> bidirectioneel doen!
+     */
+
+
+    /**
+     * Receipies (wrs??)
+     */
+
+
+
+
+
+
+
+
+
 }

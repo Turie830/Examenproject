@@ -141,7 +141,7 @@ public class IngredientType {
     /**
      * Initialize this new regular ingredient type with the given name and
      * standard temperature.
-     * <p>
+     *
      * The standard state is liquid.
      *
      * @param name                The name of this new ingredient type.
@@ -156,7 +156,6 @@ public class IngredientType {
         this(name, State.LIQUID, standardTemperature);
     }
 
-    // todo copy constructor or method
 
 
     /**********************************************************
@@ -421,16 +420,6 @@ public class IngredientType {
 
         return new Temperature(0, 20);
     }
-
-
-
-
-
-
-    //ToDO: Nog later nodig: integratie met AlchemicIngredient, Quantity, Kettle/mengsels, full name.
-
-
-
 
 
 }
