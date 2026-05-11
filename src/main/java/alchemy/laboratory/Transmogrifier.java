@@ -1,6 +1,7 @@
 package alchemy.laboratory;
 
 import alchemy.ingredients.AlchemicIngredient;
+import alchemy.ingredients.State;
 
 /**
  * A class for transmogrifier devices.
@@ -26,7 +27,15 @@ public class Transmogrifier extends SingleContainerDevice {
         super(laboratory);
     }
 
-
+    /**
+     * Execute this transmogrifier.
+     *
+     * @throws IllegalStateException The device must have an ingredient to transmogrify.
+     * @post If the ingredient is a powder, its state is changed to liquid
+     * @post If the ingredient is not a powder, its state is changed to powder
+     * @post The converted ingredient is stored in the result container
+     * @post The device content is empty after execution
+     */
     @Override
     public void execute() throws IllegalStateException {
         AlchemicIngredient ingredient = getActualDeviceContent();
@@ -35,8 +44,15 @@ public class Transmogrifier extends SingleContainerDevice {
             throw new IllegalStateException("No ingredient in device");
         }
 
-        // todo first implement state in IngredientType
-//        ingredient.
+        State currentState = ingredient.getState();
 
+        if (currentState == State.POWDER) {
+            ingredient.changeState(State.LIQUID);
+        } else {
+            ingredient.changeState(State.POWDER);
+        }
+
+        createResultContainer(ingredient);
+        emptyDeviceContent();
     }
 }
