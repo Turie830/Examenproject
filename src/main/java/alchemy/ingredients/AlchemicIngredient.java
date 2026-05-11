@@ -176,13 +176,33 @@ public class AlchemicIngredient {
     }
 
     /**
+     * Converts to the given state
      *
-     * @param state
-     * @param quantity
+     * @param newState The state to convert to
      *
+     * @post the state is changed to the given state
+     *      | getState() == newState
+     *
+     * @post the quantity is changed to the equivalent spoon amount, in this conversion a drop or a pinch could get lost
+     *      | getQuantity().getAmount() == old.getQuantity().toSpoons(old.getState())
+     *      | getQuantity().getUnit() == Unit.SPOON
+     *
+     * @throws IllegalArgumentException
+     *          when newState is not effective
+     *          | newState == null
      */
-    public void changeStateTo(State state, Quantity quantity) {
-        //ToDO: implement when transmogrifier is being made
+    public void changeState(State newState) throws IllegalArgumentException {
+        if (newState == null) {
+            throw new IllegalArgumentException("State cannot be null");
+        }
+        if (newState == getState()) {
+            return;
+        }
+        long spoonAmount = getQuantity().toSpoons(getState());
+
+        this.state = newState;
+        this.quantity = new Quantity(spoonAmount, Unit.SPOON);
+
     }
 
 
