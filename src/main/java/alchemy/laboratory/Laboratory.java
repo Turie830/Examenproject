@@ -5,6 +5,7 @@ import alchemy.ingredients.AlchemicIngredient;
 import alchemy.ingredients.IngredientContainer;
 import alchemy.ingredients.Quantity;
 import alchemy.ingredients.State;
+import alchemy.recipes.Recipe;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
 
@@ -648,6 +649,48 @@ public class Laboratory {
      * Receipies (wrs??)
      */
 
+
+    /**
+     * Execute the given recipe in this laboratory the given number of times.
+     *
+     * Walk through the recipe step by step, scale every amount of ingredient
+     * by the given factor, and use the devices in this laboratory to
+     * heat, cool, mix or add ingredients. The final mixture is stored
+     * in the laboratory.
+     *
+     * If at some point there is not enough of an ingredient, the recipe-execution stops.
+     * All of the ingredients that were already taken out of the laboratory
+     * are converted to standard temperature again and stored back.
+     *
+     *
+     * @param recipe
+     *        The recipe to execute.
+     *
+     * @param factor
+     *        How many times to execute the recipe.
+     *        Must be strictly positive.
+     *
+     * @throws IllegalArgumentException
+     *         The recipe is not effective or the factor is not strictly positive.
+     *
+     * @throws IllegalStateException
+     *         A required device is not in this laboratory.
+     */
+    public void execute(Recipe recipe, int factor)
+            throws IllegalArgumentException, IllegalStateException {
+        if (recipe == null) {
+            throw new IllegalArgumentException("Recipe can't be null");
+        }
+        if (factor <= 0) {
+            throw new IllegalArgumentException("Factor must be strictly positive");
+        }
+
+
+        // Set of all ingredients not yet mixed.
+        // After a MIX, this list contains exactly only the mixture anymore.
+        List<AlchemicIngredient> IngredientsSet = new ArrayList<>();
+
+        // NOG VERDER DOEN
 
 
 
