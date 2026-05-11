@@ -335,7 +335,7 @@ public class Laboratory {
      *         not match the ingredient's state, or the requested amount is greater than
      *         the available amount (in the Laboratory).
      */
-    public IngredientContainer request(String name, Quantity quantity)
+    public IngredientContainer request(String name, Quantity quantity)          // ToDo: controle deze functie: is ie te (overbodig) ingewikkeld?
             throws IllegalArgumentException {
         if (name == null) {
             throw new IllegalArgumentException("Name cannot be null");
@@ -360,30 +360,125 @@ public class Laboratory {
             throw new IllegalArgumentException("Not enough quantity available");
         }
 
-        // todo fix: commented it out to verify if tests were working
-        //Unit containerUnit = smallestContainerUnitFor(requested, state);
-//        if (containerUnit == null) {
-//            throw new IllegalArgumentException(
-//                    "Requested quantity does not fit in any container");
-//        }
-//
-//        // Create a new ingredient with the requested quantity and put it in a new container.
-//        AlchemicIngredient out = new AlchemicIngredient(existing.getType(), quantity);
-//        IngredientContainer result = new IngredientContainer(containerUnit, out);
-//
-//        replaceWithRemaining(existing, available - requested, state);
-//        return result;
-        // todo remove
-        return new IngredientContainer(Unit.SPOON);
-    } // ToDo: controle met frisse gedachten
+        Unit containerUnit = smallestContainerUnitFor(requested, state);
+        if (containerUnit == null) {
+            throw new IllegalArgumentException(
+                    "Requested quantity does not fit in any container");
+        }
+
+        // Create a new ingredient with the requested quantity and put it in a new container.
+        AlchemicIngredient out = new AlchemicIngredient(existing.getType(), quantity);
+        IngredientContainer result = new IngredientContainer(containerUnit, out);
+
+        // The amount left stays in the laboratory.
+        replaceWithRemaining(existing, available - requested, state);
+        return result;
+        } // ToDo: controle
+
+    /**
+     * Take the stored amount of the ingredient with the given name out of
+     * this laboratory and return it inside the largest container unit that is valid for
+     * the standard state of the ingredient.
+     *
+     * If the laboratory holds more than the new container can hold, the
+     * amount that can't fit is gone.
+     *
+     * @param name
+     *        The name of the ingredient to retrieve, simple or special.
+     *
+     * @return A new container holding the ingredient.
+     *
+     * @post After this call, no ingredient with the same name is still in this lab.
+     *     | !new.hasIngredient(name)
+     *
+     * @throws IllegalArgumentException
+     *         The given name is not effective or there is no ingredient with that name.
+     */
+    public IngredientContainer request(String name) throws IllegalArgumentException{
+
+        AlchemicIngredient existing = getIngredient(name);
+
+        State state = existing.getType().getStandardState();
+        Unit largest = largestContainerUnitFor(state);
+        long containerCapacity = largest.getFactorToBaseUnit(state);
+        long available = existing.getAmountInLowestUnit();
+        // Math.min takes as the most amount the container can hold, the rest is lost.
+        long taken = Math.min(available, containerCapacity);
+
+        Quantity outQuantity = new Quantity(taken, Unit.getBaseUnit(state));
+        AlchemicIngredient outIngred = new AlchemicIngredient(existing.getType(), outQuantity);
+        IngredientContainer result = new IngredientContainer(largest, outIngred);
+
+        // remove the ingredient from the laboratory
+        ingredients.remove(existing);
+        return result;
+
+    }
 
 
+    // ToDo: hulpfunctie: moet hier documentatie bij (zie komende 3 fct) ? --> zo ja, vervolledigen ToDo
 
+    /**
+     * Replace the old ingrediënt with a new version that only now contains the remaining amount.
+     * If none of the ingredient is left, remove the ingredient.
+     *
+     * @param existing
+     * @param remainingInLowest
+     * @param state
+     */
+    private void replaceWithRemaining(AlchemicIngredient existing, long remainingInLowest, State state) {
+        ingredients.remove(existing);
+        if (remainingInLowest <= 0) {
+            return;
+        }
+        Quantity remainingQty = new Quantity(remainingInLowest, Unit.getBaseUnit(state));
+        ingredients.add(new AlchemicIngredient(existing.getType(), remainingQty));
+    }
 
 
     /**
-     * Devices --> bidirectioneel doen!
+     * find the smallest container unit for the state of which
+     * the unit capacity is large enough to hold the requested amount.
+     * Return null if the largest container unit is still too small.
      */
+    private static Unit smallestContainerUnitFor(long amountInLowest, State state) {
+        Unit best = null;
+        for (Unit u : Unit.values()) {
+            if (!u.isValidFor(state)) continue;
+            if (!IngredientContainer.isValidCapacityUnit(u)) continue;
+            long cap = u.getFactorToBaseUnit(state);
+            if (cap < amountInLowest) continue;
+            // ToDo: iteratielogica? stap is wel juist maar weet niet of na || overbodig is
+            if (best == null || cap < best.getFactorToBaseUnit(state)) {
+                best = u;
+            }
+        }
+        return best;
+    }
+
+
+    /**
+     * Return the largest valid container unit for the given state.
+     * = BARREL for liquids and CHEST for powders.
+     */
+    private static Unit largestContainerUnitFor(State state) {
+        Unit best = null;
+        for (Unit u : Unit.values()) {
+            if (!u.isValidFor(state)) continue;
+            if (!IngredientContainer.isValidCapacityUnit(u)) continue;
+            if (best == null || u.getFactorToBaseUnit(state) > best.getFactorToBaseUnit(state)) {
+                best = u;
+            }
+        }
+        return best;
+    }
+
+
+    /**
+     * Devices --> bidirectional
+     */
+
+
 
 
     /**
