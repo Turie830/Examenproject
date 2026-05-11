@@ -19,7 +19,7 @@ public class CoolingBoxTest {
 
     @BeforeEach
     public void setUp() {
-        coolingBox = new CoolingBox(new Laboratory());
+        coolingBox = new CoolingBox(new Laboratory(1));
         ingredient = new AlchemicIngredient(new IngredientType(Name.WATER), new Quantity(1L, Unit.VIAL));
     }
 

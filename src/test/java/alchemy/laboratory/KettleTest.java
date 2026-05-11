@@ -31,7 +31,7 @@ public class KettleTest {
 
     @BeforeEach
     public void setUp() {
-        kettle = new Kettle(new Laboratory());
+        kettle = new Kettle(new Laboratory(1));
     }
 
     @Test

@@ -10,7 +10,7 @@ public class DeviceTest {
 
     @Test
     public void constructor_EffectiveLaboratory_StoresLaboratory() {
-        Laboratory laboratory = new Laboratory();
+        Laboratory laboratory = new Laboratory(1);
         TestDevice device = new TestDevice(laboratory);
 
         assertSame(laboratory, device.getLaboratory());

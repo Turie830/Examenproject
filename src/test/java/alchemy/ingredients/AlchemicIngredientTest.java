@@ -46,7 +46,7 @@ public class AlchemicIngredientTest {
         AlchemicIngredient ingredient = new AlchemicIngredient(type, null);
 
         assertNotNull(ingredient.getQuantity());
-        assertEquals(0L, ingredient.getAmount());
+        assertEquals(1L, ingredient.getAmount());
         assertEquals(Unit.SPOON, ingredient.getUnit());
     }
 
@@ -59,7 +59,7 @@ public class AlchemicIngredientTest {
         AlchemicIngredient ingredient = new AlchemicIngredient(type);
 
         assertSame(type, ingredient.getType());
-        assertEquals(0L, ingredient.getAmount());
+        assertEquals(1L, ingredient.getAmount());
         assertEquals(Unit.SPOON, ingredient.getUnit());
     }
 
@@ -69,7 +69,7 @@ public class AlchemicIngredientTest {
 
         assertSame(IngredientType.DEFAULT, ingredient.getType());
         assertEquals("Water", ingredient.getSimpleName());
-        assertEquals(0L, ingredient.getAmount());
+        assertEquals(1L, ingredient.getAmount());
         assertEquals(Unit.SPOON, ingredient.getUnit());
     }
 

@@ -19,7 +19,7 @@ public class OvenTest {
 
     @BeforeEach
     public void setUp() {
-        oven = new Oven(new Laboratory());
+        oven = new Oven(new Laboratory(1));
         ingredient = new AlchemicIngredient(new IngredientType(Name.WATER), new Quantity(1L, Unit.VIAL));
     }
 

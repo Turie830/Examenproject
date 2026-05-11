@@ -18,7 +18,7 @@ public class MultiContainerDeviceTest {
 
     @BeforeEach
     public void setUp() {
-        device = new TestMultiContainerDevice(new Laboratory());
+        device = new TestMultiContainerDevice(new Laboratory(1));
     }
 
     @Test

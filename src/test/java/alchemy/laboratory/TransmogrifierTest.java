@@ -20,7 +20,8 @@ public class TransmogrifierTest {
 
     @BeforeEach
     public void setUp() {
-        transmogrifier = new Transmogrifier(new Laboratory());
+        // todo fix every test using laboratory
+        transmogrifier = new Transmogrifier(new Laboratory(1));
     }
 
     @Test
