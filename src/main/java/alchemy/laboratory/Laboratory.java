@@ -478,6 +478,169 @@ public class Laboratory {
      * Devices --> bidirectional
      */
 
+    /**
+     * The CoolingBox currently in this laboratory, null if there is no CoolingBox in this Laboratory.
+     *
+     * @invar If not null, the CoolingBox references this laboratory.
+     *      | coolingBox == null || coolingBox.getLaboratory() == this
+     */
+    private CoolingBox coolingBox;
+
+    /**
+     * The Oven currently in this laboratory, null if there is no Oven in this Laboratory.
+     *
+     * @invar If not null, the Oven references this laboratory.
+     *      | oven == null || oven.getLaboratory() == this
+     */
+    private Oven oven;
+
+    /**
+     * The Kettle currently in this laboratory, null if there is no Kettle in this Laboratory.
+     *
+     * @invar If not null, the Kettle references this laboratory.
+     *      | kettle == null || kettle.getLaboratory() == this
+     */
+    private Kettle kettle;
+
+    /**
+     * The Transmogrifier currently in this laboratory, null if there is no Transmogrifier in this Laboratory.
+     *
+     * @invar If not null, the Transmogrifier references this laboratory.
+     *      | transmogrifier == null || transmogrifier.getLaboratory() == this
+     */
+    private Transmogrifier transmogrifier;
+
+
+    /**
+     * Register this device with this laboratory.
+     * This method is called automatically from the Device constructor, so there is a
+     * bidirectional link.
+     *
+     * Only callable from alchemy.laboratory ToDo: correct? laten staan of weg?
+     *
+     * @param device
+     *        The device to be registered.
+     *
+     * @post The given device is now registered as the device of its kind in this laboratory.
+     *
+     * @throws IllegalArgumentException
+     *         The given device is not effective, it does not reference this laboratory
+     *         or its concrete type is not a valid device type.
+     *
+     * @throws IllegalStateException
+     *         A device of the same kind is already registered in this laboratory.
+     */
+    void registerDevice(Device device)
+            throws IllegalArgumentException, IllegalStateException {
+        if (device == null) {
+            throw new IllegalArgumentException("Device can't be null");
+        }
+        if (device.getLaboratory() != this) {
+            throw new IllegalArgumentException("Device is not referencing this laboratory");
+        }
+
+        if (device instanceof CoolingBox) {
+            if (coolingBox != null) {
+                throw new IllegalStateException("A CoolingBox is already present in this laboratory");
+            }
+            coolingBox = (CoolingBox) device;
+        }
+        else if (device instanceof Oven) {
+            if (oven != null) {
+                throw new IllegalStateException("An Oven is already present in this laboratory");
+            }
+            oven = (Oven) device;
+        }
+        else if (device instanceof Kettle) {
+            if (kettle != null) {
+                throw new IllegalStateException("A Kettle is already present in this laboratory");
+            }
+            kettle = (Kettle) device;
+        }
+        else if (device instanceof Transmogrifier) {
+            if (transmogrifier != null) {
+                throw new IllegalStateException("A Transmogrifier is already present in this laboratory");
+            }
+            transmogrifier = (Transmogrifier) device;
+        }
+        else {
+            throw new IllegalArgumentException("Unknown device type");
+        }
+    }
+
+
+    /**
+     * Return the CoolingBox in this laboratory or null if there is none in this Laboratory.
+     */
+    @Basic
+    public CoolingBox getCoolingBox() {
+        return coolingBox;
+    }
+
+    /**
+     * Return the Oven in this laboratory or null if there is none in this Laboratory.
+     */
+    @Basic
+    public Oven getOven() {
+        return oven;
+    }
+
+    /**
+     * Return the Kettle in this laboratory or null if there is none in this Laboratory.
+     */
+    @Basic
+    public Kettle getKettle() {
+        return kettle;
+    }
+
+    /**
+     * Return the Transmogrifier in this laboratory or null if there is none in this Laboratory.
+     */
+    @Basic
+    public Transmogrifier getTransmogrifier() {
+        return transmogrifier;
+    }
+
+
+    /**
+     * Check if this laboratory has a CoolingBox.
+     *
+     * @return True if a CoolingBox is registered in this laboratory.
+     *       | result == (getCoolingBox() != null)
+     */
+    public boolean hasCoolingBox() {
+        return coolingBox != null;
+    }
+
+    /**
+     * Check if this laboratory has an Oven.
+     *
+     * @return True if an Oven is registered in this laboratory.
+     *       | result == (getOven() != null)
+     */
+    public boolean hasOven() {
+        return oven != null;
+    }
+
+    /**
+     * Check if this laboratory has a Kettle.
+     *
+     * @return True if a Kettle is registered in this laboratory.
+     *       | result == (getKettle() != null)
+     */
+    public boolean hasKettle() {
+        return kettle != null;
+    }
+
+    /**
+     * Check if this laboratory contains a Transmogrifier.
+     *
+     * @return True if a Transmogrifier is registered in this laboratory.
+     *       | result == (getTransmogrifier() != null)
+     */
+    public boolean hasTransmogrifier() {
+        return transmogrifier != null;
+    }
 
 
 
