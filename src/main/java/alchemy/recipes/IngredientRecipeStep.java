@@ -87,7 +87,7 @@ public class IngredientRecipeStep extends RecipeStep {
     /**
      * Gets the ingredient name needed in this step
      *
-     * @returns the ingredient name need for this step
+     * @return the ingredient name need for this step
      */
     @Basic
     @Immutable
@@ -98,7 +98,7 @@ public class IngredientRecipeStep extends RecipeStep {
     /**
      * Gets the ingredient quantity needed in this step
      *
-     * @returns the ingredient quantity need for this step
+     * @return the ingredient quantity need for this step
      */
     @Basic
     @Immutable

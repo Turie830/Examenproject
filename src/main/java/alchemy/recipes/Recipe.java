@@ -78,7 +78,7 @@ public class Recipe {
     /**
      * Gets the amount of steps
      *
-     * @returns the amount of steps in this recipe
+     * @return the amount of steps in this recipe
      */
     @Basic
     public int getNbSteps() {

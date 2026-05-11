@@ -49,7 +49,7 @@ public abstract class RecipeStep {
     /**
      * Gets the operation of the step
      *
-     * @returns the operation of this step
+     * @return the operation of this step
      */
     @Basic
     @Immutable
