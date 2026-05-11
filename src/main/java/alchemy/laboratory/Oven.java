@@ -72,7 +72,7 @@ public class Oven extends SingleContainerDevice implements TemperatureDevice {
             int n = rand.nextInt(11) - 5; // random between 0 and 10 (inclusive) then shift 5 left
 
             // heat the ingredient by the amount
-            ingredient.heat(heatAmount);
+            ingredient.heat(heatAmount + n);
             createResultContainer(ingredient);
         }
 
