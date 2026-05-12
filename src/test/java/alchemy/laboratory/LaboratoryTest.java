@@ -110,7 +110,8 @@ public class LaboratoryTest {
         Laboratory labo = new Laboratory(1);
         IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
                 new Temperature(0, 20));
-        AlchemicIngredient ingredient = new AlchemicIngredient(waterType, new Quantity(2L, Unit.SPOON));
+        AlchemicIngredient ingredient = new AlchemicIngredient(waterType,
+                new Quantity(2L, Unit.SPOON));
 
         assertTrue(labo.hasRoomFor(ingredient));
     }
@@ -120,7 +121,8 @@ public class LaboratoryTest {
         Laboratory labo = new Laboratory(1);
         IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
                 new Temperature(0, 20));
-        AlchemicIngredient ingredient = new AlchemicIngredient(waterType, new Quantity(2L, Unit.STOREROOM));
+        AlchemicIngredient ingredient = new AlchemicIngredient(waterType,
+                new Quantity(2L, Unit.STOREROOM));
 
         assertFalse(labo.hasRoomFor(ingredient));
     }
@@ -132,6 +134,95 @@ public class LaboratoryTest {
 
         assertFalse(labo.hasRoomFor(null));
     }
+
+    @Test
+    public void getIngredient_SimpleName() {
+        Laboratory labo = new Laboratory(1);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(2L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        assertSame(water, labo.getIngredient("Water"));
+    }
+
+    @Test
+    public void getIngredient_SpecialName() {
+        Laboratory labo = new Laboratory(1);
+        Name mixtureName = Name.createMixtureName("Beer mixed with Coke");
+        MixedIngredientType mixedType = new MixedIngredientType(mixtureName, State.LIQUID,
+                new Temperature(0, 20));
+
+        mixedType.setSpecialName("Mazout");
+
+        AlchemicIngredient mazout = new AlchemicIngredient(mixedType,
+                new Quantity(2L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, mazout));
+
+        assertSame(mazout, labo.getIngredient("Mazout"));
+    }
+
+    @Test
+    public void getIngredient_MixedSimpleName() {
+        Laboratory labo = new Laboratory(1);
+        Name mixtureName = Name.createMixtureName("Beer mixed with Coke");
+        MixedIngredientType mixedType = new MixedIngredientType(mixtureName, State.LIQUID,
+                new Temperature(0, 20));
+
+        mixedType.setSpecialName("Mazout");
+
+        AlchemicIngredient ingredient = new AlchemicIngredient(mixedType,
+                new Quantity(2L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, ingredient));
+
+        assertSame(ingredient, labo.getIngredient("Beer mixed with Coke"));
+    }
+
+    @Test
+    public void getIngredient_NullName() {
+        Laboratory labo = new Laboratory(1);
+
+        assertThrows(IllegalArgumentException.class, () -> labo.getIngredient(null));
+    }
+
+    @Test
+    public void getIngredient_UnknownName() {
+        Laboratory labo = new Laboratory(1);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(2L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        assertThrows(IllegalArgumentException.class, () -> labo.getIngredient("Salt"));
+    }
+
+    @Test
+    public void getIngredient_SpecialNameOfRegularIngredient() {
+        Laboratory labo = new Laboratory(1);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(2L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        assertThrows(IllegalArgumentException.class, () -> labo.getIngredient("Mazout"));
+    }
+
+
+
+
+
+
+
+
+
 
 
 
