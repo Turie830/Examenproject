@@ -1,11 +1,15 @@
 package alchemy.laboratory;
 
+import alchemy.Temperature;
 import alchemy.Unit;
 import alchemy.ingredients.AlchemicIngredient;
 import alchemy.ingredients.IngredientContainer;
 import alchemy.ingredients.Quantity;
 import alchemy.ingredients.State;
+import alchemy.recipes.IngredientRecipeStep;
+import alchemy.recipes.Operation;
 import alchemy.recipes.Recipe;
+import alchemy.recipes.RecipeStep;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
 
@@ -648,14 +652,14 @@ public class Laboratory {
 
 
     /**
-     * Receipies (wrs??)
+     * Receipies
      */
 
 
     /**
      * Execute the given recipe in this laboratory the given number of times.
      *
-     * Walk through the recipe step by step, scale every amount of ingredient
+     * Walk through the recipe step by step, scale every ingredient
      * by the given factor, and use the devices in this laboratory to
      * heat, cool, mix or add ingredients. The final mixture is stored
      * in the laboratory.
@@ -686,16 +690,183 @@ public class Laboratory {
             throw new IllegalArgumentException("Factor must be strictly positive");
         }
 
-
-        // Set of all ingredients not yet mixed.
+        // Set of all ingredients which are not yet mixed.
         // After a MIX, this list contains exactly only the mixture anymore.
         List<AlchemicIngredient> IngredientsSet = new ArrayList<>();
 
-        // NOG VERDER DOEN
+        for (int i = 0; i < recipe.getStepsAmount(); i++) {
+            RecipeStep step = recipe.getStepAt(i);
+            Operation op = step.getOperation();
 
+            try {
+                if (op == Operation.ADD) {
+                    IngredientRecipeStep addStep = (IngredientRecipeStep) step; // (IngredientRecipeStep) moet, met haakjes, om als IngredientRecipeStep te knn behandelen
+                    Quantity scaled = new Quantity(addStep.getIngredientQuantity().getAmount() * factor,
+                            addStep.getIngredientQuantity().getUnit());
+                    IngredientContainer takenFromLab = request(
+                            addStep.getIngredientName().getSimpleName(), scaled);
+                    IngredientsSet.add(takenFromLab.getIngredient());
+                } else if (op == Operation.HEAT) {
+                    if (IngredientsSet.isEmpty()) {
+                        throw new IllegalStateException("No ingredient to be heated");
+                    }
+                    if (!hasOven()) {
+                        throw new IllegalStateException("No Oven in this laboratory");
+                    }
+                    AlchemicIngredient last = IngredientsSet.removeLast();
+                    IngredientsSet.add(heatBy(last, 10));   // standaard 10, want opgave bij recepten
 
+                } else if (op == Operation.COOL) {
+                    if (IngredientsSet.isEmpty()) {
+                        throw new IllegalStateException("No ingredient to be cooled");
+                    }
+                    if (!hasCoolingBox()) {
+                        throw new IllegalStateException("No CoolingBox in this laboratory");
+                    }
+                    AlchemicIngredient last = IngredientsSet.removeLast();
+                    IngredientsSet.add(coolBy(last, 10));
+
+                } else if (op == Operation.MIX) {
+                    // als er maar 1 ingredient is maar geen kettle, maakt dat niet uit want je geeft dan gwn het ingredient
+                    if (IngredientsSet.size() >= 2) {
+                        if (!hasKettle()) {
+                            throw new IllegalStateException("No Kettle in this laboratory");
+                        }
+                    }
+                    AlchemicIngredient mixture = mixAll(IngredientsSet);
+                    IngredientsSet.clear();
+                    IngredientsSet.add(mixture);
+                }
+            } catch (IllegalArgumentException | IllegalStateException exeption) {
+                // bij fail; bvb niet genoeg ingredient, restore je alles naar hoe het was voor execute
+                storeBackAll(IngredientsSet);
+                return;
+            }
+        }
+        // succes
+        storeBackAll(IngredientsSet);
     }
 
+
+
+
+
+
+    /**
+     * Use the Oven to heat the given ingredient by the given amount
+     * and return the heated ingredient.
+     *
+     * The oven is set to standard temperature + amount before running, so the
+     * ingredient ends up exactly that amount warmer then the standard temperature.
+     *
+     * @param ingredient
+     *        The ingredient to heat, not null.
+     *
+     * @param amount
+     *        The number of temperature units to add to the hotness.
+     *        Must be strictly positive.
+     *
+     * @return The ingredient after it has been heated by the given amount.
+     *
+     * @pre   There is an Oven in this laboratory (hasOven() == true).
+     */
+    private AlchemicIngredient heatBy(AlchemicIngredient ingredient, long amount) {
+        State state = ingredient.getType().getStandardState();
+        // Ingredient in container before putting it in the Oven
+        Unit containerUnit = smallestContainerUnitFor(ingredient.getAmountInLowestUnit(), state);
+        IngredientContainer container = new IngredientContainer(containerUnit, ingredient);
+
+        // [1] = hotness
+        long targetTemp = ingredient.getType().getStandardTemperature()[1] + amount;
+        // no coldness, only hotness
+        getOven().setTemperatureTarget(new Temperature(0, targetTemp));
+        // container in Oven
+        getOven().add(container);
+        // execute oven
+        getOven().execute();
+        // getresult returns a container
+        return getOven().getResult().getIngredient();
+    }
+
+
+    /**
+     * Use the CoolingBox to cool the given ingredient by the given amount
+     * and return the cooled ingredient.
+     *
+     * The CoolingBox is set to standard temperature + amount before running, so the
+     * ingredient ends up exactly that amount colder than the standard temperature.
+     *
+     * @param ingredient
+     *        The ingredient to cool, not null.
+     *
+     * @param amount
+     *        The number of temperature units to add to the coldness.
+     *        Must be strictly positive.
+     *
+     * @return The ingredient after it has been cooled by the given amount.
+     *
+     * @pre   There is a CoolingBox in this laboratory (hasCoolingBox() == true).
+     */
+    private AlchemicIngredient coolBy(AlchemicIngredient ingredient, long amount) {
+        State state = ingredient.getType().getStandardState();
+        Unit containerUnit = smallestContainerUnitFor(ingredient.getAmountInLowestUnit(), state);
+        IngredientContainer container = new IngredientContainer(containerUnit, ingredient);
+
+        long targetColdness = ingredient.getColdness() + amount;
+        getCoolingBox().setTemperatureTarget(new Temperature(targetColdness, 0));
+        getCoolingBox().add(container);
+        getCoolingBox().execute();
+        return getCoolingBox().getResult().getIngredient();
+    }
+
+
+    /**
+     * Add all ingredients in the given list to the kettle, run the kettle
+     * and return the result-mixture.
+     *
+     * Every ingredient is placed in the smallest container that can fit it
+     * before the ingredient is added to the kettle.
+     *
+     * @param toMix
+     *        The list of ingredients to mix together. Must have at least 2 elements.
+     *
+     * @return The mixture that comes out of the kettle. (one thing)
+     *
+     * @pre   This laboratory has a kettle (hasKettle() == true).
+     * @pre   toMix contains at least 2 ingredients.
+     */
+    private AlchemicIngredient mixAll(List<AlchemicIngredient> toMix) {
+        for (AlchemicIngredient ing : toMix) {
+            State state = ing.getType().getStandardState();
+            Unit containerUnit = smallestContainerUnitFor(ing.getAmountInLowestUnit(), state);
+            getKettle().add(new IngredientContainer(containerUnit, ing));
+        }
+        getKettle().execute();          // ToDo: is het bad practice om getKettle(). te doen? hierboven ook al gebruikt maar denk er nu aan
+        return getKettle().getResult().getIngredient();
+    }
+
+
+    /**
+     * Store every ingredient that is in the given list
+     * back in this laboratory.
+     *
+     * Used when execute() succeeds or fails anywhere in the function.
+     * store() brings each ingredient back to its standard temperature
+     * and merges it with the ingredient with the same name if
+     * there is already one in the laboratory.
+     *
+     * @param remaining
+     *        The list of ingredients to store back.
+     *        If empty, nothing happens.
+     */
+    private void storeBackAll(List<AlchemicIngredient> remaining) {
+        for (AlchemicIngredient ing : remaining) {
+            State state = ing.getType().getStandardState();
+            Unit containerUnit = smallestContainerUnitFor(ing.getAmountInLowestUnit(), state);
+            store(new IngredientContainer(containerUnit, ing));
+
+        }
+    }
 
 
 }
