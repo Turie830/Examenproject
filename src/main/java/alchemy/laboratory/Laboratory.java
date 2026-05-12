@@ -136,6 +136,8 @@ public class Laboratory {
      *  ToDo: moet er een throw? illegalargument?
      */
     public long getUsedAmountInLowestUnit(State state) {
+        //ToDO:  if (state == null) -> throw new IllegalArgumentExc ?!
+
         long total = 0L;
         for (AlchemicIngredient ing : ingredients) {
             if (ing.getType().getStandardState() == state) {
