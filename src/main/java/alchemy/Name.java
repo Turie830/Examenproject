@@ -51,7 +51,7 @@ public class Name {
     private static final String[] FORBIDDEN_SIMPLE_NAME_WORDS = {
             "Heated",
             "Cooled"
-            // TODO: Add extra prefix/suffix words when they are introduced.
+            // extra prefix/suffix can be added here
     };
 
     /**
