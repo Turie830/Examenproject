@@ -49,8 +49,14 @@ public class Kettle extends MultiContainerDevice {
             throw new IllegalStateException("The kettle should have ingredients in it");
         }
 
-        IngredientType resultType = createResultType(ingredients);
-        Quantity resultQuantity = createResultQuantity(ingredients, resultType.getStandardState());
+        State resultState = selectResultState(ingredients);
+        IngredientType resultType = createResultType(ingredients, resultState);
+        Quantity resultQuantity = createResultQuantity(ingredients, resultState);
+
+        if (resultQuantity.getAmount() <= 0) {
+            throw new IllegalStateException("Mixing these ingredients leaves no resulting quantity");
+        }
+
         AlchemicIngredient result = new AlchemicIngredient(resultType, resultQuantity);
         setTemperature(result, calculateWeightedTemperature(ingredients));
 
@@ -65,11 +71,11 @@ public class Kettle extends MultiContainerDevice {
      * @return a regular type if all names are equal
      * @return a mixed type if at least two different names occur
      */
-    private IngredientType createResultType(List<AlchemicIngredient> ingredients) {
-        State resultState = selectResultState(ingredients);
+    private IngredientType createResultType(List<AlchemicIngredient> ingredients, State resultState) {
         Temperature resultStandardTemperature = selectResultStandardTemperature(ingredients);
         List<String> simpleNames = getUniqueSimpleNames(ingredients);
 
+        // standardState is set to the state after mixing (resultState)
         if (simpleNames.size() == 1) {
             return new IngredientType(new Name(simpleNames.getFirst()), resultState, resultStandardTemperature);
         }
@@ -82,10 +88,10 @@ public class Kettle extends MultiContainerDevice {
     }
 
     /**
-     * Select the standard state for the resulting ingredient
+     * Select the state for the resulting ingredient
      *
      * @param ingredients The ingredients that are mixed
-     * @return the state of the type closest to the default temperature
+     * @return the state of the hottest type closest to the default temperature
      * @return liquid if liquid and powder are tied
      */
     private State selectResultState(List<AlchemicIngredient> ingredients) {
@@ -95,7 +101,7 @@ public class Kettle extends MultiContainerDevice {
         for (AlchemicIngredient ingredient : ingredients) {
             // null = default (when using difference which getStandardTemperatureDifference does)
             long difference = ingredient.getType().getStandardTemperatureDifference(null);
-            State state = ingredient.getType().getStandardState();
+            State state = ingredient.getState();
 
             if (difference < bestDifference
                     || (difference == bestDifference && state == State.LIQUID)) {
@@ -255,7 +261,7 @@ public class Kettle extends MultiContainerDevice {
 
 
         // todo: possibly change quantity so that amount > 0 instead of >=0
-        // currently we could have an ingredient with weight 0 so totalWeigt could be 0
+        // currently we could have an ingredient with weight 0 so totalWeight could be 0
         long averageColdness = Math.round(totalColdness / totalWeight);
         long averageHotness = Math.round(totalHotness / totalWeight);
 
