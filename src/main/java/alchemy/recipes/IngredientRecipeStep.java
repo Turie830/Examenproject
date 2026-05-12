@@ -10,13 +10,13 @@ import be.kuleuven.cs.som.annotate.Raw;
  * A class for recipe steps that need ingredients
  *
  * @invar the step must have an IngredientName that is effective
- *      | getIngredientName != null
+ *      | getIngredientName() != null
  *
  * @invar the step must have an effective quantity
- *       | getIngredientQuantity != null
+ *       | getIngredientQuantity() != null
  *
  * @invar The operation for this step must need an ingredient
- *      | operation.requiresIngredient() == true
+ *      | getOperation().requiresIngredient() == true
  *
  * @author Obe Willaert
  * @author Mauro Devolder

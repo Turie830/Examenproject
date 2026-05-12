@@ -96,7 +96,7 @@ public class Recipe {
      *      The index of the step to retrieve
      *
      * @pre The index of the requested recipe must be less than the total amount of recipes
-     *       | index < getNbRecipes()
+     *       | index < getNbSteps()
      *
      * @return The recipe at the given index.
      *       | result == steps.get(index)

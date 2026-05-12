@@ -4,7 +4,7 @@ package alchemy.recipes;
 import be.kuleuven.cs.som.annotate.Basic;
 
 /**
- * An enum for the operations possible in a receipt
+ * An enum for the operations possible in a recipe
  *
  *
  * @author Obe Willaert
@@ -19,7 +19,8 @@ public enum Operation {
     /**
      * Checks if the operation requires an ingredient in the step
      *
-     * @return
+     * @return if the operation needs a ingredient
+     *      | this == ADD
      */
     @Basic
     public boolean requiresIngredient() {

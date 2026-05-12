@@ -82,7 +82,7 @@ public class CoolingBox extends SingleContainerDevice implements TemperatureDevi
     /**
      * Gets the temperature target
      *
-     * @return the temperature this coolbox will reach when executed
+     * @return the temperature this cooling box will reach when executed
      */
     // todo @Basic want geeft kopie?
     @Override

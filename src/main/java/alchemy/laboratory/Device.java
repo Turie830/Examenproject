@@ -87,7 +87,7 @@ public abstract class Device {
     /**
      * Gets the result
      *
-     * @return null if the device has not ran yet
+     * @return null if the device has not run yet
      * @return a container with the same capacity and ingredient as the result container
      */
     public IngredientContainer getResult() {
