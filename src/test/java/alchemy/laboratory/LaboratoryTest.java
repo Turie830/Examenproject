@@ -215,13 +215,77 @@ public class LaboratoryTest {
         assertThrows(IllegalArgumentException.class, () -> labo.getIngredient("Mazout"));
     }
 
+    @Test
+    public void hasIngredient_SimpleName() {
+        Laboratory labo = new Laboratory(1);
+
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(2L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        assertTrue(labo.hasIngredient("Water"));
+    }
+
+    @Test
+    public void hasIngredient_SpecialName() {
+        Laboratory labo = new Laboratory(1);
+
+        Name mixtureName = Name.createMixtureName("Beer mixed with Coke");
+
+        MixedIngredientType mixedType = new MixedIngredientType(mixtureName, State.LIQUID,
+                new Temperature(0, 20));
+        mixedType.setSpecialName("Mazout");
+
+        AlchemicIngredient ingredient = new AlchemicIngredient(mixedType,
+                new Quantity(2L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, ingredient));
+
+        assertTrue(labo.hasIngredient("Mazout"));
+    }
+
+    @Test
+    public void hasIngredient_MixedSimpleName() {
+        Laboratory labo = new Laboratory(1);
+
+        Name mixtureName = Name.createMixtureName("Beer mixed with Coke");
+
+        MixedIngredientType mixedType = new MixedIngredientType(mixtureName, State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient ingredient = new AlchemicIngredient(mixedType,
+                new Quantity(2L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, ingredient));
+
+        assertTrue(labo.hasIngredient("Beer mixed with Coke"));
+    }
+
+    @Test
+    public void hasIngredient_UnknownName() {
+        Laboratory labo = new Laboratory(1);
+
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(2L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        assertFalse(labo.hasIngredient("Salt"));
+    }
+
+    @Test
+    public void hasIngredient_NullName() {
+        Laboratory labo = new Laboratory(1);
+
+        assertFalse(labo.hasIngredient(null));
+    }
 
 
-
-
-
-
-
+//ToDO: alles vanaf store()
 
 
 
