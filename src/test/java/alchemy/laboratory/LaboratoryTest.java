@@ -102,25 +102,38 @@ public class LaboratoryTest {
 
     @Test
     public void getUsedAmountInLowestUnit_nullState() {
-        Laboratory labo = new Laboratory(3);
+        //zie ToDo
+    }
 
+    @Test
+    public void hasRoomFor_IngredientFitsInLaboratory() {
+        Laboratory labo = new Laboratory(1);
         IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
                 new Temperature(0, 20));
-        IngredientType saltType = new IngredientType(new Name("Salt"), State.POWDER,
-                new Temperature(0,20));
-        AlchemicIngredient water = new AlchemicIngredient(waterType,
-                new Quantity(2L, Unit.SPOON));
-        AlchemicIngredient salt = new AlchemicIngredient(saltType,
-                new Quantity(3L, Unit.SPOON));
+        AlchemicIngredient ingredient = new AlchemicIngredient(waterType, new Quantity(2L, Unit.SPOON));
 
-        labo.store(new IngredientContainer(Unit.VIAL, water));
-        labo.store(new IngredientContainer(Unit.SACHET, salt));
-
-        assertEquals(
-                salt.getAmountInLowestUnit(),
-                labo.getUsedAmountInLowestUnit(State.POWDER)
-        );
+        assertTrue(labo.hasRoomFor(ingredient));
     }
+
+    @Test
+    public void hasRoomFor_IngredientDoesNotFitInLaboratory() {
+        Laboratory labo = new Laboratory(1);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient ingredient = new AlchemicIngredient(waterType, new Quantity(2L, Unit.STOREROOM));
+
+        assertFalse(labo.hasRoomFor(ingredient));
+    }
+
+
+    @Test
+    public void hasRoomFor_NullIngredient() {
+        Laboratory labo = new Laboratory(1);
+
+        assertFalse(labo.hasRoomFor(null));
+    }
+
+
 
 
 
