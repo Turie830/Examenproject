@@ -108,7 +108,7 @@ public class IngredientRecipeStep extends RecipeStep {
         return ingredientQuantity;
     }
 
-    // todo comment needed here (@override)
+    // todo comment needed here? (@override)
     @Override
     public boolean isValidRecipeStep() {
         return getOperation().requiresIngredient()

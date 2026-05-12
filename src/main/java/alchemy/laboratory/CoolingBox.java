@@ -2,6 +2,7 @@ package alchemy.laboratory;
 
 import alchemy.Temperature;
 import alchemy.ingredients.AlchemicIngredient;
+import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
 
 /**
@@ -83,7 +84,9 @@ public class CoolingBox extends SingleContainerDevice implements TemperatureDevi
      *
      * @return the temperature this coolbox will reach when executed
      */
+    // todo @Basic want geeft kopie?
     @Override
+    @Basic
     public Temperature getTemperatureTarget() {
         if (temperatureTarget == null) {
             return null;

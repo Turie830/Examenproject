@@ -1,6 +1,7 @@
 package alchemy.recipes;
 
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
 
 import java.util.ArrayList;
@@ -83,6 +84,7 @@ public class Recipe {
      * @return the amount of steps in this recipe
      */
     @Basic
+    @Immutable
     public int getNbSteps() {
         return steps.size();
     }
@@ -100,9 +102,9 @@ public class Recipe {
      *       | result == steps.get(index)
      *
      * @note this does not return a copy since every field in a recipeStep is final
-     * TODO verify if this follows liskov
      */
     @Basic
+    @Immutable
     public RecipeStep getStepAt(int index)  {
         return steps.get(index);
     }

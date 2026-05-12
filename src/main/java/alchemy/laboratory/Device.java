@@ -1,5 +1,7 @@
 package alchemy.laboratory;
 
+import alchemy.Unit;
+import alchemy.ingredients.AlchemicIngredient;
 import alchemy.ingredients.IngredientContainer;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
@@ -27,6 +29,11 @@ public abstract class Device {
      *       Therefore, this association is only stored from device to laboratory.
      */
     private Laboratory laboratory;
+
+    /**
+     * The result container after executing
+     */
+    private IngredientContainer result;
 
     /**
      * Initialise a new device
@@ -75,5 +82,51 @@ public abstract class Device {
      * Execute the operation of this device.
      */
     public abstract void execute();
+
+
+    /**
+     * Gets the result
+     *
+     * @return null if the device has not ran yet
+     * @return a container with the same capacity and ingredient as the result container
+     */
+    public IngredientContainer getResult() {
+        if (result == null) {
+            return null;
+        }
+        return new IngredientContainer(result.getCapacityUnit(), result.getIngredient());
+    }
+
+    /**
+     * Create a result container for the given ingredient
+     *
+     * @param resultIngredient The ingredient for which to create a result container
+     * @throws IllegalArgumentException The given result ingredient must be effective
+     *                                  | resultIngredient == null
+     * @throws IllegalArgumentException The given result ingredient must fit in a valid container
+     */
+    protected void createResultContainer(AlchemicIngredient resultIngredient) {
+        if (resultIngredient == null) {
+            throw new IllegalArgumentException("Result ingredient cannot be null");
+        }
+
+        Unit resultUnit = resultIngredient.getQuantity().getUnit();
+
+        if (IngredientContainer.isValidCapacityUnit(resultUnit)
+                && IngredientContainer.canContain(resultUnit, resultIngredient)) {
+            result = new IngredientContainer(resultUnit, resultIngredient);
+            return;
+        }
+
+        for (Unit capacityUnit : Unit.values()) {
+            if (IngredientContainer.isValidCapacityUnit(capacityUnit)
+                    && IngredientContainer.canContain(capacityUnit, resultIngredient)) {
+                result = new IngredientContainer(capacityUnit, resultIngredient);
+                return;
+            }
+        }
+
+        throw new IllegalArgumentException("Result ingredient does not fit in a valid container");
+    }
 
 }

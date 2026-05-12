@@ -276,8 +276,7 @@ public class Kettle extends MultiContainerDevice {
      * @return the amount expressed as a spoon based value
      */
     private long getSpoonWeight(AlchemicIngredient ingredient) {
-        // todo: convert to getState
-        State state = ingredient.getType().getStandardState();
+        State state = ingredient.getState();
         return ingredient.getQuantity().toSpoons(state);
     }
 
