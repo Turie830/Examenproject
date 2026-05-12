@@ -63,6 +63,7 @@ public class MixedIngredientType extends IngredientType{
      *         the default standard state and the default standard temperature.
      *       | this(name, DEFAULT.getStandardState(), DEFAULT.getStandardTemperatureObject())
      */
+    @Raw
     public MixedIngredientType(Name name) {
         this(name, DEFAULT.getStandardState(), DEFAULT.getStandardTemperatureObject());
     }

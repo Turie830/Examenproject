@@ -3,6 +3,7 @@ package alchemy.recipes;
 
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for recipe steps
@@ -38,7 +39,8 @@ public abstract class RecipeStep {
      * @post the operation is set to the given operation
      *      | new.getOperation() == operation
      */
-    protected RecipeStep(Operation operation) throws IllegalArgumentException {
+    @Raw
+    public RecipeStep(Operation operation) throws IllegalArgumentException {
         if (operation == null) {
             throw new IllegalArgumentException("Operation cannot be null");
         }

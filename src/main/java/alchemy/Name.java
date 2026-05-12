@@ -40,7 +40,6 @@ public class Name {
     /**
      * A string containing all allowed special characters in names.
      */
-    // TODO kettle says it wants , in the name but not allowed?
     private static final String ALLOWED_SPECIAL_CHARACTERS = "'(),";
 
     /**
@@ -84,6 +83,7 @@ public class Name {
      *         The given name is not a valid regular name.
      *       | !isValidName(name)
      */
+    @Raw
     public Name(String name) {
         this(name, false);
     }
@@ -113,6 +113,7 @@ public class Name {
      *         the words "mixed" and "with" are allowed.
      *       | !isValidName(name, allowMixedAndWith)
      */
+    @Raw
     private Name(String name, boolean allowMixedAndWith) {
         if (!AlchemicIngredient.isValidName(name, allowMixedAndWith)) {
             throw new IllegalArgumentException("Invalid name.");

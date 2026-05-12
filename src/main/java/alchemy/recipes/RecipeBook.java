@@ -1,6 +1,7 @@
 package alchemy.recipes;
 
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class RecipeBook {
      * @post an empty recipe book is created
      *      | getNbRecipes() == 0
      */
+    @Raw
     public RecipeBook() {}
 
 

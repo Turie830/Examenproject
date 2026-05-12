@@ -2,6 +2,7 @@ package alchemy.laboratory;
 
 import alchemy.Temperature;
 import alchemy.ingredients.AlchemicIngredient;
+import be.kuleuven.cs.som.annotate.Raw;
 
 import java.util.Random;
 
@@ -30,6 +31,7 @@ public class Oven extends SingleContainerDevice implements TemperatureDevice {
      * @post The laboratory of this device is set to the given laboratory
      * | new.getLaboratory() == laboratory
      */
+    @Raw
     public Oven(Laboratory laboratory) {
         super(laboratory);
     }

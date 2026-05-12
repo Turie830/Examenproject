@@ -4,6 +4,7 @@ import alchemy.Name;
 import alchemy.Temperature;
 import alchemy.Unit;
 import alchemy.ingredients.*;
+import be.kuleuven.cs.som.annotate.Raw;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class Kettle extends MultiContainerDevice {
      * @post The laboratory of this device is set to the given laboratory
      * | new.getLaboratory() == laboratory
      */
+    @Raw
     public Kettle(Laboratory laboratory) {
         super(laboratory);
     }

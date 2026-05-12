@@ -676,8 +676,7 @@ public class Laboratory {
      * @throws IllegalStateException
      *         A required device is not in this laboratory.
      */
-    public void execute(Recipe recipe, int factor)
-            throws IllegalArgumentException, IllegalStateException {
+    public void execute(Recipe recipe, int factor) throws IllegalArgumentException, IllegalStateException {
         if (recipe == null) {
             throw new IllegalArgumentException("Recipe can't be null");
         }
@@ -693,9 +692,7 @@ public class Laboratory {
         // NOG VERDER DOEN
 
 
-
-
-
+    }
 
 
 

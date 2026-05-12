@@ -4,6 +4,7 @@ import alchemy.Name;
 import alchemy.ingredients.Quantity;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for recipe steps that need ingredients
@@ -62,6 +63,7 @@ public class IngredientRecipeStep extends RecipeStep {
      *      The operation must require an ingredient
      *      | !operation.reqruiresIngredient()
      */
+    @Raw
     public IngredientRecipeStep(Operation operation, Name ingredientName, Quantity quantity) throws IllegalArgumentException {
         // We must do this one again, cause if it's null the operation.requiresIngredient Will fail for nullpointer even thoug it's already in RecipeStep
         if (operation == null) {

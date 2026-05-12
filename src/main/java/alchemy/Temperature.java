@@ -3,6 +3,7 @@ package alchemy;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Model;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class of temperatures for alchemic ingredients.
@@ -76,6 +77,7 @@ public class Temperature {
      * @effect This new temperature is initialized with coldness 0 and hotness 20.
      *       | this(DEFAULT_COLDNESS, DEFAULT_HOTNESS)
      */
+    @Raw
     public Temperature() {
         this(DEFAULT_COLDNESS, DEFAULT_HOTNESS);
     }
@@ -103,6 +105,7 @@ public class Temperature {
      *     |   new.getColdness() == DEFAULT_COLDNESS
      *     |   && new.getHotness() == DEFAULT_HOTNESS
      */
+    @Raw
     public Temperature(long coldness, long hotness) {
         if (isValidTemperature(coldness, hotness)) {
             this.coldness = coldness;
@@ -156,6 +159,7 @@ public class Temperature {
      * // standardTemperature is still [0, 20]
      *
      */
+    @Raw
     public Temperature(Temperature temperature) {
         if (temperature == null) {
             this.coldness = DEFAULT_COLDNESS;

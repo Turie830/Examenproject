@@ -2,6 +2,7 @@ package alchemy.laboratory;
 
 import alchemy.ingredients.AlchemicIngredient;
 import alchemy.ingredients.State;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for transmogrifier devices.
@@ -23,6 +24,7 @@ public class Transmogrifier extends SingleContainerDevice {
      * @post The laboratory of this device is set to the given laboratory
      * | new.getLaboratory() == laboratory
      */
+    @Raw
     public Transmogrifier(Laboratory laboratory) {
         super(laboratory);
     }

@@ -1,6 +1,8 @@
 package alchemy.recipes;
 
 
+import be.kuleuven.cs.som.annotate.Raw;
+
 /**
  * A class for recipe steps without ingredients
  *
@@ -25,6 +27,7 @@ public class SimpleRecipeStep extends RecipeStep {
      *      The operation for this step must not need an ingredient
      *      | operation.requiresIngredient() == false
      */
+    @Raw
     public SimpleRecipeStep(Operation operation) throws IllegalArgumentException {
         // We must do this one again, cause if it's null the operation.requiresIngredient Will fail for nullpointer even thoug it's already in RecipeStep
         if (operation == null) {

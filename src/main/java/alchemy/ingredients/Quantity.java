@@ -3,6 +3,7 @@ package alchemy.ingredients;
 import alchemy.Unit;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for quantities
@@ -51,12 +52,12 @@ public class Quantity {
      * @post The unit in which the amount is put
      *      | new.getUnit() == unit
      */
+    @Raw
     public Quantity(Long amount, Unit unit) {
         this.amount = amount;
         this.unit = unit;
     }
 
-    // todo copy constructor or method
 
     /**
      * Gets the amount of this quantity

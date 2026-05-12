@@ -1,10 +1,11 @@
 package alchemy.ingredients;
 
 import alchemy.Name;
-import alchemy.Unit;
 import alchemy.Temperature;
+import alchemy.Unit;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class of alchemic ingredients.
@@ -98,6 +99,7 @@ public class AlchemicIngredient {
      *     |   new.getAmount() == 1
      *     |   && new.getUnit() == Unit.getSpoonUnit(new.getType().getStandardState())
      */
+    @Raw
     public AlchemicIngredient(IngredientType type, Quantity quantity) {
         if (type == null) {
             this.type = IngredientType.DEFAULT;
@@ -128,6 +130,7 @@ public class AlchemicIngredient {
      *         a default quantity.
      *       | this(type, null)
      */
+    @Raw
     public AlchemicIngredient(IngredientType type) {
         this(type, null);
     }
@@ -138,6 +141,7 @@ public class AlchemicIngredient {
      * @effect This new alchemic ingredient is initialized with the default type.
      *       | this(IngredientType.DEFAULT)
      */
+    @Raw
     public AlchemicIngredient() {
         this(IngredientType.DEFAULT);
     }

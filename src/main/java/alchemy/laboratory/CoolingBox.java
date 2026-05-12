@@ -2,6 +2,7 @@ package alchemy.laboratory;
 
 import alchemy.Temperature;
 import alchemy.ingredients.AlchemicIngredient;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * A class for cooling boxes
@@ -28,6 +29,7 @@ public class CoolingBox extends SingleContainerDevice implements TemperatureDevi
      * @post The laboratory of this device is set to the given laboratory
      * | new.getLaboratory() == laboratory
      */
+    @Raw
     public CoolingBox(Laboratory laboratory) {
         super(laboratory);
     }

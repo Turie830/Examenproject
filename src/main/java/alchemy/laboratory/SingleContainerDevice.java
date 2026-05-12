@@ -4,6 +4,7 @@ import alchemy.Unit;
 import alchemy.ingredients.AlchemicIngredient;
 import alchemy.ingredients.IngredientContainer;
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * An abstract class for devices that can contain at most one ingredient container.
@@ -36,6 +37,7 @@ public abstract class SingleContainerDevice extends Device {
      * @post The laboratory of this device is set to the given laboratory
      * | new.getLaboratory() == laboratory
      */
+    @Raw
     public SingleContainerDevice(Laboratory laboratory) {
         super(laboratory);
     }

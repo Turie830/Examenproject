@@ -1,6 +1,7 @@
 package alchemy.recipes;
 
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,7 @@ public class Recipe {
      * @throws IllegalArgumentException
      *      Each step in the given list must be valid
      */
+    @Raw
     public Recipe(List<RecipeStep> steps) throws IllegalArgumentException {
         if  (steps == null || steps.isEmpty()) {
             throw new IllegalArgumentException("Steps cannot be null or empty");

@@ -2,6 +2,7 @@ package alchemy.laboratory;
 
 import alchemy.ingredients.IngredientContainer;
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Raw;
 
 /**
  * An abstract class for devices.
@@ -40,6 +41,7 @@ public abstract class Device {
      *      when the laboratory is not effective
      *      | laboratory == null
      */
+    @Raw
     public Device(Laboratory laboratory) {
         if (laboratory == null) {
             throw new IllegalArgumentException("Laboratory object can't be null");

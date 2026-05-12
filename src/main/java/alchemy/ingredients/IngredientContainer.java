@@ -85,6 +85,7 @@ public class IngredientContainer {
      *         and no ingredient.
      *       | this(capacityUnit, null)
      */
+    @Raw
     public IngredientContainer(Unit capacityUnit) {
         this(capacityUnit, null);
     }
