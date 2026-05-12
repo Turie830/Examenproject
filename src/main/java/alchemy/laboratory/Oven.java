@@ -87,7 +87,6 @@ public class Oven extends SingleContainerDevice implements TemperatureDevice {
 
             // heat the ingredient by the amount
             ingredient.heat(heatAmount + n);
-            createResultContainer(ingredient);
         }
 
         // can't throw since we put 1 container in so we get the same amount out

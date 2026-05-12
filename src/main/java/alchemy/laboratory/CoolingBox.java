@@ -82,9 +82,7 @@ public class CoolingBox extends SingleContainerDevice implements TemperatureDevi
 
             // cool the ingredient by the amount
             ingredient.cool(coolAmount);
-            return;
         }
-
 
         // can't throw since we put 1 container in so we get the same amount out
         createResultContainer(ingredient);
