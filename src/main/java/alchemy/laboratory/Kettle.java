@@ -268,29 +268,29 @@ public class Kettle extends MultiContainerDevice {
      * @return the weighted average temperature
      */
     private Temperature calculateWeightedTemperature(List<AlchemicIngredient> ingredients) {
-        long totalColdness = 0L;
-        long totalHotness = 0L;
+        // coldness and hotness are doubles to not lose precision during averaging (weight could be a fraction)
+        double totalColdness = 0L;
+        double totalHotness = 0L;
         double totalWeight = 0.0;
 
         for (AlchemicIngredient ingredient : ingredients) {
             long[] temp = ingredient.getTemperature();
-            long weight = getSpoonWeight(ingredient);
+            double weight = getSpoonWeightFraction(ingredient);
 
             totalWeight += weight;
 
+            // coldness is a double to not lose precision here
             totalColdness += (temp[0] * weight);
             totalHotness += (temp[1] * weight);
         }
 
 
-        // todo: possibly change quantity so that amount > 0 instead of >=0
-        // currently we could have an ingredient with weight 0 so totalWeight could be 0
+        // convert back to long using normal rounding
         long averageColdness = Math.round(totalColdness / totalWeight);
         long averageHotness = Math.round(totalHotness / totalWeight);
 
         if (averageColdness > averageHotness) {
-            averageColdness -= averageHotness;
-            return new Temperature(averageColdness, 0);
+            return new Temperature(averageColdness - averageHotness, 0);
         } else {
             return new Temperature(0, averageHotness - averageColdness);
         }
@@ -299,14 +299,18 @@ public class Kettle extends MultiContainerDevice {
 
 
     /**
-     * Get the weight of an ingredient in spoons
+     * Get the weight of an ingredient in spoons fractions
      *
      * @param ingredient The ingredient to weigh
-     * @return the amount expressed as a spoon based value
+     *
+     * @return the amount expressed as a spoon based value in fractions
      */
-    private long getSpoonWeight(AlchemicIngredient ingredient) {
+    private double getSpoonWeightFraction(AlchemicIngredient ingredient) {
         State state = ingredient.getState();
-        return ingredient.getQuantity().toSpoons(state);
+        long baseAmount = ingredient.getQuantity().toLowestUnit(state);
+        long spoonFactor = Unit.SPOON.getFactorToBaseUnit(state);
+
+        return (double) baseAmount / spoonFactor;
     }
 
 
