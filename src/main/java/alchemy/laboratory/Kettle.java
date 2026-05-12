@@ -39,7 +39,20 @@ public class Kettle extends MultiContainerDevice {
     /**
      * Mix all ingredients in this kettle into one resulting ingredient
      *
-     * @throws IllegalStateException The kettle must contain at least one ingredient
+     * @post The result container is made with the resulting ingredient
+     *     | getResult() != null
+     *
+     * @post This kettle is now empty
+     *     | getActualDeviceContents().isEmpty()
+     *
+     * @throws IllegalStateException
+     *         This kettle must contain at least one ingredient
+     *       | getActualDeviceContents().isEmpty()
+     *
+     * @throws IllegalStateException
+     *         Mixing the ingredients must leave a strictly positive resulting quantity
+     *       | createResultQuantity(getActualDeviceContents(),
+     *       |     selectResultState(getActualDeviceContents())).getAmount() <= 0
      */
     @Override
     public void execute() {
@@ -53,6 +66,9 @@ public class Kettle extends MultiContainerDevice {
         IngredientType resultType = createResultType(ingredients, resultState);
         Quantity resultQuantity = createResultQuantity(ingredients, resultState);
 
+        // the only time this could happen is if the ingredient where we take the resultState of has quantity amount = 0
+        // and the other ingredients of the same state also have = 0
+        // and ingredients of other states round down to 0
         if (resultQuantity.getAmount() <= 0) {
             throw new IllegalStateException("Mixing these ingredients leaves no resulting quantity");
         }
@@ -210,30 +226,37 @@ public class Kettle extends MultiContainerDevice {
      * @param ingredients The ingredients that are mixed
      * @param resultState The state of the resulting ingredient
      * @return the resulting quantity expressed in the base unit of the result state
+     *
+     * @note If more states would be added in the future this function should be updated,
+     * it currently only works when there are only 2 states present,
+     * the math around the conversion of different states must then change
      */
     private Quantity createResultQuantity(List<AlchemicIngredient> ingredients, State resultState) {
         long sameStateResultBaseAmount = 0L;
-        long changedStateSpoons = 0L;
-        long changedStateRemainderBaseAmount = 0L;
-        int changedStateSpoonFactor = 1;
+        long differentStateBaseAmount = 0L;
+        State differentState = null;
 
         for (AlchemicIngredient ingredient : ingredients) {
-            State ingredientState = ingredient.getType().getStandardState();
+            State ingredientState = ingredient.getState();
             long ingredientBaseAmount = ingredient.getQuantity().toLowestUnit(ingredientState);
 
             if (ingredientState == resultState) {
                 sameStateResultBaseAmount += ingredientBaseAmount;
             } else {
-                changedStateSpoonFactor = Unit.SPOON.getFactorToBaseUnit(ingredientState);
-                changedStateSpoons += ingredientBaseAmount / changedStateSpoonFactor;
-                changedStateRemainderBaseAmount += ingredientBaseAmount % changedStateSpoonFactor;
+                // store different state
+                differentState = ingredientState;
+                differentStateBaseAmount += ingredientBaseAmount;
             }
         }
 
-        changedStateSpoons += changedStateRemainderBaseAmount / changedStateSpoonFactor;
+        long differentStateSpoons = 0L;
+        // not needed if no other states present
+        if (differentState != null) {
+            // convert base amounts to spoons and round down (long type)
+            differentStateSpoons = differentStateBaseAmount / Unit.SPOON.getFactorToBaseUnit(differentState);
+        }
 
-        long resultBaseAmount = sameStateResultBaseAmount
-                + changedStateSpoons * Unit.SPOON.getFactorToBaseUnit(resultState);
+        long resultBaseAmount = sameStateResultBaseAmount + differentStateSpoons * Unit.SPOON.getFactorToBaseUnit(resultState);
 
         return new Quantity(resultBaseAmount, Unit.getBaseUnit(resultState));
     }

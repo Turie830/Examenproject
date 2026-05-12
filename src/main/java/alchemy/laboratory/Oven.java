@@ -37,16 +37,28 @@ public class Oven extends SingleContainerDevice implements TemperatureDevice {
     }
 
     /**
-     * Execute this oven.
+     * Execute this oven
      *
-     * @post If the target temperature is colder than the ingredient temperature,
-     *       the ingredient temperature does not change.
-     * @post If the target temperature is hotter than or equal to the ingredient temperature,
-     *       the ingredient is heated to the target temperature.
-     * @throws IllegalStateException The device must have an ingredient to cool
-     *      | TODO getDeviceContent is protected so what expression?
-     * @throws IllegalStateException The device must have a target temperature
-     *      | getTemperatureTarget() == null
+     * @post If the target temperature is colder than or equal to the ingredient
+     *       temperature, the ingredient temperature does not change
+     *
+     * @post If the target temperature is hotter than the ingredient temperature,
+     *       the ingredient is heated by the difference between its temperature and
+     *       the target temperature with 5 deviation (in each direction)
+     *
+     * @post The result container is made with the resulting ingredient
+     *     | getResult() != null
+     *
+     * @post This oven is empty
+     *     | getActualDeviceContent() == null
+     *
+     * @throws IllegalStateException
+     *         This oven must contain an ingredient
+     *       | getActualDeviceContent() == null
+     *
+     * @throws IllegalStateException
+     *         This oven must have a target temperature
+     *       | getTemperatureTarget() == null
      */
     @Override
     public void execute() throws IllegalStateException {

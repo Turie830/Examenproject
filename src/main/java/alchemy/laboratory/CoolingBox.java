@@ -36,16 +36,28 @@ public class CoolingBox extends SingleContainerDevice implements TemperatureDevi
     }
 
     /**
-     * Execute this cooling box.
+     * Execute this cooling box
      *
-     * @post If the target temperature is hotter than the ingredient temperature,
-     *       the ingredient temperature does not change.
-     * @post If the target temperature is colder than or equal to the ingredient temperature,
-     *       the ingredient is cooled to the target temperature.
-     * @throws IllegalStateException The device must have an ingredient to cool
-     *      | TODO getDeviceContent is protected so what expression?
-     * @throws IllegalStateException The device must have a target temperature
-     *      | getTemperatureTarget() == null
+     * @post If the target temperature is hotter than or equal to the ingredient
+     *       temperature, the ingredient temperature does not change
+     *
+     * @post If the target temperature is colder than the ingredient temperature,
+     *       the ingredient is cooled by the difference between its temperature and
+     *       the target temperature
+     *
+     * @post The result container is made with the resulting ingredient
+     *     | getResult() != null
+     *
+     * @post This cooling box is empty
+     *     | getActualDeviceContent() == null
+     *
+     * @throws IllegalStateException
+     *         This cooling box must contain an ingredient
+     *       | getActualDeviceContent() == null
+     *
+     * @throws IllegalStateException
+     *         This cooling box must have a target temperature
+     *       | getTemperatureTarget() == null
      */
     @Override
     public void execute() throws IllegalStateException {
@@ -84,7 +96,6 @@ public class CoolingBox extends SingleContainerDevice implements TemperatureDevi
      *
      * @return the temperature this cooling box will reach when executed
      */
-    // todo @Basic want geeft kopie?
     @Override
     @Basic
     public Temperature getTemperatureTarget() {
