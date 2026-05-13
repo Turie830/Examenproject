@@ -126,6 +126,7 @@ public abstract class Device {
             }
         }
 
+        // todo: or do we take the largest possible amount?
         throw new IllegalArgumentException("Result ingredient does not fit in a valid container");
     }
 

@@ -214,34 +214,27 @@ public class Laboratory {
 
 
     /**
-     * Return the ingredient in this laboratory whose simple name or
-     * special name (mixed ingredient) matches the given name.
+     * find the smallest container unit for the state of which
+     * the unit capacity is large enough to hold the requested amount.
      *
-     * @param name
-     *        The name to look up.
      *
-     * @throws IllegalArgumentException
-     *         The given name is not effective, or no ingredient with that
-     *         name is in this laboratory.
-     *       | name == null || !hasIngredient(name)
+     * @return the smallest container unit for the given state
+     *          or null if the largest container unit is still too small.
+     *
      */
-    public AlchemicIngredient getIngredient(String name) throws IllegalArgumentException {
-        if (name == null) {
-            throw new IllegalArgumentException("Name cannot be null");
-        }
-        for (AlchemicIngredient ing : ingredients) {
-            // simple name
-            if (name.equals(ing.getSimpleName())) {
-                return ing;
-            }
-            // special name
-            if (ing.getType().isMixed()
-                    && ing.getType().getName().hasSpecialName()
-                    && name.equals(ing.getType().getName().getSpecialName())) {
-                return ing;
+    private static Unit smallestContainerUnitFor(long amountInLowest, State state) {
+        Unit best = null;
+        for (Unit u : Unit.values()) {
+            if (!u.isValidFor(state)) continue;
+            if (!IngredientContainer.isValidCapacityUnit(u)) continue;
+            long cap = u.getFactorToBaseUnit(state);
+            if (cap < amountInLowest) continue;
+            // ToDo: iteratielogica? stap is wel juist maar weet niet of na || overbodig is
+            if (best == null || cap < best.getFactorToBaseUnit(state)) {
+                best = u;
             }
         }
-        throw new IllegalArgumentException("No ingredient with the name " + name);
+        return best;
     }
 
 
@@ -324,6 +317,7 @@ public class Laboratory {
     }
 
 
+    // todo: split throws?
     /**
      * Take the requested quantity of the ingredient with the given name out of
      * this laboratory and return it inside a new container.
@@ -450,27 +444,41 @@ public class Laboratory {
     }
 
 
+    // todo comment
+
     /**
-     * find the smallest container unit for the state of which
-     * the unit capacity is large enough to hold the requested amount.
-     * Return null if the largest container unit is still too small.
+     * Return the ingredient in this laboratory whose simple name or
+     * special name (mixed ingredient) matches the given name.
+     *
+     * @param name
+     *        The name to look up.
+     *
+     * @throws IllegalArgumentException
+     *         The given name is not effective, or no ingredient with that
+     *         name is in this laboratory.
+     *       | name == null || !hasIngredient(name)
      */
-    private static Unit smallestContainerUnitFor(long amountInLowest, State state) {
-        Unit best = null;
-        for (Unit u : Unit.values()) {
-            if (!u.isValidFor(state)) continue;
-            if (!IngredientContainer.isValidCapacityUnit(u)) continue;
-            long cap = u.getFactorToBaseUnit(state);
-            if (cap < amountInLowest) continue;
-            // ToDo: iteratielogica? stap is wel juist maar weet niet of na || overbodig is
-            if (best == null || cap < best.getFactorToBaseUnit(state)) {
-                best = u;
+    // TODO: kopie maken?
+    public AlchemicIngredient getIngredient(String name) throws IllegalArgumentException {
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+        for (AlchemicIngredient ing : ingredients) {
+            // simple name
+            if (name.equals(ing.getSimpleName())) {
+                return ing;
+            }
+            // special name
+            if (ing.getType().isMixed()
+                    && ing.getType().getName().hasSpecialName()
+                    && name.equals(ing.getType().getName().getSpecialName())) {
+                return ing;
             }
         }
-        return best;
+        throw new IllegalArgumentException("No ingredient with the name " + name);
     }
 
-
+// todo comment
     /**
      * Return the largest valid container unit for the given state.
      * = BARREL for liquids and CHEST for powders.
@@ -492,6 +500,7 @@ public class Laboratory {
      * Devices --> bidirectional
      */
 
+    // todo: why an invars with a func?
     /**
      * The CoolingBox currently in this laboratory, null if there is no CoolingBox in this Laboratory.
      *
@@ -582,6 +591,7 @@ public class Laboratory {
         }
     }
 
+    //TODO; are hasOven,... also @Basic?
 
     /**
      * Return the CoolingBox in this laboratory or null if there is none in this Laboratory.
@@ -659,7 +669,7 @@ public class Laboratory {
 
 
     /**
-     * Receipies
+     * Recipes
      */
 
 
@@ -826,7 +836,6 @@ public class Laboratory {
         return getCoolingBox().getResult().getIngredient();
     }
 
-
     /**
      * Add all ingredients in the given list to the kettle, run the kettle
      * and return the result-mixture.
@@ -849,6 +858,7 @@ public class Laboratory {
             getKettle().add(new IngredientContainer(containerUnit, ing));
         }
         getKettle().execute();          // ToDo: is het bad practice om getKettle(). te doen? hierboven ook al gebruikt maar denk er nu aan
+        // nee denk et nie
         return getKettle().getResult().getIngredient();
     }
 

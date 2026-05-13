@@ -20,7 +20,7 @@ import java.util.TreeSet;
  * @version 1.0
  */
 public class Kettle extends MultiContainerDevice {
-
+    // TODO: make sure the total quantity can't exceed the largest container unit or do we take what fits in it
 
     /**
      * Initialise a new multi container device
