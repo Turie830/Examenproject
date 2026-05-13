@@ -705,7 +705,6 @@ public class LaboratoryTest {
         assertThrows(IllegalStateException.class, () -> labo.execute(recipe, 1));
     }
 
-
     @Test
     public void execute_CoolStepWithCoolingBox_StoresCooledIngredientBack() {
         Laboratory labo = new Laboratory(1);
@@ -779,17 +778,6 @@ public class LaboratoryTest {
                 || labo.hasIngredient("Water mixed with Beer"));
     }
 
-
-
-    //ToDO: HUH?????
-    @Test
-    public void ffjestesten() {
-        Laboratory labo = new Laboratory(1);
-        CoolingBox box = new CoolingBox(labo);
-
-        assertSame(box, labo.getCoolingBox());
-        assertTrue(labo.hasCoolingBox());
-    }
 
 
 
