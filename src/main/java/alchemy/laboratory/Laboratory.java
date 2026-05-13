@@ -857,8 +857,7 @@ public class Laboratory {
             Unit containerUnit = smallestContainerUnitFor(ing.getAmountInLowestUnit(), state);
             getKettle().add(new IngredientContainer(containerUnit, ing));
         }
-        getKettle().execute();          // ToDo: is het bad practice om getKettle(). te doen? hierboven ook al gebruikt maar denk er nu aan
-        // nee denk et nie
+        getKettle().execute();
         return getKettle().getResult().getIngredient();
     }
 
