@@ -25,6 +25,8 @@ public abstract class Device {
 
     /**
      * The laboratory this device is located in.
+     *
+     * @note Devices can not get moved or deleted
      */
     private final Laboratory laboratory;
 
@@ -39,7 +41,7 @@ public abstract class Device {
      * @param laboratory
      *      The laboratory this device is located in
      *
-     * @post The laboratory of this device is set to the given laboratory.
+     * @post The laboratory of this device is set to the given laboratory
      *      | new.getLaboratory() == laboratory
      * @post The given laboratory has this device registered.
      *      | laboratory.hasAsDevice(this)
@@ -105,7 +107,6 @@ public abstract class Device {
      * @param resultIngredient The ingredient for which to create a result container
      * @throws IllegalArgumentException The given result ingredient must be effective
      *                                  | resultIngredient == null
-     * @throws IllegalArgumentException The given result ingredient must fit in a valid container
      */
     protected void createResultContainer(AlchemicIngredient resultIngredient) {
         if (resultIngredient == null) {
