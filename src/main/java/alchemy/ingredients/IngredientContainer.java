@@ -222,4 +222,18 @@ public class IngredientContainer {
     }
 
 
+    /**
+     * Get the largest unit allowed for ingredient containers
+     *
+     * @param state The state for the unit
+     * @return the largest unit allowed in an ingredient container depending on the state,
+     * or null if the state is not known
+     */
+    public static Unit largestContainerUnit(State state) {
+        if (state == State.LIQUID) return Unit.BARREL;
+        else if (state == State.POWDER) return Unit.CHEST;
+        else return null;
+    }
+
+
 }

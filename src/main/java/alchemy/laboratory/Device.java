@@ -3,6 +3,7 @@ package alchemy.laboratory;
 import alchemy.Unit;
 import alchemy.ingredients.AlchemicIngredient;
 import alchemy.ingredients.IngredientContainer;
+import alchemy.ingredients.Quantity;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
 
@@ -127,8 +128,15 @@ public abstract class Device {
             }
         }
 
-        // todo: or do we take the largest possible amount?
-        throw new IllegalArgumentException("Result ingredient does not fit in a valid container");
+        // largest unit for the ingredientContainer
+        Unit largestUnitPossible = IngredientContainer.largestContainerUnit(resultIngredient.getState());
+
+        // get largest quantity for a ingredientContainer
+        Quantity largestQuantityPossible = new Quantity(1L,
+                largestUnitPossible);
+
+        AlchemicIngredient resultIngredientThatFits = new AlchemicIngredient(resultIngredient.getType(), largestQuantityPossible);
+        result = new IngredientContainer(largestUnitPossible, resultIngredientThatFits);
     }
 
 }
