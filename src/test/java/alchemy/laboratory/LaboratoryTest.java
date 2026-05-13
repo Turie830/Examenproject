@@ -525,15 +525,16 @@ public class LaboratoryTest {
     public void constructor_NoDevicesRegistered() {
         Laboratory labo = new Laboratory(1);
 
-        assertNull(labo.getCoolingBox());
-        assertNull(labo.getOven());
-        assertNull(labo.getKettle());
-        assertNull(labo.getTransmogrifier());
+        assertEquals(0, labo.getNbDevices());
+        assertNull(labo.getDevice(CoolingBox.class));
+        assertNull(labo.getDevice(Oven.class));
+        assertNull(labo.getDevice(Kettle.class));
+        assertNull(labo.getDevice(Transmogrifier.class));
 
-        assertFalse(labo.hasCoolingBox());
-        assertFalse(labo.hasOven());
-        assertFalse(labo.hasKettle());
-        assertFalse(labo.hasTransmogrifier());
+        assertFalse(labo.hasDevice(CoolingBox.class));
+        assertFalse(labo.hasDevice(Oven.class));
+        assertFalse(labo.hasDevice(Kettle.class));
+        assertFalse(labo.hasDevice(Transmogrifier.class));
     }
 
     @Test
@@ -542,9 +543,11 @@ public class LaboratoryTest {
 
         Oven oven = new Oven(labo);
 
-        assertSame(oven, labo.getOven());
-        assertTrue(labo.hasOven());
+        assertSame(oven, labo.getDevice(Oven.class));
+        assertTrue(labo.hasDevice(Oven.class));
         assertSame(labo, oven.getLaboratory());
+        assertTrue(labo.hasAsDevice(oven));
+        assertEquals(1, labo.getNbDevices());
     }
 
     @Test
@@ -553,9 +556,11 @@ public class LaboratoryTest {
 
         CoolingBox coolingBox = new CoolingBox(labo);
 
-        assertSame(coolingBox, labo.getCoolingBox());
-        assertTrue(labo.hasCoolingBox());
+        assertSame(coolingBox, labo.getDevice(CoolingBox.class));
+        assertTrue(labo.hasDevice(CoolingBox.class));
         assertSame(labo, coolingBox.getLaboratory());
+        assertTrue(labo.hasAsDevice(coolingBox));
+        assertEquals(1, labo.getNbDevices());
     }
 
     @Test
@@ -564,9 +569,11 @@ public class LaboratoryTest {
 
         Kettle kettle = new Kettle(labo);
 
-        assertSame(kettle, labo.getKettle());
-        assertTrue(labo.hasKettle());
+        assertSame(kettle, labo.getDevice(Kettle.class));
+        assertTrue(labo.hasDevice(Kettle.class));
         assertSame(labo, kettle.getLaboratory());
+        assertTrue(labo.hasAsDevice(kettle));
+        assertEquals(1, labo.getNbDevices());
     }
 
     @Test
@@ -575,9 +582,47 @@ public class LaboratoryTest {
 
         Transmogrifier transmogrifier = new Transmogrifier(labo);
 
-        assertSame(transmogrifier, labo.getTransmogrifier());
-        assertTrue(labo.hasTransmogrifier());
+        assertSame(transmogrifier, labo.getDevice(Transmogrifier.class));
+        assertTrue(labo.hasDevice(Transmogrifier.class));
         assertSame(labo, transmogrifier.getLaboratory());
+        assertTrue(labo.hasAsDevice(transmogrifier));
+        assertEquals(1, labo.getNbDevices());
+    }
+
+    @Test
+    public void constructor_DuplicateOvenInSameLaboratory_ThrowsException() {
+        Laboratory labo = new Laboratory(1);
+
+        new Oven(labo);
+
+        assertThrows(IllegalStateException.class, () -> new Oven(labo));
+    }
+
+    @Test
+    public void constructor_DuplicateCoolingBoxInSameLaboratory_ThrowsException() {
+        Laboratory labo = new Laboratory(1);
+
+        new CoolingBox(labo);
+
+        assertThrows(IllegalStateException.class, () -> new CoolingBox(labo));
+    }
+
+    @Test
+    public void constructor_DuplicateKettleInSameLaboratory_ThrowsException() {
+        Laboratory labo = new Laboratory(1);
+
+        new Kettle(labo);
+
+        assertThrows(IllegalStateException.class, () -> new Kettle(labo));
+    }
+
+    @Test
+    public void constructor_DuplicateTransmogrifierInSameLaboratory_ThrowsException() {
+        Laboratory labo = new Laboratory(1);
+
+        new Transmogrifier(labo);
+
+        assertThrows(IllegalStateException.class, () -> new Transmogrifier(labo));
     }
 
     @Test

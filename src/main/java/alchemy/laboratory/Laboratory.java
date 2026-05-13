@@ -500,39 +500,22 @@ public class Laboratory {
      * Devices --> bidirectional
      */
 
-    // todo: why an invars with a func?
-    /**
-     * The CoolingBox currently in this laboratory, null if there is no CoolingBox in this Laboratory.
-     *
-     * @invar If not null, the CoolingBox references this laboratory.
-     *      | coolingBox == null || coolingBox.getLaboratory() == this
-     */
-    private CoolingBox coolingBox;
+    // todo: @invar with funcs?
 
     /**
-     * The Oven currently in this laboratory, null if there is no Oven in this Laboratory.
+     * The devices registered in this laboratory.
      *
-     * @invar If not null, the Oven references this laboratory.
-     *      | oven == null || oven.getLaboratory() == this
+     * @invar Every device is effective
+     *      | for each device in devices:
+     *      |     device != null
+     * @invar Every device references this laboratory.
+     *      | for each device in devices:
+     *      |     device.getLaboratory() == this
+     * @invar There is at most one device of each concrete class.
+     *      | for each device1, device2 in devices:
+     *      |     device1 == device2 || device1.getClass() != device2.getClass()
      */
-    private Oven oven;
-
-    /**
-     * The Kettle currently in this laboratory, null if there is no Kettle in this Laboratory.
-     *
-     * @invar If not null, the Kettle references this laboratory.
-     *      | kettle == null || kettle.getLaboratory() == this
-     */
-    private Kettle kettle;
-
-    /**
-     * The Transmogrifier currently in this laboratory, null if there is no Transmogrifier in this Laboratory.
-     *
-     * @invar If not null, the Transmogrifier references this laboratory.
-     *      | transmogrifier == null || transmogrifier.getLaboratory() == this
-     */
-    private Transmogrifier transmogrifier;
-
+    private final List<Device> devices = new ArrayList<>();
 
     /**
      * Register this device with this laboratory.
@@ -547,11 +530,10 @@ public class Laboratory {
      * @post The given device is now registered as the device of its kind in this laboratory.
      *
      * @throws IllegalArgumentException
-     *         The given device is not effective, it does not reference this laboratory
-     *         or its concrete type is not a valid device type.
+     *         The given device is not effective or it does not reference this laboratory.
      *
      * @throws IllegalStateException
-     *         A device of the same kind is already registered in this laboratory.
+     *         A device of the same concrete class is already registered in this laboratory.
      */
     void registerDevice(Device device)
             throws IllegalArgumentException, IllegalStateException {
@@ -561,115 +543,83 @@ public class Laboratory {
         if (device.getLaboratory() != this) {
             throw new IllegalArgumentException("Device is not referencing this laboratory");
         }
+        if (hasDeviceOfClass(device.getClass())) {
+            throw new IllegalStateException("A device of this class is already present in this laboratory");
+        }
 
-        if (device instanceof CoolingBox) {
-            if (coolingBox != null) {
-                throw new IllegalStateException("A CoolingBox is already present in this laboratory");
-            }
-            coolingBox = (CoolingBox) device;
-        }
-        else if (device instanceof Oven) {
-            if (oven != null) {
-                throw new IllegalStateException("An Oven is already present in this laboratory");
-            }
-            oven = (Oven) device;
-        }
-        else if (device instanceof Kettle) {
-            if (kettle != null) {
-                throw new IllegalStateException("A Kettle is already present in this laboratory");
-            }
-            kettle = (Kettle) device;
-        }
-        else if (device instanceof Transmogrifier) {
-            if (transmogrifier != null) {
-                throw new IllegalStateException("A Transmogrifier is already present in this laboratory");
-            }
-            transmogrifier = (Transmogrifier) device;
-        }
-        else {
-            throw new IllegalArgumentException("Unknown device type");
-        }
+        devices.add(device);
     }
-    //ToDO: waarom is dit package private?
-
-
-    //TODO; are hasOven,... also @Basic?
-
-
 
     /**
-     * Return the CoolingBox in this laboratory or null if there is none in this Laboratory.
+     * Check whether this laboratory already has a device of the given concrete class
+     *
+     * @param deviceClass The device class to check
+     * @return True if a registered device has exactly the given class.
+     */
+    private boolean hasDeviceOfClass(Class<? extends Device> deviceClass) {
+        for (Device registeredDevice : devices) {
+            if (registeredDevice.getClass() == deviceClass) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Return whether the given device is registered in this laboratory.
+     *
+     * @param device
+     *        The device to check.
+     *
+     * @return True if this laboratory contains the exact given device object.
+     */
+    public boolean hasAsDevice(Device device) {
+        return devices.contains(device);
+    }
+
+    /**
+     * Return the number of devices registered in this laboratory.
      */
     @Basic
-    public CoolingBox getCoolingBox() {
-        return coolingBox;
+    public int getNbDevices() {
+        return devices.size();
     }
 
     /**
-     * Return the Oven in this laboratory or null if there is none in this Laboratory.
+     * Return the device of the given concrete class in this laboratory.
+     *
+     * @param deviceClass
+     *        The concrete device class to look up.
+     *
+     * @return The registered device of the given concrete class, or null if there is none.
      */
     @Basic
-    public Oven getOven() {
-        return oven;
+    public <T extends Device> T getDevice(Class<T> deviceClass) {
+        if (deviceClass == null) {
+            throw new IllegalArgumentException("Device class cannot be null");
+        }
+        for (Device device : devices) {
+            if (device.getClass() == deviceClass) {
+                return deviceClass.cast(device);
+            }
+        }
+        return null;
     }
 
     /**
-     * Return the Kettle in this laboratory or null if there is none in this Laboratory.
-     */
-    @Basic
-    public Kettle getKettle() {
-        return kettle;
-    }
-
-    /**
-     * Return the Transmogrifier in this laboratory or null if there is none in this Laboratory.
-     */
-    @Basic
-    public Transmogrifier getTransmogrifier() {
-        return transmogrifier;
-    }
-
-
-    /**
-     * Check if this laboratory has a CoolingBox.
+     * Check if this laboratory has a device of the given concrete class.
      *
-     * @return True if a CoolingBox is registered in this laboratory.
-     *       | result == (getCoolingBox() != null)
-     */
-    public boolean hasCoolingBox() {
-        return coolingBox != null;
-    }
-
-    /**
-     * Check if this laboratory has an Oven.
+     * @param deviceClass
+     *        The concrete device class to check.
      *
-     * @return True if an Oven is registered in this laboratory.
-     *       | result == (getOven() != null)
+     * @return True if a device of the given concrete class is registered.
      */
-    public boolean hasOven() {
-        return oven != null;
+    public boolean hasDevice(Class<? extends Device> deviceClass) {
+        if (deviceClass == null) {
+            return false;
+        }
+        return hasDeviceOfClass(deviceClass);
     }
-
-    /**
-     * Check if this laboratory has a Kettle.
-     *
-     * @return True if a Kettle is registered in this laboratory.
-     *       | result == (getKettle() != null)
-     */
-    public boolean hasKettle() {
-        return kettle != null;
-    }
-
-    /**
-     * Check if this laboratory contains a Transmogrifier.
-     *
-     * @return True if a Transmogrifier is registered in this laboratory.
-     *       | result == (getTransmogrifier() != null)
-     */
-    public boolean hasTransmogrifier() {
-        return transmogrifier != null;
-    }
-
 
 
     /**
@@ -731,7 +681,7 @@ public class Laboratory {
                     if (IngredientsSet.isEmpty()) {
                         throw new IllegalStateException("No ingredient to be heated");
                     }
-                    if (!hasOven()) {
+                    if (!hasDevice(Oven.class)) {
                         throw new IllegalStateException("No Oven in this laboratory");
                     }
                     AlchemicIngredient last = IngredientsSet.removeLast();
@@ -741,7 +691,7 @@ public class Laboratory {
                     if (IngredientsSet.isEmpty()) {
                         throw new IllegalStateException("No ingredient to be cooled");
                     }
-                    if (!hasCoolingBox()) {
+                    if (!hasDevice(CoolingBox.class)) {
                         throw new IllegalStateException("No CoolingBox in this laboratory");
                     }
                     AlchemicIngredient last = IngredientsSet.removeLast();
@@ -749,7 +699,7 @@ public class Laboratory {
 
                 } else if (op == Operation.MIX) {
                     if (IngredientsSet.size() >= 2) {
-                        if (!hasKettle()) {
+                        if (!hasDevice(Kettle.class)) {
                             throw new IllegalStateException("No Kettle in this laboratory");
                         }
                         AlchemicIngredient mixture = mixAll(IngredientsSet);
@@ -789,7 +739,7 @@ public class Laboratory {
      *
      * @return The ingredient after it has been heated by the given amount.
      *
-     * @pre   There is an Oven in this laboratory (hasOven() == true).
+     * @pre   There is an Oven in this laboratory (hasDevice(Oven.class) == true).
      */
     private AlchemicIngredient heatBy(AlchemicIngredient ingredient, long amount) {
         State state = ingredient.getType().getStandardState();
@@ -800,13 +750,14 @@ public class Laboratory {
         // [1] = hotness
         long targetTemp = ingredient.getType().getStandardTemperature()[1] + amount;
         // no coldness, only hotness
-        getOven().setTemperatureTarget(new Temperature(0, targetTemp));
+        Oven oven = getDevice(Oven.class);
+        oven.setTemperatureTarget(new Temperature(0, targetTemp));
         // container in Oven
-        getOven().add(container);
+        oven.add(container);
         // execute oven
-        getOven().execute();
+        oven.execute();
         // getresult returns a container
-        return getOven().getResult().getIngredient();
+        return oven.getResult().getIngredient();
     }
 
 
@@ -826,7 +777,7 @@ public class Laboratory {
      *
      * @return The ingredient after it has been cooled by the given amount.
      *
-     * @pre   There is a CoolingBox in this laboratory (hasCoolingBox() == true).
+     * @pre   There is a CoolingBox in this laboratory (hasDevice(CoolingBox.class) == true).
      */
     private AlchemicIngredient coolBy(AlchemicIngredient ingredient, long amount) {
         State state = ingredient.getType().getStandardState();
@@ -834,10 +785,11 @@ public class Laboratory {
         IngredientContainer container = new IngredientContainer(containerUnit, ingredient);
 
         long targetColdness = ingredient.getColdness() + amount;
-        getCoolingBox().setTemperatureTarget(new Temperature(targetColdness, 0));
-        getCoolingBox().add(container);
-        getCoolingBox().execute();
-        return getCoolingBox().getResult().getIngredient();
+        CoolingBox coolingBox = getDevice(CoolingBox.class);
+        coolingBox.setTemperatureTarget(new Temperature(targetColdness, 0));
+        coolingBox.add(container);
+        coolingBox.execute();
+        return coolingBox.getResult().getIngredient();
     }
 
     /**
@@ -852,17 +804,19 @@ public class Laboratory {
      *
      * @return The mixture that comes out of the kettle. (one thing)
      *
-     * @pre   This laboratory has a kettle (hasKettle() == true).
-     * @pre   toMix contains at least 2 ingredients.
+     * @pre   This laboratory has a kettle (hasDevice(Kettle.class) == true).
+     * @pre toMix contains at least 2 ingredients.
      */
     private AlchemicIngredient mixAll(List<AlchemicIngredient> toMix) {
+        // todo: mauro: toch niet meer met getKettle() :)
+        Kettle kettle = getDevice(Kettle.class);
         for (AlchemicIngredient ing : toMix) {
             State state = ing.getType().getStandardState();
             Unit containerUnit = smallestContainerUnitFor(ing.getAmountInLowestUnit(), state);
-            getKettle().add(new IngredientContainer(containerUnit, ing));
+            kettle.add(new IngredientContainer(containerUnit, ing));
         }
-        getKettle().execute();
-        return getKettle().getResult().getIngredient();
+        kettle.execute();
+        return kettle.getResult().getIngredient();
     }
 
 

@@ -24,11 +24,8 @@ public abstract class Device {
 
     /**
      * The laboratory this device is located in.
-     *
-     * @note A laboratory currently does not keep track of its devices.
-     *       Therefore, this association is only stored from device to laboratory.
      */
-    private Laboratory laboratory;
+    private final Laboratory laboratory;
 
     /**
      * The result container after executing
@@ -41,8 +38,10 @@ public abstract class Device {
      * @param laboratory
      *      The laboratory this device is located in
      *
-     * @post The laboratory of this device is set to the given laboratory
+     * @post The laboratory of this device is set to the given laboratory.
      *      | new.getLaboratory() == laboratory
+     * @post The given laboratory has this device registered.
+     *      | laboratory.hasAsDevice(this)
      *
      * @throws IllegalArgumentException
      *      when the laboratory is not effective
@@ -54,6 +53,8 @@ public abstract class Device {
             throw new IllegalArgumentException("Laboratory object can't be null");
         }
         this.laboratory = laboratory;
+        // todo: @Raw in laboratory?
+        laboratory.registerDevice(this);
     }
 
     /**
