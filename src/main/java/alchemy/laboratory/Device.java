@@ -25,6 +25,8 @@ public abstract class Device {
 
     /**
      * The laboratory this device is located in.
+     *
+     * @note Devices can not get moved or deleted
      */
     private final Laboratory laboratory;
 
@@ -39,7 +41,7 @@ public abstract class Device {
      * @param laboratory
      *      The laboratory this device is located in
      *
-     * @post The laboratory of this device is set to the given laboratory.
+     * @post The laboratory of this device is set to the given laboratory
      *      | new.getLaboratory() == laboratory
      * @post The given laboratory has this device registered.
      *      | laboratory.hasAsDevice(this)
