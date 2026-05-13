@@ -83,4 +83,7 @@ public abstract class MultiContainerDevice extends Device {
     protected void emptyDeviceContents() {
         deviceContents.clear();
     }
+
+    // There are no functions to get what's inside the multiContainerDevice
+    // cause it wouldn't be logical if you could take stuff out of a kettle
 }

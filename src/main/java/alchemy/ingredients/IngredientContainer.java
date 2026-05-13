@@ -69,6 +69,7 @@ public class IngredientContainer {
             throw new IllegalArgumentException("Ingredient doesn't fit in the container");
         }
 
+        // todo shouldn't we create a copy of the ingredient, capacity?
         this.capacityUnit = capacityUnit;
         this.ingredient = ingredient;
     }

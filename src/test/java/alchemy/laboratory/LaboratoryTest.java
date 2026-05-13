@@ -321,7 +321,7 @@ public class LaboratoryTest {
                 new Temperature(0,20));
         AlchemicIngredient water = new AlchemicIngredient(waterType,
                 new Quantity(2L, Unit.STOREROOM));
-        IngredientContainer container = new IngredientContainer(Unit.STOREROOM, water);
+        IngredientContainer container = new IngredientContainer(Unit.BARREL, water);
 
         assertThrows(IllegalStateException.class, () -> labo.store(container));
 

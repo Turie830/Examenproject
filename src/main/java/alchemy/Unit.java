@@ -32,19 +32,23 @@ import java.util.Map;
  * @version 1.2
  */
 public enum Unit {
+    // liquid units
     DROP(State.LIQUID, 1),
-    SPOON(8, 6),
     VIAL(State.LIQUID, 5 * 8),
     BOTTLE(State.LIQUID, 3 * 5 * 8),
     JUG(State.LIQUID, 7 * 3 * 5 * 8),
     BARREL(State.LIQUID, 12 * 7 * 3 * 5 * 8),
-    STOREROOM(5 * 12 * 7 * 3 * 5 * 8, 5 * 10 * 3 * 6 * 7 * 6),
 
+    // powder units
     PINCH(State.POWDER, 1),
     SACHET(State.POWDER, 7 * 6),
     BOX(State.POWDER, 6 * 7 * 6),
     SACK(State.POWDER, 3 * 6 * 7 * 6),
-    CHEST(State.POWDER, 10 * 3 * 6 * 7 * 6);
+    CHEST(State.POWDER, 10 * 3 * 6 * 7 * 6),
+
+    // Shared units
+    SPOON(8, 6),
+    STOREROOM(5 * 12 * 7 * 3 * 5 * 8, 5 * 10 * 3 * 6 * 7 * 6);
 
     /**
      * A map registering the factor to the base unit for each valid state.

@@ -58,6 +58,17 @@ public class Laboratory {
      */
 
     /**
+     * Variable storing the storerooms capacity of this laboratory.
+     * Final means it is set once in the constructor and never changes.
+     */
+    // TODO: see constructor
+    private final int storerooms;
+
+    /**
+     * Capacity             ToDo: contoleer op totaal enzo
+     */
+
+    /**
      * Initialize this new laboratory with the given storerooms capacity,
      * with no ingredients and no devices.
      *
@@ -82,18 +93,9 @@ public class Laboratory {
         if (storerooms < 0) {
             throw new IllegalArgumentException("Storerooms cannot be negative");
         }
+        //TODO: why keep this in an int? why not create a new Quantity?
         this.storerooms = storerooms;
     }
-
-    /**
-     * Capacity             ToDo: contoleer op totaal enzo
-     */
-
-    /**
-     * Variable storing the storerooms capacity of this laboratory.
-     * Final means it is set once in the constructor and never changes.
-     */
-    private final int storerooms;
 
 
     /**
@@ -103,7 +105,6 @@ public class Laboratory {
     public int getStorerooms() {
         return storerooms;
     }
-
 
     /**
      * Return the total capacity of this laboratory in the lowest unit
@@ -119,6 +120,7 @@ public class Laboratory {
      *         The given state is not effective.
      *       | state == null
      */
+    // TODO: convert to inSpoons (state independent, maybe helper function in Unit.java: getFactorToSpoons?)
     public long getCapacityInLowestUnit(State state) throws IllegalArgumentException {
         if (state == null) {
             throw new IllegalArgumentException("State cannot be null");
@@ -139,6 +141,7 @@ public class Laboratory {
      *
      *  ToDo: moet er een throw? illegalargument?
      */
+    // TODO: inSpoons
     public long getUsedAmountInLowestUnit(State state) {
         //ToDO:  if (state == null) -> throw new IllegalArgumentExc ?!
 
@@ -172,6 +175,7 @@ public class Laboratory {
      *       |    + ingredient.getAmountInLowestUnit())
      *       |   <= getCapacityInLowestUnit(ingredient.getType().getStandardState())
      */
+    // TODO, convert to using Spoons
     public boolean hasRoomFor(AlchemicIngredient ingredient) {
         if (ingredient == null) {
             return false;
@@ -205,6 +209,8 @@ public class Laboratory {
 
 
     // ToDo: is public List<AlchemicIngredient> getIngredients() nodig?
+    // denk het nie, ik zou nog 2 functies toevoegen, getNbIngredients (wordt ook gebruikt in docs) + getIngredientAt
+    // met deze 2 functies zou je ook alle ingredienten kunenn ophalen
 
 
     /**
@@ -235,7 +241,7 @@ public class Laboratory {
                 return ing;
             }
         }
-        throw new IllegalArgumentException("No ingredient that name");
+        throw new IllegalArgumentException("No ingredient with the name " + name);
     }
 
 
@@ -308,6 +314,7 @@ public class Laboratory {
         String simpleName = toStore.getSimpleName();
         if (!hasIngredient(simpleName)) {
             ingredients.add(toStore);
+            container.empty();
         } else {
             AlchemicIngredient existing = getIngredient(simpleName);
             // TODO: mix `existing` and `toStore` via getDevice(Kettle.class) and replace
