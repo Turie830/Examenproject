@@ -4,7 +4,14 @@ import alchemy.Name;
 import alchemy.Temperature;
 import alchemy.Unit;
 import alchemy.ingredients.*;
+import alchemy.recipes.IngredientRecipeStep;
+import alchemy.recipes.Operation;
+import alchemy.recipes.Recipe;
+import alchemy.recipes.SimpleRecipeStep;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -481,22 +488,308 @@ public class LaboratoryTest {
         assertThrows(IllegalArgumentException.class, () -> labo.request("Water"));
     }
 
+    @Test
+    public void request_WithoutQuantity_LiquidIngredient_UsesLargestLiquidContainer() {
+        Laboratory labo = new Laboratory(2);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(5L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        IngredientContainer result = labo.request("Water");
+
+        //it chooses the largest container, and if not everything fits inside it, the remaining amount is lost
+        assertEquals(Unit.BARREL, result.getCapacityUnit());
+    }
+
+    @Test
+    public void request_WithoutQuantity_PowderIngredient_UsesLargestPowderContainer() {
+        Laboratory labo = new Laboratory(2);
+        IngredientType saltType = new IngredientType(new Name("Salt"), State.POWDER,
+                new Temperature(0, 20));
+        AlchemicIngredient salt = new AlchemicIngredient(
+                saltType, new Quantity(5L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.SACHET, salt));
+
+        IngredientContainer result = labo.request("Salt");
+
+        //it chooses the largest container, and if not everything fits inside it, the remaining amount is lost
+        assertEquals(Unit.CHEST, result.getCapacityUnit());
+    }
+
+
+    @Test
+    public void constructor_NoDevicesRegistered() {
+        Laboratory labo = new Laboratory(1);
+
+        assertNull(labo.getCoolingBox());
+        assertNull(labo.getOven());
+        assertNull(labo.getKettle());
+        assertNull(labo.getTransmogrifier());
+
+        assertFalse(labo.hasCoolingBox());
+        assertFalse(labo.hasOven());
+        assertFalse(labo.hasKettle());
+        assertFalse(labo.hasTransmogrifier());
+    }
+
+    @Test
+    public void constructor_Oven() {
+        Laboratory labo = new Laboratory(1);
+
+        Oven oven = new Oven(labo);
+
+        assertSame(oven, labo.getOven());
+        assertTrue(labo.hasOven());
+        assertSame(labo, oven.getLaboratory());
+    }
+
+    @Test
+    public void constructor_CoolingBox() {
+        Laboratory labo = new Laboratory(1);
+
+        CoolingBox coolingBox = new CoolingBox(labo);
+
+        assertSame(coolingBox, labo.getCoolingBox());
+        assertTrue(labo.hasCoolingBox());
+        assertSame(labo, coolingBox.getLaboratory());
+    }
+
+    @Test
+    public void constructor_Kettle() {
+        Laboratory labo = new Laboratory(1);
+
+        Kettle kettle = new Kettle(labo);
+
+        assertSame(kettle, labo.getKettle());
+        assertTrue(labo.hasKettle());
+        assertSame(labo, kettle.getLaboratory());
+    }
+
+    @Test
+    public void constructor_Transmogrifier() {
+        Laboratory labo = new Laboratory(1);
+
+        Transmogrifier transmogrifier = new Transmogrifier(labo);
+
+        assertSame(transmogrifier, labo.getTransmogrifier());
+        assertTrue(labo.hasTransmogrifier());
+        assertSame(labo, transmogrifier.getLaboratory());
+    }
+
+    @Test
+    public void execute_NullRecipe() {
+        Laboratory labo = new Laboratory(1);
+
+        assertThrows(IllegalArgumentException.class, () -> labo.execute(null, 1));
+    }
+
+    @Test
+    public void execute_ZeroFactor() {
+        Laboratory labo = new Laboratory(1);
+
+        Recipe recipe = new Recipe(new ArrayList<>(List.of(new SimpleRecipeStep(Operation.MIX))));
+
+        assertThrows(IllegalArgumentException.class, () -> labo.execute(recipe, 0));
+    }
+
+    @Test
+    public void execute_NegativeFactor() {
+        Laboratory labo = new Laboratory(1);
+
+        Recipe recipe = new Recipe(List.of(new SimpleRecipeStep(Operation.MIX)));
+
+        assertThrows(IllegalArgumentException.class, () -> labo.execute(recipe, -1));
+    }
+
+    @Test
+    public void execute_AddStep() {
+        Laboratory labo = new Laboratory(1);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(5L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        Recipe recipe = new Recipe(new ArrayList<>(List.of(new IngredientRecipeStep(Operation.ADD,
+                new Name("Water"), new Quantity(2L, Unit.SPOON)))));
+
+        labo.execute(recipe, 1);
+
+        assertTrue(labo.hasIngredient("Water"));
+        //stays 5 spoons, because execute takes 2 spoons out of labo and then at the end stores them back.
+        assertEquals(5L, labo.getIngredient("Water").getAmountInSpoons());
+    }
+
+    @Test
+    public void execute_AddStep_WithFactor() {
+        Laboratory labo = new Laboratory(1);
+
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(10L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.BOTTLE, water));
+
+        Recipe recipe = new Recipe(new ArrayList<>(List.of(new IngredientRecipeStep(Operation.ADD,
+                new Name("Water"), new Quantity(2L, Unit.SPOON)))));
+
+        labo.execute(recipe, 3);
+
+        assertTrue(labo.hasIngredient("Water"));
+        assertEquals(10L, labo.getIngredient("Water").getAmountInSpoons());
+    }
+
+    @Test
+    public void execute_HeatStepWithoutOven() {
+        Laboratory labo = new Laboratory(1);
+
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(5L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        Recipe recipe = new Recipe(new ArrayList<>(List.of(new IngredientRecipeStep(Operation.ADD,
+                        new Name("Water"), new Quantity(2L, Unit.SPOON)),
+                        new SimpleRecipeStep(Operation.HEAT))));
+
+        assertThrows(IllegalStateException.class, () -> labo.execute(recipe, 1));
+    }
+
+    @Test
+    public void execute_HeatStepWithOven_StoresHeatedIngredientBack() {
+        Laboratory labo = new Laboratory(1);
+        new Oven(labo);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(5L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        Recipe recipe = new Recipe(new ArrayList<>(List.of(new IngredientRecipeStep(Operation.ADD,
+                        new Name("Water"), new Quantity(2L, Unit.SPOON)),
+                        new SimpleRecipeStep(Operation.HEAT))));
+
+        labo.execute(recipe, 1);
+
+        assertTrue(labo.hasIngredient("Water"));
+        assertEquals("Heated Water", labo.getIngredient("Water").getFullName());
+    }
+
+    @Test
+    public void execute_CoolStepWithoutCoolingBox() {
+        Laboratory labo = new Laboratory(1);
+
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(5L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        Recipe recipe = new Recipe(new ArrayList<>(List.of(new IngredientRecipeStep(Operation.ADD,
+                        new Name("Water"), new Quantity(2L, Unit.SPOON)),
+                        new SimpleRecipeStep(Operation.COOL))));
+
+        assertThrows(IllegalStateException.class, () -> labo.execute(recipe, 1));
+    }
+
+
+    @Test
+    public void execute_CoolStepWithCoolingBox_StoresCooledIngredientBack() {
+        Laboratory labo = new Laboratory(1);
+        new CoolingBox(labo);
+
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(5L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        Recipe recipe = new Recipe(new ArrayList<>(List.of(new IngredientRecipeStep(Operation.ADD,
+                        new Name("Water"), new Quantity(2L, Unit.SPOON)),
+                        new SimpleRecipeStep(Operation.COOL))));
+
+        labo.execute(recipe, 1);
+
+        assertTrue(labo.hasIngredient("Water"));
+        assertEquals("Cooled Water", labo.getIngredient("Water").getFullName());
+    }
+
+    @Test
+    public void execute_MixStepWithoutKettle() {
+        Laboratory labo = new Laboratory(1);
+
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+
+        IngredientType beerType = new IngredientType(new Name("Beer"), State.LIQUID,
+                new Temperature(0, 20));
+
+        labo.store(new IngredientContainer(Unit.VIAL, new AlchemicIngredient(waterType,
+                new Quantity(2L, Unit.SPOON))));
+
+        labo.store(new IngredientContainer(Unit.VIAL, new AlchemicIngredient(beerType,
+                new Quantity(2L, Unit.SPOON))));
+
+        Recipe recipe = new Recipe(new ArrayList<>(List.of(
+                new IngredientRecipeStep(Operation.ADD, new Name("Water"), new Quantity(1L, Unit.SPOON)),
+                new IngredientRecipeStep(Operation.ADD, new Name("Beer"), new Quantity(1L, Unit.SPOON)),
+                new SimpleRecipeStep(Operation.MIX))));
+
+        assertThrows(IllegalStateException.class, () -> labo.execute(recipe, 1));
+    }
+
+    @Test
+    public void execute_MixStepWithKettle() {
+        Laboratory labo = new Laboratory(1);
+        new Kettle(labo);
+
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        IngredientType beerType = new IngredientType(new Name("Beer"), State.LIQUID,
+                new Temperature(0, 20));
+
+        labo.store(new IngredientContainer(Unit.VIAL, new AlchemicIngredient(waterType,
+                new Quantity(2L, Unit.SPOON))));
+
+        labo.store(new IngredientContainer(Unit.VIAL, new AlchemicIngredient(beerType,
+                new Quantity(2L, Unit.SPOON))));
+
+        Recipe recipe = new Recipe(new ArrayList<>(List.of(
+                new IngredientRecipeStep(Operation.ADD, new Name("Water"), new Quantity(1L, Unit.SPOON)),
+                new IngredientRecipeStep(Operation.ADD, new Name("Beer"), new Quantity(1L, Unit.SPOON)),
+                new SimpleRecipeStep(Operation.MIX))));
+
+        labo.execute(recipe, 1);
+
+        assertTrue(labo.hasIngredient("Beer mixed with Water")
+                || labo.hasIngredient("Water mixed with Beer"));
+    }
 
 
 
+    //ToDO: HUH?????
+    @Test
+    public void ffjestesten() {
+        Laboratory labo = new Laboratory(1);
+        CoolingBox box = new CoolingBox(labo);
 
-    
-
-
-
-
-
-
-
-
-
-
-
+        assertSame(box, labo.getCoolingBox());
+        assertTrue(labo.hasCoolingBox());
+    }
 
 
 

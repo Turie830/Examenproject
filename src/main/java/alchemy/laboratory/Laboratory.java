@@ -590,8 +590,12 @@ public class Laboratory {
             throw new IllegalArgumentException("Unknown device type");
         }
     }
+    //ToDO: waarom is dit package private?
+
 
     //TODO; are hasOven,... also @Basic?
+
+
 
     /**
      * Return the CoolingBox in this laboratory or null if there is none in this Laboratory.
@@ -744,20 +748,20 @@ public class Laboratory {
                     IngredientsSet.add(coolBy(last, 10));
 
                 } else if (op == Operation.MIX) {
-                    // als er maar 1 ingredient is maar geen kettle, maakt dat niet uit want je geeft dan gwn het ingredient
                     if (IngredientsSet.size() >= 2) {
                         if (!hasKettle()) {
                             throw new IllegalStateException("No Kettle in this laboratory");
                         }
+                        AlchemicIngredient mixture = mixAll(IngredientsSet);
+                        IngredientsSet.clear();
+                        IngredientsSet.add(mixture);
                     }
-                    AlchemicIngredient mixture = mixAll(IngredientsSet);
-                    IngredientsSet.clear();
-                    IngredientsSet.add(mixture);
+                    // If there is exactly one ingredient, do nothing.
                 }
-            } catch (IllegalArgumentException | IllegalStateException exeption) {
+            } catch (IllegalArgumentException | IllegalStateException exception) {
                 // bij fail; bvb niet genoeg ingredient, restore je alles naar hoe het was voor execute
                 storeBackAll(IngredientsSet);
-                return;
+                throw exception;
             }
         }
         // succes
