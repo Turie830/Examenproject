@@ -54,6 +54,7 @@ public abstract class Device {
             throw new IllegalArgumentException("Laboratory object can't be null");
         }
         this.laboratory = laboratory;
+        laboratory.registerDevice(this);
     }
 
     /**

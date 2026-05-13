@@ -302,17 +302,21 @@ public class Laboratory {
         if (!hasRoomFor(toStore)) {
             throw new IllegalStateException("Not enough capacity in laboratory");
         }
-        // ToDo: bring `toStore` back to its standard temperature here, using
-        //       getDevice(Oven.class) or getDevice(CoolingBox.class).
+        // Bring the ingredient back to its standard temperature.
+        toStore = bringToStandardTemperature(toStore);
         String simpleName = toStore.getSimpleName();
         if (!hasIngredient(simpleName)) {
             ingredients.add(toStore);
             container.empty();
         } else {
+            // An ingredient with the same name already exists: merge them via the Kettle.
             AlchemicIngredient existing = getIngredient(simpleName);
-            // TODO: mix `existing` and `toStore` via getDevice(Kettle.class) and replace
-            //       `existing` in the list with the resulting merged ingredient.
-            container.empty();
+            ingredients.remove(existing);
+            List<AlchemicIngredient> toMerge = new ArrayList<>();
+            toMerge.add(existing);
+            toMerge.add(toStore);
+            AlchemicIngredient merged = mixAll(toMerge);
+            ingredients.add(merged);
         }
     }
 
