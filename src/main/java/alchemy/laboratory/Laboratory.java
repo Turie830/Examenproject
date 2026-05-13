@@ -694,7 +694,7 @@ public class Laboratory {
         // After a MIX, this list contains exactly only the mixture anymore.
         List<AlchemicIngredient> IngredientsSet = new ArrayList<>();
 
-        for (int i = 0; i < recipe.getStepsAmount(); i++) {
+        for (int i = 0; i < recipe.getNbSteps(); i++) {
             RecipeStep step = recipe.getStepAt(i);
             Operation op = step.getOperation();
 

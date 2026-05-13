@@ -11,14 +11,14 @@ import java.util.List;
  * A class for recipes
  *
  * @invar A recipe must have at least 1 step
- *      | getStepsAmount() > 0
+ *      | getNbSteps() > 0
  *
  * @invar Each recipe step must be effective
- *      | for each I in 0..getStepsAmount()-1:
+ *      | for each I in 0..getNbSteps()-1:
  *      |     getStepAt(I) != null
  *
  * @invar Each recipe step must be valid
- *      | for each I in 0..getStepsAmount()-1:
+ *      | for each I in 0..getNbSteps()-1:
  *      |     getStepAt(I).isValidRecipeStep()
  *
  * @author Obe Willaert
@@ -40,7 +40,7 @@ public class Recipe {
      * @param steps A list of steps
      *
      * @post The given steps are set as the steps for this recipe
-     *      | getStepsAmount() == steps.size()
+     *      | getNbSteps() == steps.size()
      *
      * @throws IllegalArgumentException
      *      The given list steps must be effective and not empty
@@ -85,7 +85,7 @@ public class Recipe {
      */
     @Basic
     @Immutable
-    public int getStepsAmount() {
+    public int getNbSteps() {
         return steps.size();
     }
 
@@ -96,7 +96,7 @@ public class Recipe {
      *      The index of the step to retrieve
      *
      * @pre The index of the requested recipe must be less than the total amount of recipes
-     *       | index < getStepsAmount()
+     *       | index < getNbSteps()
      *
      * @return The recipe at the given index.
      *       | result == steps.get(index)
