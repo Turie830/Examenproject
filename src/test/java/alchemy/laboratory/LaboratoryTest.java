@@ -284,8 +284,52 @@ public class LaboratoryTest {
         assertFalse(labo.hasIngredient(null));
     }
 
+    @Test
+    public void storeEffectiveContainer() {
+        Laboratory labo = new Laboratory(1);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0,20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(2L, Unit.SPOON));
+        IngredientContainer container = new IngredientContainer(Unit.VIAL, water);
 
-//ToDO: alles vanaf store()
+        labo.store(container);
+
+        assertTrue(container.isEmpty());
+        assertTrue(labo.hasIngredient("Water"));
+        assertSame(water, labo.getIngredient("Water"));
+    }
+
+    @Test
+    public void storeNullContainer() {
+        Laboratory labo = new Laboratory(1);
+
+        assertThrows(IllegalArgumentException.class, () -> labo.store(null));
+    }
+
+    @Test
+    public void emptyContainerStore() {
+        Laboratory labo = new Laboratory(1);
+        IngredientContainer container = new IngredientContainer(Unit.VIAL);
+        assertThrows(IllegalArgumentException.class, () -> labo.store(container));
+    }
+
+    @Test
+    public void store_NotEnoughCapacity() {
+        Laboratory labo = new Laboratory(1);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0,20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(2L, Unit.STOREROOM));
+        IngredientContainer container = new IngredientContainer(Unit.STOREROOM, water);
+
+        assertThrows(IllegalStateException.class, () -> labo.store(container));
+
+        //ToDO: klopt deze test wel, want Unit.STOREROOM mag blijkbaar niet??
+    }
+
+
+
 
 
 
