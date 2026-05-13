@@ -320,10 +320,29 @@ public class LaboratoryTest {
         IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
                 new Temperature(0,20));
         AlchemicIngredient water = new AlchemicIngredient(waterType,
-                new Quantity(2L, Unit.STOREROOM));
+                new Quantity(1L, Unit.BARREL));
         IngredientContainer container = new IngredientContainer(Unit.BARREL, water);
+        labo.store(container);
 
-        assertThrows(IllegalStateException.class, () -> labo.store(container));
+        IngredientContainer container2 = new IngredientContainer(Unit.BARREL, water);
+        labo.store(container2);
+
+        IngredientContainer container3 = new IngredientContainer(Unit.BARREL, water);
+        labo.store(container3);
+
+        IngredientContainer container4 = new IngredientContainer(Unit.BARREL, water);
+        labo.store(container4);
+
+        IngredientContainer container5 = new IngredientContainer(Unit.BARREL, water);
+        labo.store(container5);
+
+        IngredientContainer container6 = new IngredientContainer(Unit.BARREL, water);
+        labo.store(container6);
+
+        IngredientContainer container7 = new IngredientContainer(Unit.BARREL, water);
+
+
+        assertThrows(IllegalStateException.class, () -> labo.store(container7));
 
         //ToDO: klopt deze test wel, want Unit.STOREROOM mag blijkbaar niet??
     }
@@ -465,6 +484,8 @@ public class LaboratoryTest {
 
 
 
+
+    
 
 
 
