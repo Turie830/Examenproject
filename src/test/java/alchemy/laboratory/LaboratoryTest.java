@@ -330,6 +330,148 @@ public class LaboratoryTest {
 
 
 
+    @Test
+    public void request_WithQuantity_RequestedAmount() {
+        Laboratory labo = new Laboratory(1);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(5L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        IngredientContainer result = labo.request("Water", new Quantity(2L, Unit.SPOON));
+
+        //checks what you get back.
+        assertFalse(result.isEmpty());
+        assertEquals("Water", result.getIngredient().getSimpleName());
+        assertEquals(2L, result.getIngredient().getAmount());
+        assertEquals(Unit.SPOON, result.getIngredient().getUnit());
+    }
+
+    @Test
+    public void request_WithQuantity_LeavesRemainingAmountInLaboratory() {
+        Laboratory labo = new Laboratory(1);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(5L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        labo.request("Water", new Quantity(2L, Unit.SPOON));
+
+        AlchemicIngredient remaining = labo.getIngredient("Water");
+
+        //checks what remains in the laboratory.
+        assertEquals(3L, remaining.getAmountInSpoons());
+    }
+
+    @Test
+    public void request_WithQuantity_AllAvailableAmount() {
+        Laboratory labo = new Laboratory(1);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(5L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        labo.request("Water", new Quantity(5L, Unit.SPOON));
+
+        assertFalse(labo.hasIngredient("Water"));
+    }
+
+    @Test
+    public void request_WithQuantity_NullName() {
+        Laboratory labo = new Laboratory(1);
+
+        assertThrows(IllegalArgumentException.class, () -> labo.request(null, new Quantity(1L, Unit.SPOON)));
+    }
+
+    @Test
+    public void request_WithQuantity_NullQuantity() {
+        Laboratory labo = new Laboratory(1);
+
+        assertThrows(IllegalArgumentException.class, () -> labo.request("Water", null));
+    }
+
+    @Test
+    public void request_WithQuantity_UnknownName() {
+        Laboratory labo = new Laboratory(1);
+
+        assertThrows(IllegalArgumentException.class, () -> labo.request("Water", new Quantity(1L, Unit.SPOON)));
+    }
+
+    @Test
+    public void request_WithQuantity_TooMuchRequested() {
+        Laboratory labo = new Laboratory(1);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(5L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        assertThrows(IllegalArgumentException.class, () -> labo.request("Water", new Quantity(6L, Unit.SPOON)));
+    }
+
+    @Test
+    public void request_WithoutQuantity() {
+        Laboratory labo = new Laboratory(1);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(5L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        IngredientContainer result = labo.request("Water");
+
+        assertFalse(result.isEmpty());
+        assertEquals("Water", result.getIngredient().getSimpleName());
+    }
+
+    @Test
+    public void request_WithoutQuantity_RemovesIngredientFromLaboratory() {
+        Laboratory labo = new Laboratory(1);
+        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
+                new Temperature(0, 20));
+
+        AlchemicIngredient water = new AlchemicIngredient(waterType,
+                new Quantity(5L, Unit.SPOON));
+
+        labo.store(new IngredientContainer(Unit.VIAL, water));
+
+        labo.request("Water");
+
+        assertFalse(labo.hasIngredient("Water"));
+    }
+
+    @Test
+    public void request_WithoutQuantity_NullName() {
+        Laboratory labo = new Laboratory(1);
+
+        assertThrows(IllegalArgumentException.class, () -> labo.request(null));
+    }
+
+    @Test
+    public void request_WithoutQuantity_UnknownName() {
+        Laboratory labo = new Laboratory(1);
+
+        assertThrows(IllegalArgumentException.class, () -> labo.request("Water"));
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
