@@ -344,7 +344,7 @@ public class LaboratoryTest {
 
         assertThrows(IllegalStateException.class, () -> labo.store(container7));
 
-        //ToDO: klopt deze test wel, want Unit.STOREROOM mag blijkbaar niet??
+        //ToDO: er kan te veel in Mauro'tje!!!
     }
 
 
