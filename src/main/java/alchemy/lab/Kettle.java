@@ -1,9 +1,8 @@
-package alchemy.laboratory;
+package alchemy.lab;
 
 import alchemy.Name;
 import alchemy.Temperature;
 import alchemy.Unit;
-import alchemy.ingredients.*;
 import be.kuleuven.cs.som.annotate.Raw;
 
 import java.util.ArrayList;

@@ -1,11 +1,7 @@
-package alchemy.laboratory;
+package alchemy.lab;
 
 import alchemy.Temperature;
 import alchemy.Unit;
-import alchemy.ingredients.AlchemicIngredient;
-import alchemy.ingredients.IngredientContainer;
-import alchemy.ingredients.Quantity;
-import alchemy.ingredients.State;
 import alchemy.recipes.IngredientRecipeStep;
 import alchemy.recipes.Operation;
 import alchemy.recipes.Recipe;
@@ -70,6 +66,41 @@ public class Laboratory {
      */
 
     /**
+     * The list of ingredients stored in this laboratory.
+     * <p>
+     * Per simple name there is a maximum of one ingredient in this list.
+     * (Because two ingredients with the same name merge into one).
+     *
+     * @invar No two ingredients share the same simple name.
+     * @invar Every ingredient is effective (not null).
+     */
+    private final List<AlchemicIngredient> ingredients = new ArrayList<>();
+
+
+    /**
+     * Return the storerooms capacity of this laboratory.
+     */
+    @Basic
+    public int getStorerooms() {
+        return storerooms;
+    }
+    /**
+     * The devices registered in this laboratory.
+     *
+     * @invar Every device is effective
+     * | for each device in devices:
+     * |     device != null
+     * @invar Every device references this laboratory.
+     * | for each device in devices:
+     * |     device.getLaboratory() == this
+     * @invar There is at most one device of each concrete class.
+     * | for each device1, device2 in devices:
+     * |     device1 == device2 || device1.getClass() != device2.getClass()
+     */
+    private final List<Device> devices = new ArrayList<>();
+
+
+    /**
      * Initialize this new laboratory with the given storerooms capacity,
      * with no ingredients and no devices.
      *
@@ -98,14 +129,33 @@ public class Laboratory {
         this.storerooms = storerooms;
     }
 
+    /**
+     * find the smallest container unit for the state of which
+     * the unit capacity is large enough to hold the requested amount.
+     *
+     * @return the smallest container unit for the given state
+     * or null if the largest container unit is still too small.
+     *
+     */
+    private static Unit smallestContainerUnitFor(long amountInLowest, State state) {
+        Unit best = null;
+        for (Unit u : Unit.values()) {
+            if (!u.isValidFor(state)) continue;
+            if (!IngredientContainer.isValidCapacityUnit(u)) continue;
+            long cap = u.getFactorToBaseUnit(state);
+            if (cap < amountInLowest) continue;
+            // ToDo: iteratielogica? stap is wel juist maar weet niet of na || overbodig is
+            if (best == null || cap < best.getFactorToBaseUnit(state)) {
+                best = u;
+            }
+        }
+        return best;
+    }
+
 
     /**
-     * Return the storerooms capacity of this laboratory.
+     * Ingredients
      */
-    @Basic
-    public int getStorerooms() {
-        return storerooms;
-    }
 
     /**
      * Return the total capacity of this laboratory in spoons
@@ -123,6 +173,10 @@ public class Laboratory {
                 / Unit.SPOON.getFactorToBaseUnit(State.POWDER);
     }
 
+
+    // ToDo: is public List<AlchemicIngredient> getIngredients() nodig?
+    // denk het nie, ik zou nog 2 functies toevoegen, getNbIngredients (wordt ook gebruikt in docs) + getIngredientAt
+    // met deze 2 functies zou je ook alle ingredienten kunenn ophalen
 
     /**
      *
@@ -151,7 +205,6 @@ public class Laboratory {
         }
         return total;
     }
-
 
     /**
      * Check if this laboratory has enough capacity to add
@@ -256,7 +309,6 @@ public class Laboratory {
         }
     }
 
-
     /**
      * Store the contents of the given ingredient container in this laboratory.
      * After this call the container is empty ('container wordt vernietigd'). ToDo: dit juiste interpreattie van vernietigen?
@@ -310,7 +362,6 @@ public class Laboratory {
      * After this call the container is empty ('container wordt vernietigd'). ToDo: dit juiste interpreattie van vernietigen?
      * <p>
      * <p>
-     * The ingredient gets brought to its standard temperaturen using Oven or CoolingBox
      * If an ingredient with the same simple name already exists in this laboratory, merge the two via the Kettle.
      *
      * @param container The container whose contents should be stored.
@@ -324,7 +375,7 @@ public class Laboratory {
      * | container.isEmpty()
      * @post The ingredient that was in the container is now stored in this laboratory.
      */
-    private void storeNoTempChange(IngredientContainer container)                    // ToDo: check deze pls, ingewikkeld
+    private void storeNoTempChange(IngredientContainer container)
             throws IllegalArgumentException, IllegalStateException {
         if (container == null) {
             throw new IllegalArgumentException("Container cannot be null");
@@ -354,6 +405,50 @@ public class Laboratory {
         }
     }
 
+
+    /**
+     * Return a boolean if the ingredient needs cooling
+     *
+     * @param ingredient the ingredient to check if it needs cooling
+     * @return true if the ingredient is hotter than the standard temperature
+     * @pre ingredient is effective
+     *
+     */
+    @Model
+    private boolean needsCooling(AlchemicIngredient ingredient) {
+        long coldness = ingredient.getTemperature()[0];
+        long hotness = ingredient.getTemperature()[1];
+        Temperature temp = new Temperature(coldness, hotness);
+
+        long standardColdness = ingredient.getType().getStandardTemperature()[0];
+        long standardHotness = ingredient.getType().getStandardTemperature()[1];
+        Temperature standardTemp = new Temperature(standardColdness, standardHotness);
+
+        return temp.isHotterThan(standardTemp);
+    }
+
+    /**
+     * Return a boolean if the ingredient needs heating
+     *
+     * @param ingredient the ingredient to check if it needs heating
+     * @return true if the ingredient is colder than the standard temperature
+     * @pre the ingredient is effective
+     */
+    @Model
+    private boolean needsHeating(AlchemicIngredient ingredient) {
+        long coldness = ingredient.getTemperature()[0];
+        long hotness = ingredient.getTemperature()[1];
+        Temperature temp = new Temperature(coldness, hotness);
+
+        long standardColdness = ingredient.getType().getStandardTemperature()[0];
+        long standardHotness = ingredient.getType().getStandardTemperature()[1];
+        Temperature standardTemp = new Temperature(standardColdness, standardHotness);
+
+        return temp.isColderThan(standardTemp);
+    }
+
+
+    // todo: split throws?
 
     /**
      * Bring the ingredient to the standard temperature using the Oven or CoolingBox
@@ -387,8 +482,16 @@ public class Laboratory {
         }
         if (needsHeating(ingredient)) {
             if (!hasDevice(Oven.class)) throw new IllegalStateException("No Oven in this laboratory");
-            // heat ingredient
-            return heatBy(ingredient, temp.difference(standardTemp));
+            // heat ingredient by too much
+            heatBy(ingredient, temp.difference(standardTemp) + 5);
+
+            // cool the ingredient back to the standard temperature
+            // this way we garantee it's the exact standard temperature
+            long coldness2 = ingredient.getTemperature()[0];
+            long hotness2 = ingredient.getTemperature()[1];
+            Temperature temp2 = new Temperature(coldness, hotness);
+
+            coolBy(ingredient, temp2.difference(standardTemp));
         }
         // does not need to be cooled or heated
         return ingredient;
@@ -503,6 +606,29 @@ public class Laboratory {
         return result;
         } // ToDo: controle
 
+
+    // ToDo: hulpfunctie: moet hier documentatie bij (zie komende 3 fct) ? --> zo ja, vervolledigen ToDo
+
+    /**
+     * Replace the old ingrediënt with a new version that only now contains the remaining amount.
+     * If none of the ingredient is left, remove the ingredient.
+     *
+     * @param existing
+     * @param remainingInLowest
+     * @param state
+     */
+    private void replaceWithRemaining(AlchemicIngredient existing, long remainingInLowest, State state) {
+        ingredients.remove(existing);
+        if (remainingInLowest <= 0) {
+            return;
+        }
+        Quantity remainingQty = new Quantity(remainingInLowest, Unit.getBaseUnit(state));
+        ingredients.add(new AlchemicIngredient(existing.getType(), remainingQty));
+    }
+
+
+    // todo comment
+
     /**
      * Take the stored amount of the ingredient with the given name out of
      * this laboratory and return it inside the largest container unit that is valid for
@@ -543,28 +669,30 @@ public class Laboratory {
 
     }
 
-
-    // ToDo: hulpfunctie: moet hier documentatie bij (zie komende 3 fct) ? --> zo ja, vervolledigen ToDo
+// todo comment
 
     /**
-     * Replace the old ingrediënt with a new version that only now contains the remaining amount.
-     * If none of the ingredient is left, remove the ingredient.
-     *
-     * @param existing
-     * @param remainingInLowest
-     * @param state
+     * Return the largest valid container unit for the given state.
+     * = BARREL for liquids and CHEST for powders.
      */
-    private void replaceWithRemaining(AlchemicIngredient existing, long remainingInLowest, State state) {
-        ingredients.remove(existing);
-        if (remainingInLowest <= 0) {
-            return;
+    private static Unit largestContainerUnitFor(State state) {
+        Unit best = null;
+        for (Unit u : Unit.values()) {
+            if (!u.isValidFor(state)) continue;
+            if (!IngredientContainer.isValidCapacityUnit(u)) continue;
+            if (best == null || u.getFactorToBaseUnit(state) > best.getFactorToBaseUnit(state)) {
+                best = u;
+            }
         }
-        Quantity remainingQty = new Quantity(remainingInLowest, Unit.getBaseUnit(state));
-        ingredients.add(new AlchemicIngredient(existing.getType(), remainingQty));
+        return best;
     }
 
 
-    // todo comment
+    /**
+     * Devices --> bidirectional
+     */
+
+    // todo: @invar with funcs?
 
     /**
      * Return the ingredient in this laboratory whose simple name or
@@ -831,11 +959,12 @@ public class Laboratory {
                 }
             } catch (IllegalArgumentException | IllegalStateException exception) {
                 // bij fail; bvb niet genoeg ingredient, restore je alles naar hoe het was voor execute
-                storeBackAll(IngredientsSet);
-                throw exception;
+                // restore the temperature to standard temperature
+                storeBackAllRestoreTemp(IngredientsSet);
             }
         }
         // succes
+        // don't restore the temperature
         storeBackAll(IngredientsSet);
     }
 
@@ -976,15 +1105,14 @@ public class Laboratory {
     /**
      * Store every ingredient that is in the given list
      * back in this laboratory.
-     *
+     * <p>
      * Used when execute() succeeds or fails anywhere in the function.
-     * store() brings each ingredient back to its standard temperature
+     * store()
      * and merges it with the ingredient with the same name if
      * there is already one in the laboratory.
      *
-     * @param remaining
-     *        The list of ingredients to store back.
-     *        If empty, nothing happens.
+     * @param remaining The list of ingredients to store back.
+     *                  If empty, nothing happens.
      */
     private void storeBackAll(List<AlchemicIngredient> remaining) {
         for (AlchemicIngredient ing : remaining) {
@@ -992,6 +1120,27 @@ public class Laboratory {
             Unit containerUnit = smallestContainerUnitFor(ing.getAmountInLowestUnit(), state);
             storeNoTempChange(new IngredientContainer(containerUnit, ing));
 
+        }
+    }
+
+    /**
+     * Store every ingredient that is in the given list
+     * back in this laboratory.
+     * <p>
+     * Used when execute() succeeds or fails anywhere in the function.
+     * store() brings each ingredient back to its standard temperature
+     * and merges it with the ingredient with the same name if
+     * there is already one in the laboratory.
+     *
+     * @param remaining The list of ingredients to store back.
+     *                  If empty, nothing happens.
+     *
+     */
+    private void storeBackAllRestoreTemp(List<AlchemicIngredient> remaining) {
+        for (AlchemicIngredient ing : remaining) {
+            State state = ing.getType().getStandardState();
+            Unit containerUnit = smallestContainerUnitFor(ing.getAmountInLowestUnit(), state);
+            store(new IngredientContainer(containerUnit, ing));
         }
     }
 

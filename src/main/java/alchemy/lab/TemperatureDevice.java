@@ -1,4 +1,4 @@
-package alchemy.laboratory;
+package alchemy.lab;
 
 import alchemy.Temperature;
 

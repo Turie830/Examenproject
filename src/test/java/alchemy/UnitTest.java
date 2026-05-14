@@ -1,6 +1,6 @@
 package alchemy;
 
-import alchemy.ingredients.State;
+import alchemy.lab.State;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

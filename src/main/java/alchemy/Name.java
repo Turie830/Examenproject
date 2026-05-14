@@ -1,7 +1,7 @@
 package alchemy;
 
 import alchemy.exceptions.IllegalNameException;
-import alchemy.ingredients.AlchemicIngredient;
+import alchemy.lab.AlchemicIngredient;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Model;

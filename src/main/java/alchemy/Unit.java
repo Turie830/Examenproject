@@ -1,6 +1,6 @@
 package alchemy;
 
-import alchemy.ingredients.State;
+import alchemy.lab.State;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;

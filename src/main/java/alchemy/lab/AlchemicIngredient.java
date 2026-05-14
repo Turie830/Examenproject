@@ -1,4 +1,4 @@
-package alchemy.ingredients;
+package alchemy.lab;
 
 import alchemy.Name;
 import alchemy.Temperature;
@@ -529,7 +529,7 @@ public class AlchemicIngredient {
      * @effect The temperature of this ingredient is heated with the given amount.
      *       | getTemperatureObject().heat(amount)
      */
-    public void heat(long amount) {
+    protected void heat(long amount) {
         temperature.heat(amount);
     }
 
@@ -542,7 +542,7 @@ public class AlchemicIngredient {
      * @effect The temperature of this ingredient is cooled with the given amount.
      *       | getTemperatureObject().cool(amount)
      */
-    public void cool(long amount) {
+    protected void cool(long amount) {
         temperature.cool(amount);
     }
 

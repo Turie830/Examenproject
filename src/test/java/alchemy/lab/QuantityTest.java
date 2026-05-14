@@ -1,4 +1,4 @@
-package alchemy.ingredients;
+package alchemy.lab;
 
 import alchemy.Unit;
 import org.junit.jupiter.api.Test;

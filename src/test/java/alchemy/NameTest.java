@@ -1,6 +1,6 @@
 package alchemy;
 
-import alchemy.ingredients.AlchemicIngredient;
+import alchemy.lab.AlchemicIngredient;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

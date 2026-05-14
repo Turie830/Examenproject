@@ -1,12 +1,8 @@
-package alchemy.laboratory;
+package alchemy.lab;
 
 import alchemy.Name;
 import alchemy.Temperature;
 import alchemy.Unit;
-import alchemy.ingredients.AlchemicIngredient;
-import alchemy.ingredients.IngredientContainer;
-import alchemy.ingredients.IngredientType;
-import alchemy.ingredients.Quantity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

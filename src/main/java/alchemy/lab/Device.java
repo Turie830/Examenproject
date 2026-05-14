@@ -1,9 +1,6 @@
-package alchemy.laboratory;
+package alchemy.lab;
 
 import alchemy.Unit;
-import alchemy.ingredients.AlchemicIngredient;
-import alchemy.ingredients.IngredientContainer;
-import alchemy.ingredients.Quantity;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
 

@@ -1,29 +1,27 @@
-package alchemy.laboratory;
+package alchemy.lab;
 
 import alchemy.Temperature;
-import alchemy.ingredients.AlchemicIngredient;
+import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Raw;
 
-import java.util.Random;
-
 /**
- * A class for ovens
+ * A class for cooling boxes
  *
  * @author Obe Willaert
  * @author Mauro Devolder
  * @author Arthur Pintelon
  * @version 1.0
  */
-public class Oven extends SingleContainerDevice implements TemperatureDevice {
+public class CoolingBox extends SingleContainerDevice implements TemperatureDevice {
 
     /**
-     * The temperature target of the oven
+     * The temperature target of the cooling box
      */
     private Temperature temperatureTarget;
 
 
     /**
-     * Initialise a new oven device
+     * Initialise a new single container device
      *
      * @param laboratory The laboratory this device is located in
      * @throws IllegalArgumentException The given laboratory must be effective
@@ -32,32 +30,32 @@ public class Oven extends SingleContainerDevice implements TemperatureDevice {
      * | new.getLaboratory() == laboratory
      */
     @Raw
-    public Oven(Laboratory laboratory) {
+    public CoolingBox(Laboratory laboratory) {
         super(laboratory);
     }
 
     /**
-     * Execute this oven
+     * Execute this cooling box
      *
-     * @post If the target temperature is colder than or equal to the ingredient
+     * @post If the target temperature is hotter than or equal to the ingredient
      *       temperature, the ingredient temperature does not change
      *
-     * @post If the target temperature is hotter than the ingredient temperature,
-     *       the ingredient is heated by the difference between its temperature and
-     *       the target temperature with 5 deviation (in each direction)
+     * @post If the target temperature is colder than the ingredient temperature,
+     *       the ingredient is cooled by the difference between its temperature and
+     *       the target temperature
      *
      * @post The result container is made with the resulting ingredient
      *     | getResult() != null
      *
-     * @post This oven is empty
+     * @post This cooling box is empty
      *     | getActualDeviceContent() == null
      *
      * @throws IllegalStateException
-     *         This oven must contain an ingredient
+     *         This cooling box must contain an ingredient
      *       | getActualDeviceContent() == null
      *
      * @throws IllegalStateException
-     *         This oven must have a target temperature
+     *         This cooling box must have a target temperature
      *       | getTemperatureTarget() == null
      */
     @Override
@@ -73,20 +71,16 @@ public class Oven extends SingleContainerDevice implements TemperatureDevice {
 
         long ingredientColdness = ingredient.getColdness();
         long ingredientHotness = ingredient.getHotness();
-
         Temperature ingredientTemp = new Temperature(ingredientColdness, ingredientHotness);
 
-        // Check the ingredient needs to be heated
-        if (ingredientTemp.isColderThan(temperatureTarget)) {
-            // calculate heating amount
-            long heatAmount = ingredientTemp.difference(temperatureTarget);
 
-            // can be 5 of (either direction)
-            Random rand = new Random();
-            int n = rand.nextInt(11) - 5; // random between 0 and 10 (inclusive) then shift 5 left
+        // Check the ingredient needs to be cooled
+        if (ingredientTemp.isHotterThan(temperatureTarget)) {
+            // calculate cooling amount
+            long coolAmount = ingredientTemp.difference(temperatureTarget);
 
-            // heat the ingredient by the amount
-            ingredient.heat(heatAmount + n);
+            // cool the ingredient by the amount
+            ingredient.cool(coolAmount);
         }
 
         // can't throw since we put 1 container in so we get the same amount out
@@ -97,9 +91,10 @@ public class Oven extends SingleContainerDevice implements TemperatureDevice {
     /**
      * Gets the temperature target
      *
-     * @return the temperature this oven will reach when executed
+     * @return the temperature this cooling box will reach when executed
      */
     @Override
+    @Basic
     public Temperature getTemperatureTarget() {
         if (temperatureTarget == null) {
             return null;

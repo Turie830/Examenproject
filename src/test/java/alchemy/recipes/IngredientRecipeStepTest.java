@@ -2,12 +2,10 @@ package alchemy.recipes;
 
 import alchemy.Name;
 import alchemy.Unit;
-import alchemy.ingredients.Quantity;
+import alchemy.lab.Quantity;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IngredientRecipeStepTest {
 

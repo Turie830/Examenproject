@@ -1,9 +1,8 @@
-package alchemy.laboratory;
+package alchemy.lab;
 
 import alchemy.Name;
 import alchemy.Temperature;
 import alchemy.Unit;
-import alchemy.ingredients.*;
 import alchemy.recipes.IngredientRecipeStep;
 import alchemy.recipes.Operation;
 import alchemy.recipes.Recipe;

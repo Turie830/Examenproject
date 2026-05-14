@@ -1,7 +1,5 @@
-package alchemy.laboratory;
+package alchemy.lab;
 
-import alchemy.ingredients.AlchemicIngredient;
-import alchemy.ingredients.State;
 import be.kuleuven.cs.som.annotate.Raw;
 
 /**

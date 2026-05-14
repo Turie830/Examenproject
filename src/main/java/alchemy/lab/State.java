@@ -1,4 +1,4 @@
-package alchemy.ingredients;
+package alchemy.lab;
 
 /**
  * An enum for the ingredient types

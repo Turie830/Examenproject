@@ -1,7 +1,7 @@
 package alchemy.recipes;
 
 import alchemy.Name;
-import alchemy.ingredients.Quantity;
+import alchemy.lab.Quantity;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
