@@ -638,6 +638,8 @@ public class LaboratoryTest {
         AlchemicIngredient water = new AlchemicIngredient(waterType,
                 new Quantity(5L, Unit.SPOON));
 
+        Kettle kettle = new Kettle(labo);
+
         labo.store(new IngredientContainer(Unit.VIAL, water));
 
         Recipe recipe = new Recipe(new ArrayList<>(List.of(new IngredientRecipeStep(Operation.ADD,
@@ -659,6 +661,8 @@ public class LaboratoryTest {
 
         AlchemicIngredient water = new AlchemicIngredient(waterType,
                 new Quantity(10L, Unit.SPOON));
+
+        Kettle kettle = new Kettle(labo);
 
         labo.store(new IngredientContainer(Unit.BOTTLE, water));
 
@@ -694,6 +698,10 @@ public class LaboratoryTest {
     public void execute_HeatStepWithOven_StoresHeatedIngredientBack() {
         Laboratory labo = new Laboratory(1);
         new Oven(labo);
+
+        CoolingBox coolingBox = new CoolingBox(labo);
+        Kettle kettle = new Kettle(labo);
+
         IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
                 new Temperature(0, 20));
         AlchemicIngredient water = new AlchemicIngredient(waterType,
@@ -708,6 +716,7 @@ public class LaboratoryTest {
         labo.execute(recipe, 1);
 
         assertTrue(labo.hasIngredient("Water"));
+        // todo fix
         assertEquals("Heated Water", labo.getIngredient("Water").getFullName());
     }
 
@@ -734,6 +743,9 @@ public class LaboratoryTest {
     public void execute_CoolStepWithCoolingBox_StoresCooledIngredientBack() {
         Laboratory labo = new Laboratory(1);
         new CoolingBox(labo);
+
+        Oven oven = new Oven(labo);
+        Kettle kettle = new Kettle(labo);
 
         IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
                 new Temperature(0, 20));

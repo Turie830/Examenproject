@@ -298,8 +298,46 @@ public class Laboratory {
         if (!hasRoomFor(toStore)) {
             throw new IllegalStateException("Not enough capacity in laboratory");
         }
-        // Bring the ingredient back to its standard temperature.
+
         toStore = bringToStandardTemperature(toStore);
+
+        storeNoTempChange(new IngredientContainer(container.getCapacityUnit(), toStore));
+        container.empty();
+    }
+
+    /**
+     * Store the contents of the given ingredient container in this laboratory.
+     * After this call the container is empty ('container wordt vernietigd'). ToDo: dit juiste interpreattie van vernietigen?
+     * <p>
+     * <p>
+     * The ingredient gets brought to its standard temperaturen using Oven or CoolingBox
+     * If an ingredient with the same simple name already exists in this laboratory, merge the two via the Kettle.
+     *
+     * @param container The container whose contents should be stored.
+     * @throws IllegalArgumentException The given container is not effective.
+     *                                  | container == null
+     * @throws IllegalArgumentException The given container is empty.
+     *                                  | container.isEmpty()
+     * @throws IllegalStateException    There is not enough remaining capacity for the ingredient.
+     *                                  | !hasRoomFor(container.getIngredient())
+     * @post After this call, the given container is empty.
+     * | container.isEmpty()
+     * @post The ingredient that was in the container is now stored in this laboratory.
+     */
+    private void storeNoTempChange(IngredientContainer container)                    // ToDo: check deze pls, ingewikkeld
+            throws IllegalArgumentException, IllegalStateException {
+        if (container == null) {
+            throw new IllegalArgumentException("Container cannot be null");
+        }
+        if (container.isEmpty()) {
+            throw new IllegalArgumentException("Container is empty");
+        }
+
+        AlchemicIngredient toStore = container.getIngredient();
+        if (!hasRoomFor(toStore)) {
+            throw new IllegalStateException("Not enough capacity in laboratory");
+        }
+
         String simpleName = toStore.getSimpleName();
         if (!hasIngredient(simpleName)) {
             ingredients.add(toStore);
@@ -830,11 +868,22 @@ public class Laboratory {
         Unit containerUnit = smallestContainerUnitFor(ingredient.getAmountInLowestUnit(), state);
         IngredientContainer container = new IngredientContainer(containerUnit, ingredient);
 
-        // [1] = hotness
-        long targetTemp = ingredient.getType().getStandardTemperature()[1] + amount;
-        // no coldness, only hotness
+
+        long signedTemp = -ingredient.getColdness() + ingredient.getHotness() + amount;
+
+        long targetColdness;
+        long targetHotness;
+
+        if (signedTemp < 0) {
+            targetColdness = -signedTemp;
+            targetHotness = 0;
+        } else {
+            targetColdness = 0;
+            targetHotness = signedTemp;
+        }
+
         Oven oven = getDevice(Oven.class);
-        oven.setTemperatureTarget(new Temperature(0, targetTemp));
+        oven.setTemperatureTarget(new Temperature(targetColdness, targetHotness));
         // container in Oven
         oven.add(container);
         // execute oven
@@ -867,9 +916,24 @@ public class Laboratory {
         Unit containerUnit = smallestContainerUnitFor(ingredient.getAmountInLowestUnit(), state);
         IngredientContainer container = new IngredientContainer(containerUnit, ingredient);
 
-        long targetColdness = ingredient.getColdness() + amount;
+        long signedTemp = -ingredient.getColdness() + ingredient.getHotness() - amount;
+
+        long targetColdness;
+        long targetHotness;
+
+        if (signedTemp < 0) {
+            targetColdness = -signedTemp;
+            targetHotness = 0;
+        } else {
+            targetColdness = 0;
+            targetHotness = signedTemp;
+        }
+
+
         CoolingBox coolingBox = getDevice(CoolingBox.class);
-        coolingBox.setTemperatureTarget(new Temperature(targetColdness, 0));
+
+        coolingBox.setTemperatureTarget(new Temperature(targetColdness, targetHotness));
+
         coolingBox.add(container);
         coolingBox.execute();
         return coolingBox.getResult().getIngredient();
@@ -926,7 +990,7 @@ public class Laboratory {
         for (AlchemicIngredient ing : remaining) {
             State state = ing.getType().getStandardState();
             Unit containerUnit = smallestContainerUnitFor(ing.getAmountInLowestUnit(), state);
-            store(new IngredientContainer(containerUnit, ing));
+            storeNoTempChange(new IngredientContainer(containerUnit, ing));
 
         }
     }
