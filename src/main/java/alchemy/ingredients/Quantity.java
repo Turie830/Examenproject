@@ -106,6 +106,18 @@ public class Quantity {
         return toLowestUnit(state) / Unit.SPOON.getFactorToBaseUnit(state);
     }
 
+
+    /**
+     * Converts the amount to all be in spoons
+     *
+     * @param state The state for which this quantity is converted
+     * @return The largest whole number of spoons contained in this quantity.
+     * | result == toLowestUnit(state) / Unit.getSpoonUnit(state).getFactorToBaseUnit(state)
+     */
+    @Immutable
+    public double toSpoonsFractions(State state) {
+        return (double) toLowestUnit(state) / Unit.SPOON.getFactorToBaseUnit(state);
+    }
     /**
      * Checks whether this quantity fits in the given unit
      *

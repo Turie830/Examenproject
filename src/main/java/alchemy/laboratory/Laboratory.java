@@ -108,25 +108,19 @@ public class Laboratory {
     }
 
     /**
-     * Return the total capacity of this laboratory in the lowest unit
-     * for the given state (liquids - drops, powders - pinches).
+     * Return the total capacity of this laboratory in spoons
      *
-     * @param state
-     *        The state we want the capacity in (= LIQUID or POWDER).
      *
      * @return The number of storerooms multiplied by how many lowest-units fit in one storeroom.
-     *       | result = getStorerooms() * Unit.STOREROOM.getFactorToBaseUnit(state)
+     *       | result = getStorerooms() * Unit.STOREROOM.getFactorToBaseUnit(State.POWDER) / Unit.SPOON.getFactorToBaseUnit(State.POWDER)
      *
-     * @throws IllegalArgumentException         ToDo: moet dit of is da er heel over?
-     *         The given state is not effective.
-     *       | state == null
      */
-    // TODO: convert to inSpoons (state independent, maybe helper function in Unit.java: getFactorToSpoons?)
-    public long getCapacityInLowestUnit(State state) throws IllegalArgumentException {
-        if (state == null) {
-            throw new IllegalArgumentException("State cannot be null");
-        }
-        return (long) storerooms * Unit.STOREROOM.getFactorToBaseUnit(state);
+    public double getCapacityInSpoonFractions() throws IllegalArgumentException {
+
+        // should never be a fraction since storeroom is larger than spoon and we always have a natural number of storerooms
+        // this is state independent, that's why we chose State.POWDER
+        return (double) (storerooms * Unit.STOREROOM.getFactorToBaseUnit(State.POWDER))
+                / Unit.SPOON.getFactorToBaseUnit(State.POWDER);
     }
 
 
@@ -140,16 +134,19 @@ public class Laboratory {
      *         | result ==
      *         |   sum of ing.getAmountInLowestUnit() for each ing in getIngredients()
      *
-     *  ToDo: moet er een throw? illegalargument?
+     * @throws IllegalArgumentException the state must be effective
+     *                                   | state == null
+     *
      */
-    // TODO: inSpoons
-    public long getUsedAmountInLowestUnit(State state) {
-        //ToDO:  if (state == null) -> throw new IllegalArgumentExc ?!
+    public double getUsedAmountInSpoonFractions(State state) {
+        if (state == null) {
+            throw new IllegalArgumentException("State cannot be null");
+        }
 
-        long total = 0L;
+        double total = 0L;
         for (AlchemicIngredient ing : ingredients) {
             if (ing.getType().getStandardState() == state) {
-                total += ing.getAmountInLowestUnit();
+                total += ing.getAmountInSpoonFractions();
             }
         }
         return total;
@@ -160,7 +157,7 @@ public class Laboratory {
      * Check if this laboratory has enough capacity to add
      * the given ingredient or not.
      *
-     * An ingredient can be liquid or powder. hasRoomFor looks at how much is already stored    ToDo: is dit te 'engelse' uitleg?
+     * An ingredient can be liquid or powder. hasRoomFor looks at how much is already stored
      * in that state, add the new amount and check that it stays below the capacity.
      *
      * @param ingredient
@@ -176,18 +173,16 @@ public class Laboratory {
      *       |    + ingredient.getAmountInLowestUnit())
      *       |   <= getCapacityInLowestUnit(ingredient.getType().getStandardState())
      */
-    // TODO, convert to using Spoons
     public boolean hasRoomFor(AlchemicIngredient ingredient) {
         if (ingredient == null) {
             return false;
         }
         State state = ingredient.getType().getStandardState();
 
-        long used = getUsedAmountInLowestUnit(state);
-        long extra = ingredient.getAmountInLowestUnit();
-        boolean ret = used + extra <= getCapacityInLowestUnit(state);
+        double used = getUsedAmountInSpoonFractions(state);
+        double extra = ingredient.getAmountInSpoonFractions();
 
-        return ret;
+        return used + extra <= getCapacityInSpoonFractions();
     }
 
 
@@ -622,6 +617,7 @@ public class Laboratory {
      * @throws IllegalStateException
      *         A device of the same concrete class is already registered in this laboratory.
      */
+    // ToDo: packageprivate
     void registerDevice(Device device)
             throws IllegalArgumentException, IllegalStateException {
         if (device == null) {
@@ -891,11 +887,17 @@ public class Laboratory {
      *
      * @return The mixture that comes out of the kettle. (one thing)
      *
-     * @pre   This laboratory has a kettle (hasDevice(Kettle.class) == true).
+     *
+     * @throws IllegalStateException the labo must have a kettle
+     *      | !hasDevice(Kettle.class)
+     *
      * @pre toMix contains at least 2 ingredients.
      */
     private AlchemicIngredient mixAll(List<AlchemicIngredient> toMix) {
-        // todo: mauro: toch niet meer met getKettle() :)
+        if (!hasDevice(Kettle.class)) {
+            throw new IllegalStateException("No Kettle in this laboratory");
+        }
+
         Kettle kettle = getDevice(Kettle.class);
         for (AlchemicIngredient ing : toMix) {
             State state = ing.getType().getStandardState();

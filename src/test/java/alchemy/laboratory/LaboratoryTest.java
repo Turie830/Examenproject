@@ -31,40 +31,19 @@ public class LaboratoryTest {
     }
 
     @Test
-    public void getCapacityInLowestUnit_LiquidState() {
+    public void getCapacityInSpoonUnit() {
         Laboratory labo = new Laboratory(2);
-        assertEquals(2L * Unit.STOREROOM.getFactorToBaseUnit(State.LIQUID),
-                labo.getCapacityInLowestUnit(State.LIQUID));
+        assertEquals((double) (2L * Unit.STOREROOM.getFactorToBaseUnit(State.LIQUID)) / Unit.SPOON.getFactorToBaseUnit(State.LIQUID),
+                labo.getCapacityInSpoonFractions());
 
         Laboratory laboVanObe = new Laboratory(67);
-        assertEquals(67L * Unit.STOREROOM.getFactorToBaseUnit(State.LIQUID),
-                laboVanObe.getCapacityInLowestUnit(State.LIQUID));
+        assertEquals((double) (67L * Unit.STOREROOM.getFactorToBaseUnit(State.LIQUID)) / Unit.SPOON.getFactorToBaseUnit(State.LIQUID),
+                laboVanObe.getCapacityInSpoonFractions());
     }
 
-    @Test
-    public void getCapacityInLowestUnit_PowderState() {
-        Laboratory labo = new Laboratory(2);
-        assertEquals(2L * Unit.STOREROOM.getFactorToBaseUnit(State.POWDER),
-                labo.getCapacityInLowestUnit(State.POWDER));
-
-        Laboratory labo2 = new Laboratory(67);
-        assertEquals(67L * Unit.STOREROOM.getFactorToBaseUnit(State.LIQUID),
-                labo2.getCapacityInLowestUnit(State.LIQUID));
-    }
 
     @Test
-    public void getCapacityInLowestUnit_nullState() {
-        Laboratory labo = new Laboratory(0);
-        assertEquals(0L * Unit.STOREROOM.getFactorToBaseUnit(State.LIQUID),
-                labo.getCapacityInLowestUnit(State.LIQUID));
-
-        Laboratory labo2 = new Laboratory(0);
-        assertEquals(0L * Unit.STOREROOM.getFactorToBaseUnit(State.LIQUID),
-                labo2.getCapacityInLowestUnit(State.LIQUID));
-    }
-
-    @Test
-    public void getUsedAmountInLowestUnit_LiquidState() {
+    public void getUsedAmountInSpoonFractions() {
         Laboratory labo = new Laboratory(3);
 
         IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
@@ -80,37 +59,11 @@ public class LaboratoryTest {
         labo.store(new IngredientContainer(Unit.SACHET, salt));
 
         assertEquals(
-                water.getAmountInLowestUnit(),
-                labo.getUsedAmountInLowestUnit(State.LIQUID)
+                water.getAmountInSpoonFractions(),
+                labo.getUsedAmountInSpoonFractions(State.LIQUID)
         );
     }
 
-    @Test
-    public void getUsedAmountInLowestUnit_PowderState() {
-        Laboratory labo = new Laboratory(3);
-
-        IngredientType waterType = new IngredientType(new Name("Water"), State.LIQUID,
-                new Temperature(0, 20));
-        IngredientType saltType = new IngredientType(new Name("Salt"), State.POWDER,
-                new Temperature(0,20));
-        AlchemicIngredient water = new AlchemicIngredient(waterType,
-                new Quantity(2L, Unit.SPOON));
-        AlchemicIngredient salt = new AlchemicIngredient(saltType,
-                new Quantity(3L, Unit.SPOON));
-
-        labo.store(new IngredientContainer(Unit.VIAL, water));
-        labo.store(new IngredientContainer(Unit.SACHET, salt));
-
-        assertEquals(
-                salt.getAmountInLowestUnit(),
-                labo.getUsedAmountInLowestUnit(State.POWDER)
-        );
-    }
-
-    @Test
-    public void getUsedAmountInLowestUnit_nullState() {
-        //zie ToDo
-    }
 
     @Test
     public void hasRoomFor_IngredientFitsInLaboratory() {
@@ -328,30 +281,57 @@ public class LaboratoryTest {
                 new Temperature(0,20));
         AlchemicIngredient water = new AlchemicIngredient(waterType,
                 new Quantity(1L, Unit.BARREL));
+
+        Kettle kettle = new Kettle(labo);
+
         IngredientContainer container = new IngredientContainer(Unit.BARREL, water);
         labo.store(container);
 
-        IngredientContainer container2 = new IngredientContainer(Unit.BARREL, water);
+        IngredientType melkType = new IngredientType(new Name("Melk"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient melk = new AlchemicIngredient(melkType,
+                new Quantity(1L, Unit.BARREL));
+        IngredientContainer container2 = new IngredientContainer(Unit.BARREL, melk);
         labo.store(container2);
 
-        IngredientContainer container3 = new IngredientContainer(Unit.BARREL, water);
+        IngredientType colaType = new IngredientType(new Name("Cola"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient cola = new AlchemicIngredient(colaType,
+                new Quantity(1L, Unit.BARREL));
+        IngredientContainer container3 = new IngredientContainer(Unit.BARREL, cola);
         labo.store(container3);
 
-        IngredientContainer container4 = new IngredientContainer(Unit.BARREL, water);
+        IngredientType sapType = new IngredientType(new Name("Sap"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient sap = new AlchemicIngredient(sapType,
+                new Quantity(1L, Unit.BARREL));
+        IngredientContainer container4 = new IngredientContainer(Unit.BARREL, sap);
         labo.store(container4);
 
-        IngredientContainer container5 = new IngredientContainer(Unit.BARREL, water);
+
+        IngredientType appelsapType = new IngredientType(new Name("Appelsap"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient appelsap = new AlchemicIngredient(melkType,
+                new Quantity(1L, Unit.BARREL));
+        IngredientContainer container5 = new IngredientContainer(Unit.BARREL, appelsap);
         labo.store(container5);
 
-        IngredientContainer container6 = new IngredientContainer(Unit.BARREL, water);
+
+        IngredientType benzineType = new IngredientType(new Name("Benzine"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient benzine = new AlchemicIngredient(benzineType,
+                new Quantity(1L, Unit.BARREL));
+        IngredientContainer container6 = new IngredientContainer(Unit.BARREL, benzine);
         labo.store(container6);
 
-        IngredientContainer container7 = new IngredientContainer(Unit.BARREL, water);
+        IngredientType zuivelsapType = new IngredientType(new Name("Zuivelsap"), State.LIQUID,
+                new Temperature(0, 20));
+        AlchemicIngredient zuivelsap = new AlchemicIngredient(zuivelsapType,
+                new Quantity(1L, Unit.BARREL));
+        IngredientContainer container7 = new IngredientContainer(Unit.BARREL, zuivelsap);
 
 
         assertThrows(IllegalStateException.class, () -> labo.store(container7));
-
-        //ToDO: er kan te veel in Mauro'tje!!!
     }
 
 

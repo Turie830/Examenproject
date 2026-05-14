@@ -267,6 +267,17 @@ public class AlchemicIngredient {
     }
 
 
+    /**
+     * Return the amount of this alchemic ingredient in spoons fractions.
+     *
+     * @return The largest whole number of spoons contained in this ingredient.
+     * | result == getQuantity().toSpoons(getType().getState())
+     */
+    public double getAmountInSpoonFractions() {
+        return getQuantity().toSpoonsFractions(getState());
+    }
+
+
     /**********************************************************
      * NAME - DEFENSIVE
      **********************************************************/
