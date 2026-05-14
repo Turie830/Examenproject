@@ -11,6 +11,7 @@ import alchemy.recipes.Operation;
 import alchemy.recipes.Recipe;
 import alchemy.recipes.RecipeStep;
 import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.Model;
 import be.kuleuven.cs.som.annotate.Raw;
 
 import java.util.ArrayList;
@@ -318,6 +319,88 @@ public class Laboratory {
             AlchemicIngredient merged = mixAll(toMerge);
             ingredients.add(merged);
         }
+    }
+
+
+    /**
+     * Bring the ingredient to the standard temperature using the Oven or CoolingBox
+     *
+     * @param ingredient The ingredient to bring to standard temperature
+     * @return the ingredient brought to the standard temperature using the cooling box, oven
+     * or nothing if the ingredient is already at standard temperature
+     * @throws IllegalArgumentException the ingredient should be effective
+     *                                  | ingredient == null
+     * @throws IllegalStateException    if the ingredient has to be heated or cooled it must have the respective device for it
+     *                                  | (needsCooling(ingredient) && !hasDevice(CoolingBox.class))
+     *                                  | || (needsHeating(ingredient) && !hadDevice(Oven.class))
+     */
+    private AlchemicIngredient bringToStandardTemperature(AlchemicIngredient ingredient) throws IllegalArgumentException, IllegalStateException {
+        if (ingredient == null) {
+            throw new IllegalArgumentException("Ingredient cannot be null");
+        }
+
+        long coldness = ingredient.getTemperature()[0];
+        long hotness = ingredient.getTemperature()[1];
+        Temperature temp = new Temperature(coldness, hotness);
+
+        long standardColdness = ingredient.getType().getStandardTemperature()[0];
+        long standardHotness = ingredient.getType().getStandardTemperature()[1];
+        Temperature standardTemp = new Temperature(standardColdness, standardHotness);
+
+        if (needsCooling(ingredient)) {
+            if (!hasDevice(CoolingBox.class)) throw new IllegalStateException("No CoolingBox in this laboratory");
+            // cool ingredient
+            return coolBy(ingredient, temp.difference(standardTemp));
+        }
+        if (needsHeating(ingredient)) {
+            if (!hasDevice(Oven.class)) throw new IllegalStateException("No Oven in this laboratory");
+            // heat ingredient
+            return heatBy(ingredient, temp.difference(standardTemp));
+        }
+        // does not need to be cooled or heated
+        return ingredient;
+    }
+
+
+    /**
+     * Return a boolean if the ingredient needs cooling
+     *
+     * @param ingredient the ingredient to check if it needs cooling
+     * @return true if the ingredient is hotter than the standard temperature
+     * @pre ingredient is effective
+     *
+     */
+    @Model
+    private boolean needsCooling(AlchemicIngredient ingredient) {
+        long coldness = ingredient.getTemperature()[0];
+        long hotness = ingredient.getTemperature()[1];
+        Temperature temp = new Temperature(coldness, hotness);
+
+        long standardColdness = ingredient.getType().getStandardTemperature()[0];
+        long standardHotness = ingredient.getType().getStandardTemperature()[1];
+        Temperature standardTemp = new Temperature(standardColdness, standardHotness);
+
+        return temp.isHotterThan(standardTemp);
+    }
+
+    /**
+     * Return a boolean if the ingredient needs heating
+     *
+     * @param ingredient the ingredient to check if it needs heating
+     * @return true if the ingredient is colder than the standard temperature
+     * @pre the ingredient is effective
+     */
+    @Model
+    private boolean needsHeating(AlchemicIngredient ingredient) {
+        long coldness = ingredient.getTemperature()[0];
+        long hotness = ingredient.getTemperature()[1];
+        Temperature temp = new Temperature(coldness, hotness);
+
+        long standardColdness = ingredient.getType().getStandardTemperature()[0];
+        long standardHotness = ingredient.getType().getStandardTemperature()[1];
+        Temperature standardTemp = new Temperature(standardColdness, standardHotness);
+
+        return temp.isColderThan(standardTemp);
     }
 
 
