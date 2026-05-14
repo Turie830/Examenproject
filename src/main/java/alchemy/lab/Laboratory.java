@@ -15,37 +15,31 @@ import java.util.List;
 
 /**
  * A class for laboratories.
- *
+ * <p>
  * A laboratory has a fixed capacity (in storerooms),
  * stores alchemic ingredients, and has a maximum of one
  * device of every kind. Devices are linked bidirectionally to their
  * laboratory (a device registers itself in the laboratory at construction).
  *
- * @invar The storerooms capacity of every laboratory is positive.
- *      | getStorerooms() >= 0
- *
- * @invar Each laboratory has maximum one device of each type.
- *      | for each type in Class<? extends Device>:     // ToDo ? invullen
- *      |     count(d in getDevices() | d.getClass() == type) <= 1
- *
- * @invar Every device in a laboratory references that laboratory back (bidirectional link).
- *      | for each d in getDevices():
- *      |     d.getLaboratory() == this
- *
- * @invar No two different ingredients in a laboratory share the same simple name.
- *      Same-name ingredients are merged on storage, so they always appear as one.
- *      | for any two distinct ingredients a and b in getIngredients():
- *      |     a.getSimpleName() is not equal to b.getSimpleName()
- *
- * @invar The total stored amount per state never exceeds the capacity for that state.
- *      | for each state in State.values():
- *      |     getUsedAmountInLowestUnit(state) <= getCapacityInLowestUnit(state)
- *
  * @author Obe Willaert
  * @author Mauro Devolder
  * @author Arthur Pintelon
- *
  * @version 1.0
+ * @invar The storerooms capacity of every laboratory is positive.
+ * | getStorerooms() >= 0
+ * @invar Each laboratory has maximum one device of each type.
+ * | for each type in Class<? extends Device>:     // ToDo ? invullen OFNIET
+ * |     count(d in getDevices() | d.getClass() == type) <= 1
+ * @invar Every device in a laboratory references that laboratory back (bidirectional link).
+ * | for each d in getDevices():
+ * |     d.getLaboratory() == this
+ * @invar No two different ingredients in a laboratory share the same simple name.
+ * Same-name ingredients are merged on storage, so they always appear as one.
+ * | for any two distinct ingredients a and b in getIngredients():
+ * |     a.getSimpleName() is not equal to b.getSimpleName()
+ * @invar The total stored amount per state never exceeds the capacity for that state.
+ * | for each state in State.values():
+ * |     getUsedAmountInLowestUnit(state) <= getCapacityInLowestUnit(state)
  */
 
 public class Laboratory {
@@ -104,21 +98,15 @@ public class Laboratory {
      * Initialize this new laboratory with the given storerooms capacity,
      * with no ingredients and no devices.
      *
-     * @param storerooms
-     *        The number of storerooms of capacity for this laboratory (>=0).
-     *
+     * @param storerooms The number of storerooms of capacity for this laboratory (>=0).
+     * @throws IllegalArgumentException The given number of storerooms is negative.
+     *                                  | storerooms < 0
      * @post The number of storerooms of this new laboratory equals the given amount.
-     *     | new.getStorerooms() == storerooms
-     *
+     * | new.getStorerooms() == storerooms
      * @post This new laboratory has no ingredients.
-     *     | new.getNbIngredients() == 0
-     *
+     * | new.getNbIngredients() == 0
      * @post This new laboratory has no devices.
-     *     | new.getNbDevices() == 0
-     *
-     * @throws IllegalArgumentException
-     *         The given number of storerooms is negative.
-     *       | storerooms < 0
+     * | new.getNbDevices() == 0
      */
     @Raw
     public Laboratory(int storerooms) throws IllegalArgumentException {
@@ -160,9 +148,8 @@ public class Laboratory {
     /**
      * Return the total capacity of this laboratory in spoons
      *
-     *
      * @return The number of storerooms multiplied by how many lowest-units fit in one storeroom.
-     *       | result = getStorerooms() * Unit.STOREROOM.getFactorToBaseUnit(State.POWDER) / Unit.SPOON.getFactorToBaseUnit(State.POWDER)
+     * | result = getStorerooms() * Unit.STOREROOM.getFactorToBaseUnit(State.POWDER) / Unit.SPOON.getFactorToBaseUnit(State.POWDER)
      *
      */
     public double getCapacityInSpoonFractions() throws IllegalArgumentException {
@@ -180,16 +167,13 @@ public class Laboratory {
 
     /**
      *
-     * @param state
-     *        The state we want the total in (= LIQUID or POWDER).
-     *
+     * @param state The state we want the total in (= LIQUID or POWDER).
      * @return The sum of the amounts of every ingredient
-     *         in this laboratory, in the lowest unit.
-     *         | result ==
-     *         |   sum of ing.getAmountInLowestUnit() for each ing in getIngredients()
-     *
+     * in this laboratory, in the lowest unit.
+     * | result ==
+     * |   sum of ing.getAmountInLowestUnit() for each ing in getIngredients()
      * @throws IllegalArgumentException the state must be effective
-     *                                   | state == null
+     *                                  | state == null
      *
      */
     public double getUsedAmountInSpoonFractions(State state) {
@@ -209,22 +193,19 @@ public class Laboratory {
     /**
      * Check if this laboratory has enough capacity to add
      * the given ingredient or not.
-     *
+     * <p>
      * An ingredient can be liquid or powder. hasRoomFor looks at how much is already stored
      * in that state, add the new amount and check that it stays below the capacity.
      *
-     * @param ingredient
-     *        The ingredient check room for.
-     *
+     * @param ingredient The ingredient check room for.
      * @return False if the given ingredient is not effective.
-     *       | if (ingredient == null) then result == false
-     *
+     * | if (ingredient == null) then result == false
      * @return True if (currently used) + (new amount) is less then or equal to the capacity.
-     *         everything is calculated in the lowest unit for the ingredient's state.
-     *       | result ==
-     *       |   (getUsedAmountInLowestUnit(ingredient.getType().getStandardState())
-     *       |    + ingredient.getAmountInLowestUnit())
-     *       |   <= getCapacityInLowestUnit(ingredient.getType().getStandardState())
+     * everything is calculated in the lowest unit for the ingredient's state.
+     * | result ==
+     * |   (getUsedAmountInLowestUnit(ingredient.getType().getStandardState())
+     * |    + ingredient.getAmountInLowestUnit())
+     * |   <= getCapacityInLowestUnit(ingredient.getType().getStandardState())
      */
     public boolean hasRoomFor(AlchemicIngredient ingredient) {
         if (ingredient == null) {
@@ -238,64 +219,13 @@ public class Laboratory {
         return used + extra <= getCapacityInSpoonFractions();
     }
 
-
-    /**
-     * Ingredients
-     */
-
-
-    /**
-     * The list of ingredients stored in this laboratory.
-     *
-     * Per simple name there is a maximum of one ingredient in this list.
-     * (Because two ingredients with the same name merge into one).
-     *
-     * @invar No two ingredients share the same simple name.
-     *
-     * @invar Every ingredient is effective (not null).
-     */
-    private final List<AlchemicIngredient> ingredients = new ArrayList<>();
-
-
-    // ToDo: is public List<AlchemicIngredient> getIngredients() nodig?
-    // denk het nie, ik zou nog 2 functies toevoegen, getNbIngredients (wordt ook gebruikt in docs) + getIngredientAt
-    // met deze 2 functies zou je ook alle ingredienten kunenn ophalen
-
-
-    /**
-     * find the smallest container unit for the state of which
-     * the unit capacity is large enough to hold the requested amount.
-     *
-     *
-     * @return the smallest container unit for the given state
-     *          or null if the largest container unit is still too small.
-     *
-     */
-    private static Unit smallestContainerUnitFor(long amountInLowest, State state) {
-        Unit best = null;
-        for (Unit u : Unit.values()) {
-            if (!u.isValidFor(state)) continue;
-            if (!IngredientContainer.isValidCapacityUnit(u)) continue;
-            long cap = u.getFactorToBaseUnit(state);
-            if (cap < amountInLowest) continue;
-            // ToDo: iteratielogica? stap is wel juist maar weet niet of na || overbodig is
-            if (best == null || cap < best.getFactorToBaseUnit(state)) {
-                best = u;
-            }
-        }
-        return best;
-    }
-
-
     /**
      * Check if an ingredient with the given name exists in this laboratory.
      * The name can be a simple name or a special name.
      *
-     * @param name
-     *        The name to look up.
-     *
+     * @param name The name to look up.
      * @return False if the given name is null or if no ingredient in this
-     *         laboratory has the given name. True otherwise.
+     * laboratory has the given name. True otherwise.
      */
     public boolean hasIngredient(String name) {
         if (name == null) {
@@ -312,30 +242,21 @@ public class Laboratory {
     /**
      * Store the contents of the given ingredient container in this laboratory.
      * After this call the container is empty ('container wordt vernietigd'). ToDo: dit juiste interpreattie van vernietigen?
-     *
-     *
+     * <p>
+     * <p>
      * The ingredient gets brought to its standard temperaturen using Oven or CoolingBox
      * If an ingredient with the same simple name already exists in this laboratory, merge the two via the Kettle.
      *
-     * @param container
-     *        The container whose contents should be stored.
-     *
+     * @param container The container whose contents should be stored.
+     * @throws IllegalArgumentException The given container is not effective.
+     *                                  | container == null
+     * @throws IllegalArgumentException The given container is empty.
+     *                                  | container.isEmpty()
+     * @throws IllegalStateException    There is not enough remaining capacity for the ingredient.
+     *                                  | !hasRoomFor(container.getIngredient())
      * @post After this call, the given container is empty.
-     *     | container.isEmpty()
-     *
+     * | container.isEmpty()
      * @post The ingredient that was in the container is now stored in this laboratory.
-     *
-     * @throws IllegalArgumentException
-     *         The given container is not effective.
-     *       | container == null
-     *
-     * @throws IllegalArgumentException
-     *         The given container is empty.
-     *       | container.isEmpty()
-     *
-     * @throws IllegalStateException
-     *         There is not enough remaining capacity for the ingredient.
-     *       | !hasRoomFor(container.getIngredient())
      */
     public void store(IngredientContainer container)                    // ToDo: check deze pls, ingewikkeld
             throws IllegalArgumentException, IllegalStateException {
@@ -497,74 +418,23 @@ public class Laboratory {
         return ingredient;
     }
 
-
-    /**
-     * Return a boolean if the ingredient needs cooling
-     *
-     * @param ingredient the ingredient to check if it needs cooling
-     * @return true if the ingredient is hotter than the standard temperature
-     * @pre ingredient is effective
-     *
-     */
-    @Model
-    private boolean needsCooling(AlchemicIngredient ingredient) {
-        long coldness = ingredient.getTemperature()[0];
-        long hotness = ingredient.getTemperature()[1];
-        Temperature temp = new Temperature(coldness, hotness);
-
-        long standardColdness = ingredient.getType().getStandardTemperature()[0];
-        long standardHotness = ingredient.getType().getStandardTemperature()[1];
-        Temperature standardTemp = new Temperature(standardColdness, standardHotness);
-
-        return temp.isHotterThan(standardTemp);
-    }
-
-    /**
-     * Return a boolean if the ingredient needs heating
-     *
-     * @param ingredient the ingredient to check if it needs heating
-     * @return true if the ingredient is colder than the standard temperature
-     * @pre the ingredient is effective
-     */
-    @Model
-    private boolean needsHeating(AlchemicIngredient ingredient) {
-        long coldness = ingredient.getTemperature()[0];
-        long hotness = ingredient.getTemperature()[1];
-        Temperature temp = new Temperature(coldness, hotness);
-
-        long standardColdness = ingredient.getType().getStandardTemperature()[0];
-        long standardHotness = ingredient.getType().getStandardTemperature()[1];
-        Temperature standardTemp = new Temperature(standardColdness, standardHotness);
-
-        return temp.isColderThan(standardTemp);
-    }
-
-
-    // todo: split throws?
     /**
      * Take the requested quantity of the ingredient with the given name out of
      * this laboratory and return it inside a new container.
-     *
+     * <p>
      * The container we return uses the smallest container unit (for the ingredient)
      * that the amount of ingredient still fits into.
      *
-     * @param name
-     *        The (simple or special) name of the ingredient to put in a container.
-     *
-     * @param quantity
-     *        How much of it should be put in a container.
-     *
+     * @param name     The (simple or special) name of the ingredient to put in a container.
+     * @param quantity How much of it should be put in a container.
      * @return A new container holding an ingredient of the same type as the one
-     *         that was in the laboratory, with the requested quantity.
-     *
+     * that was in the laboratory, with the requested quantity.
+     * @throws IllegalArgumentException The given name or quantity is not effective, no ingredient with the
+     *                                  given name is in this laboratory, the requested unit does
+     *                                  not match the ingredient's state, or the requested amount is greater than
+     *                                  the available amount (in the Laboratory).
      * @post The total stored amount of the matched ingredient
-     *       has decreased by the requested amount.
-     *
-     * @throws IllegalArgumentException
-     *         The given name or quantity is not effective, no ingredient with the
-     *         given name is in this laboratory, the requested unit does
-     *         not match the ingredient's state, or the requested amount is greater than
-     *         the available amount (in the Laboratory).
+     * has decreased by the requested amount.
      */
     public IngredientContainer request(String name, Quantity quantity)          // ToDo: controle deze functie: is ie te (overbodig) ingewikkeld?
             throws IllegalArgumentException {
@@ -604,7 +474,7 @@ public class Laboratory {
         // The amount left stays in the laboratory.
         replaceWithRemaining(existing, available - requested, state);
         return result;
-        } // ToDo: controle
+    } // ToDo: controle
 
 
     // ToDo: hulpfunctie: moet hier documentatie bij (zie komende 3 fct) ? --> zo ja, vervolledigen ToDo
@@ -633,22 +503,17 @@ public class Laboratory {
      * Take the stored amount of the ingredient with the given name out of
      * this laboratory and return it inside the largest container unit that is valid for
      * the standard state of the ingredient.
-     *
+     * <p>
      * If the laboratory holds more than the new container can hold, the
      * amount that can't fit is gone.
      *
-     * @param name
-     *        The name of the ingredient to retrieve, simple or special.
-     *
+     * @param name The name of the ingredient to retrieve, simple or special.
      * @return A new container holding the ingredient.
-     *
+     * @throws IllegalArgumentException The given name is not effective or there is no ingredient with that name.
      * @post After this call, no ingredient with the same name is still in this lab.
-     *     | !new.hasIngredient(name)
-     *
-     * @throws IllegalArgumentException
-     *         The given name is not effective or there is no ingredient with that name.
+     * | !new.hasIngredient(name)
      */
-    public IngredientContainer request(String name) throws IllegalArgumentException{
+    public IngredientContainer request(String name) throws IllegalArgumentException {
 
         AlchemicIngredient existing = getIngredient(name);
 
@@ -698,13 +563,10 @@ public class Laboratory {
      * Return the ingredient in this laboratory whose simple name or
      * special name (mixed ingredient) matches the given name.
      *
-     * @param name
-     *        The name to look up.
-     *
-     * @throws IllegalArgumentException
-     *         The given name is not effective, or no ingredient with that
-     *         name is in this laboratory.
-     *       | name == null || !hasIngredient(name)
+     * @param name The name to look up.
+     * @throws IllegalArgumentException The given name is not effective, or no ingredient with that
+     *                                  name is in this laboratory.
+     *                                  | name == null || !hasIngredient(name)
      */
     // TODO: kopie maken?
     public AlchemicIngredient getIngredient(String name) throws IllegalArgumentException {
@@ -726,62 +588,17 @@ public class Laboratory {
         throw new IllegalArgumentException("No ingredient with the name " + name);
     }
 
-// todo comment
-    /**
-     * Return the largest valid container unit for the given state.
-     * = BARREL for liquids and CHEST for powders.
-     */
-    private static Unit largestContainerUnitFor(State state) {
-        Unit best = null;
-        for (Unit u : Unit.values()) {
-            if (!u.isValidFor(state)) continue;
-            if (!IngredientContainer.isValidCapacityUnit(u)) continue;
-            if (best == null || u.getFactorToBaseUnit(state) > best.getFactorToBaseUnit(state)) {
-                best = u;
-            }
-        }
-        return best;
-    }
-
-
-    /**
-     * Devices --> bidirectional
-     */
-
-    // todo: @invar with funcs?
-
-    /**
-     * The devices registered in this laboratory.
-     *
-     * @invar Every device is effective
-     *      | for each device in devices:
-     *      |     device != null
-     * @invar Every device references this laboratory.
-     *      | for each device in devices:
-     *      |     device.getLaboratory() == this
-     * @invar There is at most one device of each concrete class.
-     *      | for each device1, device2 in devices:
-     *      |     device1 == device2 || device1.getClass() != device2.getClass()
-     */
-    private final List<Device> devices = new ArrayList<>();
-
     /**
      * Register this device with this laboratory.
      * This method is called automatically from the Device constructor, so there is a
      * bidirectional link.
-     *
+     * <p>
      * Only callable from alchemy.laboratory ToDo: correct? laten staan of weg?
      *
-     * @param device
-     *        The device to be registered.
-     *
+     * @param device The device to be registered.
+     * @throws IllegalArgumentException The given device is not effective or it does not reference this laboratory.
+     * @throws IllegalStateException    A device of the same concrete class is already registered in this laboratory.
      * @post The given device is now registered as the device of its kind in this laboratory.
-     *
-     * @throws IllegalArgumentException
-     *         The given device is not effective or it does not reference this laboratory.
-     *
-     * @throws IllegalStateException
-     *         A device of the same concrete class is already registered in this laboratory.
      */
     // ToDo: packageprivate
     void registerDevice(Device device)
@@ -817,9 +634,7 @@ public class Laboratory {
     /**
      * Return whether the given device is registered in this laboratory.
      *
-     * @param device
-     *        The device to check.
-     *
+     * @param device The device to check.
      * @return True if this laboratory contains the exact given device object.
      */
     public boolean hasAsDevice(Device device) {
@@ -837,9 +652,7 @@ public class Laboratory {
     /**
      * Return the device of the given concrete class in this laboratory.
      *
-     * @param deviceClass
-     *        The concrete device class to look up.
-     *
+     * @param deviceClass The concrete device class to look up.
      * @return The registered device of the given concrete class, or null if there is none.
      */
     @Basic
@@ -858,9 +671,7 @@ public class Laboratory {
     /**
      * Check if this laboratory has a device of the given concrete class.
      *
-     * @param deviceClass
-     *        The concrete device class to check.
-     *
+     * @param deviceClass The concrete device class to check.
      * @return True if a device of the given concrete class is registered.
      */
     public boolean hasDevice(Class<? extends Device> deviceClass) {
@@ -878,29 +689,21 @@ public class Laboratory {
 
     /**
      * Execute the given recipe in this laboratory the given number of times.
-     *
+     * <p>
      * Walk through the recipe step by step, scale every ingredient
      * by the given factor, and use the devices in this laboratory to
      * heat, cool, mix or add ingredients. The final mixture is stored
      * in the laboratory.
-     *
+     * <p>
      * If at some point there is not enough of an ingredient, the recipe-execution stops.
      * All of the ingredients that were already taken out of the laboratory
      * are converted to standard temperature again and stored back.
      *
-     *
-     * @param recipe
-     *        The recipe to execute.
-     *
-     * @param factor
-     *        How many times to execute the recipe.
-     *        Must be strictly positive.
-     *
-     * @throws IllegalArgumentException
-     *         The recipe is not effective or the factor is not strictly positive.
-     *
-     * @throws IllegalStateException
-     *         A required device is not in this laboratory.
+     * @param recipe The recipe to execute.
+     * @param factor How many times to execute the recipe.
+     *               Must be strictly positive.
+     * @throws IllegalArgumentException The recipe is not effective or the factor is not strictly positive.
+     * @throws IllegalStateException    A required device is not in this laboratory.
      */
     public void execute(Recipe recipe, int factor) throws IllegalArgumentException, IllegalStateException {
         if (recipe == null) {
@@ -969,27 +772,18 @@ public class Laboratory {
     }
 
 
-
-
-
-
     /**
      * Use the Oven to heat the given ingredient by the given amount
      * and return the heated ingredient.
-     *
+     * <p>
      * The oven is set to standard temperature + amount before running, so the
      * ingredient ends up exactly that amount warmer then the standard temperature.
      *
-     * @param ingredient
-     *        The ingredient to heat, not null.
-     *
-     * @param amount
-     *        The number of temperature units to add to the hotness.
-     *        Must be strictly positive.
-     *
+     * @param ingredient The ingredient to heat, not null.
+     * @param amount     The number of temperature units to add to the hotness.
+     *                   Must be strictly positive.
      * @return The ingredient after it has been heated by the given amount.
-     *
-     * @pre   There is an Oven in this laboratory (hasDevice(Oven.class) == true).
+     * @pre There is an Oven in this laboratory (hasDevice(Oven.class) == true).
      */
     private AlchemicIngredient heatBy(AlchemicIngredient ingredient, long amount) {
         State state = ingredient.getType().getStandardState();
@@ -1025,20 +819,15 @@ public class Laboratory {
     /**
      * Use the CoolingBox to cool the given ingredient by the given amount
      * and return the cooled ingredient.
-     *
+     * <p>
      * The CoolingBox is set to standard temperature + amount before running, so the
      * ingredient ends up exactly that amount colder than the standard temperature.
      *
-     * @param ingredient
-     *        The ingredient to cool, not null.
-     *
-     * @param amount
-     *        The number of temperature units to add to the coldness.
-     *        Must be strictly positive.
-     *
+     * @param ingredient The ingredient to cool, not null.
+     * @param amount     The number of temperature units to add to the coldness.
+     *                   Must be strictly positive.
      * @return The ingredient after it has been cooled by the given amount.
-     *
-     * @pre   There is a CoolingBox in this laboratory (hasDevice(CoolingBox.class) == true).
+     * @pre There is a CoolingBox in this laboratory (hasDevice(CoolingBox.class) == true).
      */
     private AlchemicIngredient coolBy(AlchemicIngredient ingredient, long amount) {
         State state = ingredient.getType().getStandardState();
@@ -1071,19 +860,14 @@ public class Laboratory {
     /**
      * Add all ingredients in the given list to the kettle, run the kettle
      * and return the result-mixture.
-     *
+     * <p>
      * Every ingredient is placed in the smallest container that can fit it
      * before the ingredient is added to the kettle.
      *
-     * @param toMix
-     *        The list of ingredients to mix together. Must have at least 2 elements.
-     *
+     * @param toMix The list of ingredients to mix together. Must have at least 2 elements.
      * @return The mixture that comes out of the kettle. (one thing)
-     *
-     *
      * @throws IllegalStateException the labo must have a kettle
-     *      | !hasDevice(Kettle.class)
-     *
+     *                               | !hasDevice(Kettle.class)
      * @pre toMix contains at least 2 ingredients.
      */
     private AlchemicIngredient mixAll(List<AlchemicIngredient> toMix) {
