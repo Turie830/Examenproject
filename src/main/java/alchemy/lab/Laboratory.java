@@ -29,9 +29,9 @@ import java.util.List;
  * | getStorerooms() >= 0
  * @invar Each laboratory has maximum one device of each type.
  * | for each type in Class<? extends Device>:
- * |     count(d in getDevices() | d.getClass() == type) <= 1
+ * |     count(d in devices | d.getClass() == type) <= 1
  * @invar Every device in a laboratory references that laboratory back (bidirectional link).
- * | for each d in getDevices():
+ * | for each d in devices:
  * |     d.getLaboratory() == this
  * @invar No two different ingredients in a laboratory share the same simple name.
  * Same-name ingredients are merged on storage, so they always appear as one.
@@ -101,7 +101,7 @@ public class Laboratory {
      * @post The number of storerooms of this new laboratory equals the given amount.
      * | new.getStorerooms() == storerooms
      * @post This new laboratory has no ingredients.
-     * | new.getNbIngredients() == 0
+     * | new.getNbOfIngredients() == 0
      * @post This new laboratory has no devices.
      * | new.getNbDevices() == 0
      */
