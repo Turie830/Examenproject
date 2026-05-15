@@ -105,7 +105,7 @@ public class Quantity {
      *      The state for which this quantity is converted
      *
      * @return The largest whole number of spoons contained in this quantity.
-     *      | result == Math.floor(toLowestUnit(state) / Unit.getSpoonUnit(state).getFactorToBaseUnit(state))
+     *      | result == Math.floor(toLowestUnit(state) / Unit.SPOON.getFactorToBaseUnit(state))
      */
     @Immutable
     public Long toSpoons(State state) {
@@ -118,7 +118,7 @@ public class Quantity {
      *
      * @param state The state for which this quantity is converted
      * @return The largest whole number of spoons contained in this quantity.
-     * | result == toLowestUnit(state) / Unit.getSpoonUnit(state).getFactorToBaseUnit(state)
+     * | result == toLowestUnit(state) / Unit.SPOON.getFactorToBaseUnit(state)
      */
     @Immutable
     public double toSpoonsFractions(State state) {

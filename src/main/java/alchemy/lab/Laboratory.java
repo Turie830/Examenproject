@@ -748,6 +748,7 @@ public class Laboratory {
                 // bij fail; bvb niet genoeg ingredient, restore je alles naar hoe het was voor execute
                 // restore the temperature to standard temperature
                 storeBackAllRestoreTemp(IngredientsSet);
+                return;
             }
         }
         // succes

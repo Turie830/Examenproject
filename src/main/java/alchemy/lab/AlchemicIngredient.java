@@ -97,7 +97,7 @@ public class AlchemicIngredient {
      *       standard state of its type.
      *     | if (quantity == null) then
      *     |   new.getAmount() == 1
-     *     |   && new.getUnit() == Unit.getSpoonUnit(new.getType().getStandardState())
+     *     |   && new.getUnit() == Unit.SPOON
      */
     @Raw
     public AlchemicIngredient(IngredientType type, Quantity quantity) {
