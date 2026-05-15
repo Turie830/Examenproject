@@ -707,7 +707,7 @@ public class Laboratory {
 
             try {
                 if (op == Operation.ADD) {
-                    IngredientRecipeStep addStep = (IngredientRecipeStep) step; // (IngredientRecipeStep) moet, met haakjes, om als IngredientRecipeStep te knn behandelen
+                    IngredientRecipeStep addStep = (IngredientRecipeStep) step; // (IngredientRecipeStep) with brackets, to be able to use as IngredientRecipeStep
                     Quantity scaled = new Quantity(addStep.getIngredientQuantity().getAmount() * factor,
                             addStep.getIngredientQuantity().getUnit());
                     IngredientContainer takenFromLab = request(
@@ -721,7 +721,7 @@ public class Laboratory {
                         throw new IllegalStateException("No Oven in this laboratory");
                     }
                     AlchemicIngredient last = IngredientsSet.removeLast();
-                    IngredientsSet.add(heatBy(last, 10));   // standaard 10, want opgave bij recepten
+                    IngredientsSet.add(heatBy(last, 10));   // standard 10
 
                 } else if (op == Operation.COOL) {
                     if (IngredientsSet.isEmpty()) {
@@ -745,13 +745,13 @@ public class Laboratory {
                     // If there is exactly one ingredient, do nothing.
                 }
             } catch (IllegalArgumentException | IllegalStateException exception) {
-                // bij fail; bvb niet genoeg ingredient, restore je alles naar hoe het was voor execute
+                // if fail; for ex. not enough ingredient, restore all to how it was before execute
                 // restore the temperature to standard temperature
                 storeBackAllRestoreTemp(IngredientsSet);
                 return;
             }
         }
-        // succes
+        // success
         // don't restore the temperature
         storeBackAll(IngredientsSet);
     }
