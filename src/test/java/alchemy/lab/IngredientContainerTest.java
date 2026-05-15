@@ -89,12 +89,6 @@ public class IngredientContainerTest {
     }
 
 
-    @Test
-    public void constructor_InvalidCapacityUnit_ThrowsException() {
-        // ToDo
-    }
-
-
     /**
      * Constructor - has contents
      */
@@ -125,9 +119,6 @@ public class IngredientContainerTest {
 
         IngredientContainer container = new IngredientContainer(Unit.BOTTLE, fullBottle);
         assertFalse(container.isEmpty());
-
-        // one bottle and one drop do not fit in a BOTTLE container (121 drops > 120 drops)
-        // todo fullBottle.fill(1 drop) en kijk of false returnt
     }
 
 
@@ -210,14 +201,5 @@ public class IngredientContainerTest {
 
         assertTrue(container.isEmpty());
     }
-
-
-
-
-
-
-
-
-
 
 }

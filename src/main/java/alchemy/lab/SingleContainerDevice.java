@@ -43,9 +43,8 @@ public abstract class SingleContainerDevice extends Device {
      * @throws IllegalArgumentException The given container must not be empty
      *                                  | container.isEmpty()
      * @throws IllegalStateException There can't be anything in the device
-     *                                  | TODO how to do this getDeviceContent is protected
+     *                                  | getDeviceContents() != null
      */
-    // TODO do we want to create a copy or not? (see todo in OvenTest)
     @Override
     public void add(IngredientContainer container) {
         if (container == null) {
@@ -79,11 +78,10 @@ public abstract class SingleContainerDevice extends Device {
      * | result == null || result != getActualDeviceContent()
      */
     @Basic
-    public AlchemicIngredient getDeviceContent() {
+    protected AlchemicIngredient getDeviceContent() {
         if (deviceContent == null) {
             return null;
         }
-        //TODO create a copy of ingredient (needs constructor or .copy method) + update test cases
         return deviceContent;
     }
 

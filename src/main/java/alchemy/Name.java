@@ -4,7 +4,6 @@ import alchemy.exceptions.IllegalNameException;
 import alchemy.lab.AlchemicIngredient;
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
-import be.kuleuven.cs.som.annotate.Model;
 import be.kuleuven.cs.som.annotate.Raw;
 
 /**
@@ -20,7 +19,7 @@ import be.kuleuven.cs.som.annotate.Raw;
  * @invar The special name of each Name object must be proper.
  *      | canHaveAsSpecialName(getSpecialName())
  *
- * @note Name beheert zijn eigen toestand, AlchemicIngredient bevat de geldigheidsregels/checkers.
+ * @note Name manages its own status, AlchemicIngredient contains the validity checkers.
  *
  * @author Arthur
  * @author Mauro
@@ -40,6 +39,7 @@ public class Name {
     /**
      * A string containing all allowed special characters in names.
      */
+    // , was added for kettle (see assignment)
     private static final String ALLOWED_SPECIAL_CHARACTERS = "'(),";
 
     /**
@@ -255,10 +255,9 @@ public class Name {
      *       | specialName != null && !isValidName(specialName)
      */
     @Raw
-    @Model
     public void setSpecialName(String specialName) throws IllegalStateException, IllegalNameException {
         if (!isMixed() && specialName != null) {
-            throw new IllegalStateException("No special name allowed!");
+            throw new IllegalStateException("No special name allowed");
         }
 
         if (specialName != null && !AlchemicIngredient.isValidName(specialName)) {
@@ -283,7 +282,6 @@ public class Name {
      * @return True if and only if every character of the given string is either
      *         a letter, a space, or an allowed special character.
      */
-    @Model
     public static boolean hasOnlyAllowedCharacters(String name) {
         for (int i = 0; i < name.length(); i++) {
             char c = name.charAt(i);
@@ -308,7 +306,6 @@ public class Name {
      *         of allowed special characters.
      *       | result == (ALLOWED_SPECIAL_CHARACTERS.indexOf(c) != -1)
      */
-    @Model
     public static boolean isAllowedSpecialCharacter(char c) {
         return ALLOWED_SPECIAL_CHARACTERS.indexOf(c) != -1;
     }
@@ -323,7 +320,6 @@ public class Name {
      *
      * @return The number of characters in the given word that are letters.
      */
-    @Model
     public static int countLetters(String word) {
         int count = 0;
 
@@ -355,7 +351,6 @@ public class Name {
      * @return True if and only if the word has correct capitalization,
      *         taking into account whether "mixed" and "with" are allowed.
      */
-    @Model
     public static boolean hasCorrectCapitalization(String word, boolean allowMixedAndWith) {
         if (word.equals("mixed") || word.equals("with") || word.equals("and")) {
             return allowMixedAndWith;
@@ -406,7 +401,6 @@ public class Name {
      *       | result == (for some forbiddenWord in FORBIDDEN_SIMPLE_NAME_WORDS :
      *       |              word.equals(forbiddenWord))
      */
-    @Model
     public static boolean isForbiddenSimpleNameWord(String word) {
         for (String forbiddenWord : FORBIDDEN_SIMPLE_NAME_WORDS) {
             if (word.equals(forbiddenWord)) {
@@ -416,10 +410,5 @@ public class Name {
 
         return false;
     }
-
-
-
-
-
 
 }

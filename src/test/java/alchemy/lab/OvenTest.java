@@ -82,7 +82,6 @@ public class OvenTest {
 
         oven.execute();
 
-        // todo see todo singleContainerDevice: now we do this, and don't use getResult()
         assertEquals(0, ingredient.getColdness());
         assertEquals(100, ingredient.getHotness());
     }

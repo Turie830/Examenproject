@@ -13,7 +13,7 @@ import java.util.Random;
  * @author Arthur Pintelon
  * @version 1.0
  */
-public class Oven extends SingleContainerDevice implements TemperatureDevice {
+public final class Oven extends SingleContainerDevice implements TemperatureDevice {
 
     /**
      * The temperature target of the oven

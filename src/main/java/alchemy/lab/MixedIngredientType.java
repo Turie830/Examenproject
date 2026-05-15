@@ -16,6 +16,8 @@ import be.kuleuven.cs.som.annotate.Raw;
  * @invar The name of each mixed ingredient type must be proper.
  *      | canHaveAsName(getName())
  *
+ * @note We know this doesn't follow liskov but this is the simplest solution without overcomplicating it with 3 classes.
+ *
  * @author Arthur
  * @author Mauro
  * @author Obe
@@ -67,8 +69,6 @@ public class MixedIngredientType extends IngredientType{
     public MixedIngredientType(Name name) {
         this(name, DEFAULT.getStandardState(), DEFAULT.getStandardTemperatureObject());
     }
-
-    // todo copy constructor or method
 
 
     /**

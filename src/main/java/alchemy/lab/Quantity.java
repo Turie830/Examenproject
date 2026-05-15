@@ -33,7 +33,7 @@ public class Quantity {
     /**
      * A variable for storing the unit
      */
-    private final Unit  unit;
+    private final Unit unit;
 
 
     /**
@@ -46,6 +46,12 @@ public class Quantity {
      *
      * @pre The amount is not negative
      *      | amount >= 0
+     *
+     * @pre amount is not null
+     *      | amount != null
+     *
+     * @pre unit is not null
+     *
      *
      * @post The amount is set to the given amount
      *      | new.getAmount() == amount

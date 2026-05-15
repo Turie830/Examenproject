@@ -9,5 +9,6 @@ package alchemy.lab;
  * @version 1.0
  */
 public enum State {
-    LIQUID, POWDER
+    LIQUID,
+    POWDER
 }

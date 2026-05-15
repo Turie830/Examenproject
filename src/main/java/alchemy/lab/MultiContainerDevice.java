@@ -9,6 +9,10 @@ import java.util.List;
 /**
  * An abstract class for devices that can contain multiple ingredient containers.
  *
+ *
+ * @note There are no functions to get what's inside the multiContainerDevice
+ *     cause it wouldn't be logical if you could take stuff out of a kettle
+ *
  * @author Obe Willaert
  * @author Mauro Devolder
  * @author Arthur Pintelon
@@ -81,7 +85,4 @@ public abstract class MultiContainerDevice extends Device {
     protected void emptyDeviceContents() {
         deviceContents.clear();
     }
-
-    // There are no functions to get what's inside the multiContainerDevice
-    // cause it wouldn't be logical if you could take stuff out of a kettle
 }

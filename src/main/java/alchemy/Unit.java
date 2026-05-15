@@ -46,7 +46,7 @@ public enum Unit {
     SACK(State.POWDER, 3 * 6 * 7 * 6),
     CHEST(State.POWDER, 10 * 3 * 6 * 7 * 6),
 
-    // Shared units
+    // shared units
     SPOON(8, 6),
     STOREROOM(5 * 12 * 7 * 3 * 5 * 8, 5 * 10 * 3 * 6 * 7 * 6);
 
@@ -75,6 +75,7 @@ public enum Unit {
      *      The given factor to the base unit is not strictly positive.
      *      | factorToBaseUnit <= 0
      */
+    @Raw
     Unit(State state, int factorToBaseUnit) throws IllegalArgumentException {
         addFactorToBaseUnit(state, factorToBaseUnit);
     }
@@ -100,9 +101,53 @@ public enum Unit {
      *      One of the given factors to the base unit is not strictly positive.
      *      | liquidFactorToBaseUnit <= 0 || powderFactorToBaseUnit <= 0
      */
+    @Raw
     Unit(int liquidFactorToBaseUnit, int powderFactorToBaseUnit) throws IllegalArgumentException {
         addFactorToBaseUnit(State.LIQUID, liquidFactorToBaseUnit);
         addFactorToBaseUnit(State.POWDER, powderFactorToBaseUnit);
+    }
+
+    /**
+     * Gets the base unit for the given state.
+     *
+     * @param state
+     *      The state for which to get the base unit
+     *
+     * @return The unit that is valid for the given state and has a factor to the base unit equal to 1.
+     *      | result.isValidFor(state)
+     *      | result.getFactorToBaseUnit(state) == 1
+     *
+     * @throws IllegalArgumentException
+     *      The given state is not effective.
+     *      | state == null
+     */
+    @Immutable
+    public static Unit getBaseUnit(State state) throws IllegalArgumentException {
+        if (state == null) {
+            throw new IllegalArgumentException("State cannot be null");
+        }
+        // run over every unit possible
+        for (Unit unit : Unit.values()) {
+            if (unit.isValidFor(state) && unit.getFactorToBaseUnit(state) == 1) {
+                return unit;
+            }
+        }
+
+        throw new IllegalStateException("No base unit found");
+    }
+
+    /**
+     * Checks if this unit is valid for the given state.
+     *
+     * @param state
+     *      The state to check for
+     *
+     * @return True if this unit has a factor to the base unit for the given state.
+     *      | result == factorsToBaseUnit.containsKey(state)
+     */
+    public boolean isValidFor(State state) {
+        // check if the given state is in the map of this unit
+        return factorsToBaseUnit.containsKey(state);
     }
 
     /**
@@ -119,11 +164,13 @@ public enum Unit {
      * @throws IllegalArgumentException
      *      The given factor is not strictly positive.
      *      | factorToBaseUnit <= 0
+     *
+     * @post the state and the according factor to the base unit is added to the map of this unit
      */
     @Raw
     private void addFactorToBaseUnit(State state, int factorToBaseUnit) throws IllegalArgumentException {
         if (state == null) {
-            throw new IllegalArgumentException("State cannot be null.");
+            throw new IllegalArgumentException("State cannot be null");
         }
 
         if (factorToBaseUnit <= 0) {
@@ -131,20 +178,6 @@ public enum Unit {
         }
 
         factorsToBaseUnit.put(state, factorToBaseUnit);
-    }
-
-    /**
-     * Checks if this unit is valid for the given state.
-     *
-     * @param state
-     *      The state to check for
-     *
-     * @return True if this unit has a factor to the base unit for the given state.
-     *      | result == factorsToBaseUnit.containsKey(state)
-     */
-    public boolean isValidFor(State state) {
-        // check if the given state is in the map of this unit
-        return factorsToBaseUnit.containsKey(state);
     }
 
     /**
@@ -164,40 +197,10 @@ public enum Unit {
     @Immutable
     public int getFactorToBaseUnit(State state) throws IllegalArgumentException {
         if (!isValidFor(state)) {
-            throw new IllegalArgumentException("Unit is not valid for the given state.");
+            throw new IllegalArgumentException("Unit is not valid for the given state");
         }
 
         return factorsToBaseUnit.get(state);
-    }
-
-
-    /**
-     * Gets the base unit for the given state.
-     *
-     * @param state
-     *      The state for which to get the base unit
-     *
-     * @return The unit that is valid for the given state and has a factor to the base unit equal to 1.
-     *      | result.isValidFor(state)
-     *      | result.getFactorToBaseUnit(state) == 1
-     *
-     * @throws IllegalArgumentException
-     *      The given state is not effective.
-     *      | state == null
-     */
-    @Immutable
-    public static Unit getBaseUnit(State state) throws IllegalArgumentException {
-        if (state == null) {
-            throw new IllegalArgumentException("State cannot be null.");
-        }
-        // run over every unit possible
-        for (Unit unit : Unit.values()) {
-            if (unit.isValidFor(state) && unit.getFactorToBaseUnit(state) == 1) {
-                return unit;
-            }
-        }
-
-        throw new IllegalStateException("No base unit found.");
     }
 
     /**
@@ -221,7 +224,7 @@ public enum Unit {
      */
     public Long convertToBaseUnit(Long amount, State state) throws IllegalArgumentException {
         if (amount < 0) {
-            throw new IllegalArgumentException("Amount cannot be negative.");
+            throw new IllegalArgumentException("Amount cannot be negative");
         }
 
         return amount * getFactorToBaseUnit(state);

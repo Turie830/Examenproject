@@ -61,6 +61,7 @@ public class Temperature {
      */
     private long coldness;
 
+
     /**
      * Variable storing the hotness of this temperature.
      */
@@ -81,6 +82,8 @@ public class Temperature {
     public Temperature() {
         this(DEFAULT_COLDNESS, DEFAULT_HOTNESS);
     }
+
+
     /**
      * Initialize this new temperature with the given coldness and hotness.
      *
@@ -154,9 +157,9 @@ public class Temperature {
      *
      * temperatureOfIngredient1.heat(50);
      *
-     * // temperatureOfIngredient1 is now [0, 70]
-     * // temperatureOfIngredient2 is still [0, 20]
-     * // standardTemperature is still [0, 20]
+     *  temperatureOfIngredient1 is now [0, 70]
+     *  temperatureOfIngredient2 is still [0, 20]
+     *  standardTemperature is still [0, 20]
      *
      */
     @Raw
@@ -425,7 +428,5 @@ public class Temperature {
     private long getNetTemperature() {
         return getHotness() - getColdness();
     }
-
-
 
 }

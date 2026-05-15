@@ -19,7 +19,7 @@ public enum Operation {
     /**
      * Checks if the operation requires an ingredient in the step
      *
-     * @return if the operation needs a ingredient
+     * @return if the operation needs an ingredient
      *      | this == ADD
      */
     @Basic

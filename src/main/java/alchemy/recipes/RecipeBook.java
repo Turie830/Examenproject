@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * A class for recipe books
  *
- * @invar TODO geen?
+ * @invar Each recipe inside the book must be effective
  *
  * @author Obe Willaert
  * @author Mauro Devolder
@@ -26,7 +26,7 @@ public class RecipeBook {
 
 
     /**
-     * A constructor to create a new recipe book based on a list of recipes
+     * A constructor to create a new empty recipe book
      *
      * @post an empty recipe book is created
      *      | getNbRecipes() == 0

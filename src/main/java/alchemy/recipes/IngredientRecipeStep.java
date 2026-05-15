@@ -81,7 +81,6 @@ public class IngredientRecipeStep extends RecipeStep {
         }
 
         super(operation);
-        // todo: copy needed it's final?
         this.ingredientName = ingredientName;
         this.ingredientQuantity = quantity;
     }

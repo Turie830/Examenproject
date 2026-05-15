@@ -18,8 +18,7 @@ import java.util.TreeSet;
  * @author Arthur Pintelon
  * @version 1.0
  */
-public class Kettle extends MultiContainerDevice {
-    // TODO: make sure the total quantity can't exceed the largest container unit or do we take what fits in it
+public final class Kettle extends MultiContainerDevice {
 
     /**
      * Initialise a new multi container device
@@ -106,8 +105,7 @@ public class Kettle extends MultiContainerDevice {
      * Select the state for the resulting ingredient
      *
      * @param ingredients The ingredients that are mixed
-     * @return the state of the hottest type closest to the default temperature
-     * @return liquid if liquid and powder are tied
+     * @return the state of type closest to the default temperature liquid if liquid and powder are tied
      */
     private State selectResultState(List<AlchemicIngredient> ingredients) {
         long bestDifference = Long.MAX_VALUE;
@@ -172,7 +170,7 @@ public class Kettle extends MultiContainerDevice {
      * @return the different simple names in alphabetical order
      */
     private List<String> getUniqueSimpleNames(List<AlchemicIngredient> ingredients) {
-        // TreeSet: gesorteerde set
+        // TreeSet: sorted set
         Set<String> simpleNames = new TreeSet<String>();
 
         // add every simpleName
@@ -213,7 +211,6 @@ public class Kettle extends MultiContainerDevice {
             return names.get(0) + " and " + names.get(1);
         }
 
-        // so test fails as expected
         return String.join(", ", names.subList(0, names.size() - 1))
                 + " and "
                 + names.getLast();

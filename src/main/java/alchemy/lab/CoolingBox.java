@@ -12,7 +12,7 @@ import be.kuleuven.cs.som.annotate.Raw;
  * @author Arthur Pintelon
  * @version 1.0
  */
-public class CoolingBox extends SingleContainerDevice implements TemperatureDevice {
+public final class CoolingBox extends SingleContainerDevice implements TemperatureDevice {
 
     /**
      * The temperature target of the cooling box

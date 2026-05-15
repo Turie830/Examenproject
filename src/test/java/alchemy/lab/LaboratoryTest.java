@@ -715,7 +715,6 @@ public class LaboratoryTest {
         labo.execute(recipe, 1);
 
         assertTrue(labo.hasIngredient("Water"));
-        // todo fix
         assertEquals("Heated Water", labo.getIngredient("Water").getFullName());
     }
 

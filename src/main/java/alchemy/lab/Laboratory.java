@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * A class for laboratories.
- * <p>
+ *
  * A laboratory has a fixed capacity (in storerooms),
  * stores alchemic ingredients, and has a maximum of one
  * device of every kind. Devices are linked bidirectionally to their
@@ -28,7 +28,7 @@ import java.util.List;
  * @invar The storerooms capacity of every laboratory is positive.
  * | getStorerooms() >= 0
  * @invar Each laboratory has maximum one device of each type.
- * | for each type in Class<? extends Device>:     // ToDo ? invullen OFNIET
+ * | for each type in Class<? extends Device>:
  * |     count(d in getDevices() | d.getClass() == type) <= 1
  * @invar Every device in a laboratory references that laboratory back (bidirectional link).
  * | for each d in getDevices():
@@ -45,23 +45,18 @@ import java.util.List;
 public class Laboratory {
 
     /**
-     * constructors
-     */
-
-    /**
      * Variable storing the storerooms capacity of this laboratory.
      * Final means it is set once in the constructor and never changes.
      */
-    // TODO: see constructor
     private final int storerooms;
 
-    /**
-     * Capacity             ToDo: contoleer op totaal enzo
-     */
+    /**********************************
+     * CAPACITY
+     **********************************/
 
     /**
      * The list of ingredients stored in this laboratory.
-     * <p>
+     *
      * Per simple name there is a maximum of one ingredient in this list.
      * (Because two ingredients with the same name merge into one).
      *
@@ -78,6 +73,8 @@ public class Laboratory {
     public int getStorerooms() {
         return storerooms;
     }
+
+
     /**
      * The devices registered in this laboratory.
      *
@@ -113,9 +110,9 @@ public class Laboratory {
         if (storerooms < 0) {
             throw new IllegalArgumentException("Storerooms cannot be negative");
         }
-        //TODO: why keep this in an int? why not create a new Quantity?
         this.storerooms = storerooms;
     }
+
 
     /**
      * find the smallest container unit for the state of which
@@ -132,7 +129,6 @@ public class Laboratory {
             if (!IngredientContainer.isValidCapacityUnit(u)) continue;
             long cap = u.getFactorToBaseUnit(state);
             if (cap < amountInLowest) continue;
-            // ToDo: iteratielogica? stap is wel juist maar weet niet of na || overbodig is
             if (best == null || cap < best.getFactorToBaseUnit(state)) {
                 best = u;
             }
@@ -161,17 +157,26 @@ public class Laboratory {
     }
 
 
-    // ToDo: is public List<AlchemicIngredient> getIngredients() nodig?
-    // denk het nie, ik zou nog 2 functies toevoegen, getNbIngredients (wordt ook gebruikt in docs) + getIngredientAt
-    // met deze 2 functies zou je ook alle ingredienten kunenn ophalen
+    /**
+     * Get the number of ingredients in the laboratory
+     *
+     * @return The number of ingredients in the laboratory
+     */
+    public int getNbOfIngredients() {
+        return ingredients.size();
+    }
+
 
     /**
+     * Get the amount in spoon fractions
      *
      * @param state The state we want the total in (= LIQUID or POWDER).
+     *
      * @return The sum of the amounts of every ingredient
      * in this laboratory, in the lowest unit.
      * | result ==
      * |   sum of ing.getAmountInLowestUnit() for each ing in getIngredients()
+     *
      * @throws IllegalArgumentException the state must be effective
      *                                  | state == null
      *
@@ -193,7 +198,7 @@ public class Laboratory {
     /**
      * Check if this laboratory has enough capacity to add
      * the given ingredient or not.
-     * <p>
+     *
      * An ingredient can be liquid or powder. hasRoomFor looks at how much is already stored
      * in that state, add the new amount and check that it stays below the capacity.
      *
@@ -241,9 +246,8 @@ public class Laboratory {
 
     /**
      * Store the contents of the given ingredient container in this laboratory.
-     * After this call the container is empty ('container wordt vernietigd'). ToDo: dit juiste interpreattie van vernietigen?
-     * <p>
-     * <p>
+     * After this call the container is empty ('container wordt vernietigd').
+     *
      * The ingredient gets brought to its standard temperaturen using Oven or CoolingBox
      * If an ingredient with the same simple name already exists in this laboratory, merge the two via the Kettle.
      *
@@ -257,9 +261,11 @@ public class Laboratory {
      * @post After this call, the given container is empty.
      * | container.isEmpty()
      * @post The ingredient that was in the container is now stored in this laboratory.
+     *
+     * @post the ingredient container is destroyed
+     *      | container.isDestroyed()
      */
-    public void store(IngredientContainer container)                    // ToDo: check deze pls, ingewikkeld
-            throws IllegalArgumentException, IllegalStateException {
+    public void store(IngredientContainer container) throws IllegalArgumentException, IllegalStateException {
         if (container == null) {
             throw new IllegalArgumentException("Container cannot be null");
         }
@@ -275,13 +281,12 @@ public class Laboratory {
         toStore = bringToStandardTemperature(toStore);
 
         storeNoTempChange(new IngredientContainer(container.getCapacityUnit(), toStore));
-        container.empty();
+        container.emptyDestroy();
     }
 
     /**
      * Store the contents of the given ingredient container in this laboratory.
-     * After this call the container is empty ('container wordt vernietigd'). ToDo: dit juiste interpreattie van vernietigen?
-     * <p>
+     * After this call the container is empty ('container wordt vernietigd').
      * <p>
      * If an ingredient with the same simple name already exists in this laboratory, merge the two via the Kettle.
      *
@@ -296,8 +301,7 @@ public class Laboratory {
      * | container.isEmpty()
      * @post The ingredient that was in the container is now stored in this laboratory.
      */
-    private void storeNoTempChange(IngredientContainer container)
-            throws IllegalArgumentException, IllegalStateException {
+    private void storeNoTempChange(IngredientContainer container) throws IllegalArgumentException, IllegalStateException {
         if (container == null) {
             throw new IllegalArgumentException("Container cannot be null");
         }
@@ -369,8 +373,6 @@ public class Laboratory {
     }
 
 
-    // todo: split throws?
-
     /**
      * Bring the ingredient to the standard temperature using the Oven or CoolingBox
      *
@@ -379,9 +381,10 @@ public class Laboratory {
      * or nothing if the ingredient is already at standard temperature
      * @throws IllegalArgumentException the ingredient should be effective
      *                                  | ingredient == null
-     * @throws IllegalStateException    if the ingredient has to be heated or cooled it must have the respective device for it
+     * @throws IllegalStateException    if the ingredient has to be cooled it must have the cooling box device for it
      *                                  | (needsCooling(ingredient) && !hasDevice(CoolingBox.class))
-     *                                  | || (needsHeating(ingredient) && !hadDevice(Oven.class))
+     * @throws IllegalStateException    if the ingredient has to be  heated it must have the oven device for it
+     *                                  | (needsHeating(ingredient) && !hadDevice(Oven.class))
      */
     private AlchemicIngredient bringToStandardTemperature(AlchemicIngredient ingredient) throws IllegalArgumentException, IllegalStateException {
         if (ingredient == null) {
@@ -436,8 +439,7 @@ public class Laboratory {
      * @post The total stored amount of the matched ingredient
      * has decreased by the requested amount.
      */
-    public IngredientContainer request(String name, Quantity quantity)          // ToDo: controle deze functie: is ie te (overbodig) ingewikkeld?
-            throws IllegalArgumentException {
+    public IngredientContainer request(String name, Quantity quantity) throws IllegalArgumentException {
         if (name == null) {
             throw new IllegalArgumentException("Name cannot be null");
         }
@@ -474,30 +476,30 @@ public class Laboratory {
         // The amount left stays in the laboratory.
         replaceWithRemaining(existing, available - requested, state);
         return result;
-    } // ToDo: controle
+    }
 
-
-    // ToDo: hulpfunctie: moet hier documentatie bij (zie komende 3 fct) ? --> zo ja, vervolledigen ToDo
 
     /**
      * Replace the old ingrediënt with a new version that only now contains the remaining amount.
      * If none of the ingredient is left, remove the ingredient.
      *
-     * @param existing
-     * @param remainingInLowest
-     * @param state
+     * @param existing the ingredient already existing in the laboratory
+     *
+     * @param remaining the amount that will remain in the laboratory
+     *
+     * @param state The state of the existing ingredient
+     *
+     * @post the old ingredient is replaced with a new version that only now contains the remaining amount
      */
-    private void replaceWithRemaining(AlchemicIngredient existing, long remainingInLowest, State state) {
+    private void replaceWithRemaining(AlchemicIngredient existing, long remaining, State state) {
         ingredients.remove(existing);
-        if (remainingInLowest <= 0) {
+        if (remaining <= 0) {
             return;
         }
-        Quantity remainingQty = new Quantity(remainingInLowest, Unit.getBaseUnit(state));
+        Quantity remainingQty = new Quantity(remaining, Unit.getBaseUnit(state));
         ingredients.add(new AlchemicIngredient(existing.getType(), remainingQty));
     }
 
-
-    // todo comment
 
     /**
      * Take the stored amount of the ingredient with the given name out of
@@ -508,8 +510,11 @@ public class Laboratory {
      * amount that can't fit is gone.
      *
      * @param name The name of the ingredient to retrieve, simple or special.
+     *
      * @return A new container holding the ingredient.
+     *
      * @throws IllegalArgumentException The given name is not effective or there is no ingredient with that name.
+     *
      * @post After this call, no ingredient with the same name is still in this lab.
      * | !new.hasIngredient(name)
      */
@@ -518,7 +523,7 @@ public class Laboratory {
         AlchemicIngredient existing = getIngredient(name);
 
         State state = existing.getType().getStandardState();
-        Unit largest = largestContainerUnitFor(state);
+        Unit largest = IngredientContainer.largestContainerUnit(state);
         long containerCapacity = largest.getFactorToBaseUnit(state);
         long available = existing.getAmountInLowestUnit();
         // Math.min takes as the most amount the container can hold, the rest is lost.
@@ -534,30 +539,12 @@ public class Laboratory {
 
     }
 
-// todo comment
 
-    /**
-     * Return the largest valid container unit for the given state.
-     * = BARREL for liquids and CHEST for powders.
-     */
-    private static Unit largestContainerUnitFor(State state) {
-        Unit best = null;
-        for (Unit u : Unit.values()) {
-            if (!u.isValidFor(state)) continue;
-            if (!IngredientContainer.isValidCapacityUnit(u)) continue;
-            if (best == null || u.getFactorToBaseUnit(state) > best.getFactorToBaseUnit(state)) {
-                best = u;
-            }
-        }
-        return best;
-    }
 
 
     /**
      * Devices --> bidirectional
      */
-
-    // todo: @invar with funcs?
 
     /**
      * Return the ingredient in this laboratory whose simple name or
@@ -568,7 +555,6 @@ public class Laboratory {
      *                                  name is in this laboratory.
      *                                  | name == null || !hasIngredient(name)
      */
-    // TODO: kopie maken?
     public AlchemicIngredient getIngredient(String name) throws IllegalArgumentException {
         if (name == null) {
             throw new IllegalArgumentException("Name cannot be null");
@@ -593,16 +579,14 @@ public class Laboratory {
      * This method is called automatically from the Device constructor, so there is a
      * bidirectional link.
      * <p>
-     * Only callable from alchemy.laboratory ToDo: correct? laten staan of weg?
+     * Only callable from alchemy.laboratory.
      *
      * @param device The device to be registered.
      * @throws IllegalArgumentException The given device is not effective or it does not reference this laboratory.
      * @throws IllegalStateException    A device of the same concrete class is already registered in this laboratory.
      * @post The given device is now registered as the device of its kind in this laboratory.
      */
-    // ToDo: packageprivate
-    void registerDevice(Device device)
-            throws IllegalArgumentException, IllegalStateException {
+    void registerDevice(@Raw Device device) throws IllegalArgumentException, IllegalStateException {
         if (device == null) {
             throw new IllegalArgumentException("Device can't be null");
         }
@@ -682,19 +666,19 @@ public class Laboratory {
     }
 
 
-    /**
-     * Recipes
-     */
+    /**********************************
+     * RECIPES
+     **********************************/
 
 
     /**
      * Execute the given recipe in this laboratory the given number of times.
-     * <p>
+     *
      * Walk through the recipe step by step, scale every ingredient
      * by the given factor, and use the devices in this laboratory to
      * heat, cool, mix or add ingredients. The final mixture is stored
      * in the laboratory.
-     * <p>
+     *
      * If at some point there is not enough of an ingredient, the recipe-execution stops.
      * All of the ingredients that were already taken out of the laboratory
      * are converted to standard temperature again and stored back.
@@ -860,7 +844,7 @@ public class Laboratory {
     /**
      * Add all ingredients in the given list to the kettle, run the kettle
      * and return the result-mixture.
-     * <p>
+     *
      * Every ingredient is placed in the smallest container that can fit it
      * before the ingredient is added to the kettle.
      *

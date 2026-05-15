@@ -10,6 +10,9 @@ import be.kuleuven.cs.som.annotate.Raw;
  * @invar The laboratory of each device must be effective.
  *      | getLaboratory() != null
  *
+ * @invar Each device must be registered in its laboratory.
+ *      | getLaboratory().hasAsDevice(this)
+ *
  * @note this class does not contain any ingredient/devicecontent rules/variables
  *      reason: kettle accepts a list, others only accept 1 => liskov
  *
@@ -53,7 +56,6 @@ public abstract class Device {
             throw new IllegalArgumentException("Laboratory object can't be null");
         }
         this.laboratory = laboratory;
-        // todo: @Raw in laboratory?
         laboratory.registerDevice(this);
     }
 
@@ -81,6 +83,9 @@ public abstract class Device {
 
     /**
      * Execute the operation of this device.
+     *
+     * @post the result container is created and not null
+     *      | getResult() != null
      */
     public abstract void execute();
 

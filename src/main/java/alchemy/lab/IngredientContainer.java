@@ -19,12 +19,6 @@ import be.kuleuven.cs.som.annotate.Raw;
  * @invar The capacity unit of each container must be valid.
  *      | isValidCapacityUnit(getCapacityUnit())
  *
- * @note TODO remove (see new version below)? @invar If a container of a certain unit is not empty, the ingredient fits inside.
- *      | isEmpty() ||
- *      |   (getIngredient().getState() == getCapacityUnit().getState()
- *      |   && getIngredient().getQuantity().toLowestUnit()
- *      |       <= getCapacityUnit().getFactorToBaseUnit())
- *
  * @invar If this container is not empty, its ingredient must fit inside.
  *      | isEmpty() || canContain(getCapacityUnit(), getIngredient())
  *
@@ -35,6 +29,36 @@ import be.kuleuven.cs.som.annotate.Raw;
  * @version 1.0
  */
 public class IngredientContainer {
+
+    /**
+     * A variable for storing the destroyed status of this object
+     */
+    Boolean destroyed = false;
+
+
+    /**
+     * Initialize this new ingredient container with the given capacity unit,
+     * with no ingredient ( = empty container).
+     *
+     * @param capacityUnit
+     *        The capacity unit for this new container.
+     *
+     * @effect This new container is initialized with the given capacity unit
+     *         and no ingredient.
+     *       | this(capacityUnit, null)
+     */
+    @Raw
+    public IngredientContainer(Unit capacityUnit) {
+        this(capacityUnit, null);
+    }
+
+
+
+    /**
+     * Variable referencing the capacity unit of this container.
+     */
+    private final Unit capacityUnit;
+
 
 /**
  * Initialize this ingredientcontainer with a unit's capacity
@@ -62,52 +86,72 @@ public class IngredientContainer {
  *       | ingredient != null && !canContain(capacityUnit, ingredient)
  */
     @Raw
-    public IngredientContainer(Unit capacityUnit, AlchemicIngredient ingredient) {
+    public IngredientContainer(Unit capacityUnit, AlchemicIngredient ingredient) throws IllegalArgumentException {
         if (!isValidCapacityUnit(capacityUnit))
             throw new IllegalArgumentException("Invalid container capacity unit");
         if (ingredient != null && !canContain(capacityUnit, ingredient)) {
             throw new IllegalArgumentException("Ingredient doesn't fit in the container");
         }
 
-        // todo shouldn't we create a copy of the ingredient, capacity?
         this.capacityUnit = capacityUnit;
         this.ingredient = ingredient;
     }
 
-
     /**
-     * Initialize this new ingredient container with the given capacity unit,
-     * with no ingredient ( = empty container).
+     * Check whether the given capacity unit can contain the given ingredient.
+     *
+     * A capacity unit can contain an ingredient if both the capacity unit and the
+     * ingredient's quantity unit are valid for the ingredient's standard state,
+     * and if the ingredient's amount in the lowest unit is less than or equal to
+     * the capacity of the given unit.
      *
      * @param capacityUnit
-     *        The capacity unit for this new container.
+     *        The unit representing the capacity of the container.
      *
-     * @effect This new container is initialized with the given capacity unit
-     *         and no ingredient.
-     *       | this(capacityUnit, null)
-     */
-    @Raw
-    public IngredientContainer(Unit capacityUnit) {
-        this(capacityUnit, null);
-    }
-
-
-
-    /**
-     * Variable referencing the capacity unit of this container.
-     */
-    private final Unit capacityUnit;
-
-
-    /**
-     * Return the capacity unit of this container.
+     * @param ingredient
+     *        The ingredient that should be put in the container.
      *
-     * @return The unit that this container has to define the capacity.
-     *       | result == this.capacityUnit
+     * @return False if the given capacity unit is not effective.
+     *       | if (capacityUnit == null) then result == false
+     *
+     * @return False if the given ingredient is not effective.
+     *       | if (ingredient == null) then result == false
+     *
+     * @return False if the given capacity unit is not valid for the standard state
+     *         of the given ingredient.
+     *       | if (capacityUnit != null && ingredient != null
+     *       |     && !capacityUnit.isValidFor(ingredient.getState()())) then
+     *       |   result == false
+     *
+     * @return False if the quantity unit of the given ingredient is not valid for
+     *         the standard state of the given ingredient.
+     *       | if (capacityUnit != null && ingredient != null
+     *       |     && !ingredient.getQuantity().getUnit().isValidFor(ingredient.getState()())) then
+     *       |   result == false
+     *
+     * @return True if and only if the ingredient fits in the given capacity unit.
+     *       | result ==
+     *       |   capacityUnit != null
+     *       |   && ingredient != null
+     *       |   && capacityUnit.isValidFor(ingredient.getState())
+     *       |   && ingredient.getQuantity().getUnit().isValidFor(ingredient.getState()())
+     *       |   && ingredient.getQuantity().toLowestUnit(ingredient.getState()())
+     *       |      <= capacityUnit.getFactorToBaseUnit(ingredient.getState()())
      */
-    @Basic @Immutable
-    public Unit getCapacityUnit() {
-        return capacityUnit;
+    public static boolean canContain(Unit capacityUnit, AlchemicIngredient ingredient) {
+        // don't check destroyed status since a new container is never destroyed
+        if (capacityUnit == null || ingredient == null)
+            return false;
+
+        State state = ingredient.getState();
+
+        if (!capacityUnit.isValidFor(state)) {
+            return false;
+        }
+        if (!ingredient.getQuantity().getUnit().isValidFor(state)) {
+            return false;
+        }
+        return ingredient.getQuantity().toLowestUnit(state) <= capacityUnit.getFactorToBaseUnit(state);
     }
 
 
@@ -137,45 +181,34 @@ public class IngredientContainer {
                 && unit != Unit.STOREROOM;
     }
 
+    /**
+     * Get the largest unit allowed for ingredient containers
+     *
+     * @param state The state for the unit
+     * @return the largest unit allowed in an ingredient container depending on the state,
+     * or null if the state is not known
+     */
+    public static Unit largestContainerUnit(State state) {
+        Unit best = null;
+        for (Unit u : Unit.values()) {
+            if (!u.isValidFor(state)) continue;
+            if (!IngredientContainer.isValidCapacityUnit(u)) continue;
+            if (best == null || u.getFactorToBaseUnit(state) > best.getFactorToBaseUnit(state)) {
+                best = u;
+            }
+        }
+        return best;
+    }
 
     /**
-     * Check if the given ingredient can be stored in a container
-     * with the given capacity unit.
+     * Give the capacity unit of this container.
      *
-     * An ingredient fits if its state matches the capacity unit's state,
-     * and its quantity is not bigger than the capacity.
-     *
-     * @param capacityUnit
-     *        The capacity unit to check against.
-     *
-     * @param ingredient
-     *        The ingredient to check.
-     *
-     * @return True if the ingredient's state matches the unit's state
-     *         and the ingredient's quantity is less then or equal to one unit of capacity.
-     *       | result ==
-     *       |   ingredient.getState() == capacityUnit.getState()
-     *       |   && ingredient.getQuantity().toLowestUnit()
-     *       |       <= capacityUnit.getFactorToBaseUnit()
+     * @return The unit that this container has to define the capacity.
+     *       | result == this.capacityUnit
      */
-    // TODO: behoud static, maar maak ook een niet static variant om te kijken als het er bij kan
-    // Todo: je moet ook kunnen vullen
-    public static boolean canContain(Unit capacityUnit, AlchemicIngredient ingredient) {
-        if (capacityUnit == null || ingredient == null)
-            return false; // ToDo: is dit goed zo? of exception throwen beter?
-
-        // todo check isValidCapacityUnit()
-
-
-        State state = ingredient.getType().getStandardState();
-
-        if (!capacityUnit.isValidFor(state)) {
-            return false;
-        }
-        if (!ingredient.getQuantity().getUnit().isValidFor(state)) {
-            return false;
-        }
-        return ingredient.getQuantity().toLowestUnit(state) <= capacityUnit.getFactorToBaseUnit(state);
+    @Basic @Immutable
+    public Unit getCapacityUnit() {
+        return capacityUnit;
     }
 
 
@@ -208,6 +241,52 @@ public class IngredientContainer {
         return ingredient == null;
     }
 
+    /**
+     * Check if the given ingredient can be stored in a container
+     * with the given capacity unit.
+     * <p>
+     * An ingredient fits if its state matches the capacity unit's state,
+     * and its quantity is not bigger than the capacity.
+     *
+     * @param capacityUnit The capacity unit to check against.
+     * @param ingredient   The ingredient to check.
+     * @return True if the given ingredient can be added to this container
+     * without exceeding the capacity.
+     * | result ==
+     * |   capacityUnit != null
+     * |   && ingredient != null
+     * |   && !isDestroyed()
+     * |   && ingredient.getType() == getIngredient().getType()
+     * |   && capacityUnit.isValidFor(ingredient.getState())
+     * |   && ingredient.getQuantity().getUnit().isValidFor(ingredient.getState())
+     * |   && ingredient.getQuantity().toLowestUnit(ingredient.getState())
+     * |      + getIngredient().getQuantity().toLowestUnit(ingredient.getState())
+     * |      <= capacityUnit.getFactorToBaseUnit(ingredient.getState())
+     * @note this function might be useful for later implementation,
+     * for example to add ingredients into an already existing, not yet destroyed container
+     */
+    public boolean fitsIn(Unit capacityUnit, AlchemicIngredient ingredient) {
+        if (capacityUnit == null || ingredient == null || isDestroyed())
+            return false;
+
+        // state, temperature, standard temperature needs to be the same
+        if (ingredient.getType() != getIngredient().getType()) {
+            return false;
+        }
+
+        State state = ingredient.getState();
+
+        if (!capacityUnit.isValidFor(state)) {
+            return false;
+        }
+        if (!ingredient.getQuantity().getUnit().isValidFor(state)) {
+            return false;
+        }
+
+        long newTotal = ingredient.getQuantity().toLowestUnit(state) + getIngredient().getQuantity().toLowestUnit(state);
+
+        return newTotal <= capacityUnit.getFactorToBaseUnit(state);
+    }
 
     /**
      * Empty this container by removing the ingredient it contains.
@@ -216,23 +295,31 @@ public class IngredientContainer {
      * @post This container is empty after this call.
      *     | new.isEmpty()
      */
-    // ToDo: mag public zijn? of niet?
-    public void empty() {
+    protected void empty() {
         this.ingredient = null;
     }
 
+    /**
+     * Empty the container and destroy it
+     *
+     * @post this container is empty after this call
+     *      | new.isEmpty()
+     *
+     * @post this container is destroyed
+     *      | new.isDestroyed()
+     */
+    protected void emptyDestroy() {
+        empty();
+        this.destroyed = true;
+    }
 
     /**
-     * Get the largest unit allowed for ingredient containers
+     * Get the destroyed status of this object
      *
-     * @param state The state for the unit
-     * @return the largest unit allowed in an ingredient container depending on the state,
-     * or null if the state is not known
+     * @return true if it's destroyed else false
      */
-    public static Unit largestContainerUnit(State state) {
-        if (state == State.LIQUID) return Unit.BARREL;
-        else if (state == State.POWDER) return Unit.CHEST;
-        else return null;
+    public boolean isDestroyed() {
+        return destroyed;
     }
 
 
