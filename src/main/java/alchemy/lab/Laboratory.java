@@ -188,7 +188,7 @@ public class Laboratory {
 
         double total = 0L;
         for (AlchemicIngredient ing : ingredients) {
-            if (ing.getType().getStandardState() == state) {
+            if (ing.getState() == state) {
                 total += ing.getAmountInSpoonFractions();
             }
         }
@@ -208,15 +208,15 @@ public class Laboratory {
      * @return True if (currently used) + (new amount) is less then or equal to the capacity.
      * everything is calculated in the lowest unit for the ingredient's state.
      * | result ==
-     * |   (getUsedAmountInLowestUnit(ingredient.getType().getStandardState())
+     * |   (getUsedAmountInLowestUnit(ingredient.getState())
      * |    + ingredient.getAmountInLowestUnit())
-     * |   <= getCapacityInLowestUnit(ingredient.getType().getStandardState())
+     * |   <= getCapacityInLowestUnit(ingredient.getState())
      */
     public boolean hasRoomFor(AlchemicIngredient ingredient) {
         if (ingredient == null) {
             return false;
         }
-        State state = ingredient.getType().getStandardState();
+        State state = ingredient.getState();
 
         double used = getUsedAmountInSpoonFractions(state);
         double extra = ingredient.getAmountInSpoonFractions();
@@ -450,7 +450,7 @@ public class Laboratory {
         // getIngredient throws IllegalArgumentException if there is no ingredient as in request()
         AlchemicIngredient existing = getIngredient(name);
 
-        State state = existing.getType().getStandardState();
+        State state = existing.getState();
         // The requested unit must be valid for the ingredient's state.
         if (!quantity.getUnit().isValidFor(state)) {
             throw new IllegalArgumentException(
@@ -522,7 +522,7 @@ public class Laboratory {
 
         AlchemicIngredient existing = getIngredient(name);
 
-        State state = existing.getType().getStandardState();
+        State state = existing.getState();
         Unit largest = IngredientContainer.largestContainerUnit(state);
         long containerCapacity = largest.getFactorToBaseUnit(state);
         long available = existing.getAmountInLowestUnit();
@@ -771,7 +771,7 @@ public class Laboratory {
      * @pre There is an Oven in this laboratory (hasDevice(Oven.class) == true).
      */
     private AlchemicIngredient heatBy(AlchemicIngredient ingredient, long amount) {
-        State state = ingredient.getType().getStandardState();
+        State state = ingredient.getState();
         // Ingredient in container before putting it in the Oven
         Unit containerUnit = smallestContainerUnitFor(ingredient.getAmountInLowestUnit(), state);
         IngredientContainer container = new IngredientContainer(containerUnit, ingredient);
@@ -815,7 +815,7 @@ public class Laboratory {
      * @pre There is a CoolingBox in this laboratory (hasDevice(CoolingBox.class) == true).
      */
     private AlchemicIngredient coolBy(AlchemicIngredient ingredient, long amount) {
-        State state = ingredient.getType().getStandardState();
+        State state = ingredient.getState();
         Unit containerUnit = smallestContainerUnitFor(ingredient.getAmountInLowestUnit(), state);
         IngredientContainer container = new IngredientContainer(containerUnit, ingredient);
 
@@ -862,7 +862,7 @@ public class Laboratory {
 
         Kettle kettle = getDevice(Kettle.class);
         for (AlchemicIngredient ing : toMix) {
-            State state = ing.getType().getStandardState();
+            State state = ing.getState();
             Unit containerUnit = smallestContainerUnitFor(ing.getAmountInLowestUnit(), state);
             kettle.add(new IngredientContainer(containerUnit, ing));
         }
@@ -885,7 +885,7 @@ public class Laboratory {
      */
     private void storeBackAll(List<AlchemicIngredient> remaining) {
         for (AlchemicIngredient ing : remaining) {
-            State state = ing.getType().getStandardState();
+            State state = ing.getState();
             Unit containerUnit = smallestContainerUnitFor(ing.getAmountInLowestUnit(), state);
             storeNoTempChange(new IngredientContainer(containerUnit, ing));
 
@@ -907,7 +907,7 @@ public class Laboratory {
      */
     private void storeBackAllRestoreTemp(List<AlchemicIngredient> remaining) {
         for (AlchemicIngredient ing : remaining) {
-            State state = ing.getType().getStandardState();
+            State state = ing.getState();
             Unit containerUnit = smallestContainerUnitFor(ing.getAmountInLowestUnit(), state);
             store(new IngredientContainer(containerUnit, ing));
         }
